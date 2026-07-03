@@ -1,0 +1,36 @@
+package com.humanin.planpaz.model;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+//anotações do JPA
+@Entity
+@Table(name = "post")
+//anotações do Lombok
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+
+public class Post {
+	// campos da tabela
+	@Id
+	@GeneratedValue(strategy = GenerationType.UUID)
+	private UUID id;
+	private UUID authorId;
+	private LocalDateTime postedAT;
+	private String title;
+	private String content;
+	private String mediaPath;
+
+}
