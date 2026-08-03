@@ -117,7 +117,7 @@ public class User {
 
 	public void setGender(int gender) {
 		this.gender = gender;
-	}
+	}	
 
 	public int getCountryId() {
 		return countryId;
