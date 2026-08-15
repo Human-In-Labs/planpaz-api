@@ -31,7 +31,7 @@ public class PlantService {
 	}
 
 	public boolean editarPlanta(Plant planta) {
-
+//optional pq pode existir uma planta ou nenhuma
 		Optional<Plant> plantaOptional = plantRepository.findById(planta.getId());
 
 		if (plantaOptional.isEmpty()) {
@@ -67,6 +67,14 @@ public class PlantService {
 
 		plantRepository.deleteById(idPlanta);
 		return true;
+	}
+
+	public Plant buscarPorId(UUID id) {
+
+	    return plantRepository.findById(id)
+	            .orElseThrow(() ->
+	                new RuntimeException("Planta não encontrada.")
+	            );
 	}
 
 }

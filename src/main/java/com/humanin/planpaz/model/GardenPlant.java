@@ -21,8 +21,7 @@ import lombok.NoArgsConstructor;
 //@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class GardenPlant {
-
+public class GardenPlant extends Plant {
 	// campos da tabela
 	@Id
 	@GeneratedValue(strategy = GenerationType.UUID)

@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,12 +31,25 @@ public class AuthController {
 	
 	@PostMapping("/login")
 	public ResponseEntity<ResponseDTO> login(@RequestBody LoginRequestDTO body) {
+		
+		System.out.println("========== LOGIN CHEGOU NO CONTROLLER ==========");
+		System.out.println("EMAIL RECEBIDO: " + body.email());
+		
 		User user = this.repository.findByEmail(body.email()).orElseThrow(() -> new RuntimeException("User not found"));  // aprender a tratar as exceções melhor
 		System.out.println("[WARN] Tentativa de login no usuário " + user.getEmail() + ".");
 		if (passwordEncoder.matches(body.password(), user.getPassword())) {
-			System.out.println("[SUCESS] Senha autenticada com sucesso.");
-			String token = this.tokenService.generateToken(user);
-			return ResponseEntity.ok(new ResponseDTO(user.getName(), token));
+
+		    System.out.println("[SUCESS] Senha autenticada com sucesso.");
+		    System.out.println("EMAIL: " + user.getEmail());
+		    System.out.println("ID: " + user.getId());
+
+		    String token = this.tokenService.generateToken(user);
+
+		    System.out.println("TOKEN GERADO COM SUCESSO");
+
+		    return ResponseEntity.ok(
+		        new ResponseDTO(user.getName(), token)
+		    );
 		}
 		System.out.println("[ERROR] As senhas não batem.");
 		return ResponseEntity.badRequest().build();

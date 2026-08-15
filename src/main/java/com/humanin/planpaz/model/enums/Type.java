@@ -1,5 +1,5 @@
 package com.humanin.planpaz.model.enums;
 
 public enum Type {
-	edible, aromatic, other
+	EDIBLE, AROMATIC, OTHER
 }

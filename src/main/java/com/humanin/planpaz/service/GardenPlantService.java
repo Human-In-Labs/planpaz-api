@@ -13,62 +13,38 @@ import com.humanin.planpaz.repositories.GardenPlantRepository;
 
 @Service
 public class GardenPlantService {
+
 	@Autowired
 	private GardenPlantRepository gardenPlantRepository;
 
-	public boolean adicionarPlanta(GardenPlant gardenPlant) {
+	// ADICIONAR
 
+	public boolean adicionarPlanta(GardenPlant gardenPlant) {
+		
 		gardenPlant.setPlantedAt(LocalDate.now());
 		gardenPlant.setLastWatering(LocalDate.now());
 
 		if (gardenPlantRepository.existsByOwnerIdAndNickNameIgnoreCase(gardenPlant.getOwner().getId(),
 				gardenPlant.getNickName())) {
+
 			return false;
 		}
 
 		gardenPlantRepository.save(gardenPlant);
+
 		return true;
 	}
 
+	// LISTAR
+
 	public List<GardenPlant> listarPorUsuario(UUID ownerId) {
+ 
 		return gardenPlantRepository.findByOwnerId(ownerId);
 	}
 
-	public boolean editar(GardenPlant gardenPlant) {
+	// EDITAR
 
-		Optional<GardenPlant> optional = gardenPlantRepository.findById(gardenPlant.getId());
-
-		if (optional.isEmpty()) {
-			return false;
-		}
-
-		if (gardenPlantRepository.existsByOwnerIdAndNickNameIgnoreCaseAndIdNot(gardenPlant.getOwner().getId(),
-				gardenPlant.getNickName(), gardenPlant.getId())) {
-			return false;
-		}
-
-		GardenPlant planta = optional.get();
-
-		planta.setNickName(gardenPlant.getNickName());
-		planta.setLastWatering(gardenPlant.getLastWatering());
-		planta.setStage(gardenPlant.getStage());
-
-		gardenPlantRepository.save(planta);
-
-		return true;
-	}
-
-	public boolean excluirPlanta(UUID id) {
-
-		if (!gardenPlantRepository.existsById(id)) {
-			return false;
-		}
-
-		gardenPlantRepository.deleteById(id);
-		return true;
-	}
-
-	public boolean registrarRega(UUID id) {
+	public boolean editar(UUID id, UUID ownerId, GardenPlant gardenPlant) {
 
 		Optional<GardenPlant> optional = gardenPlantRepository.findById(id);
 
@@ -77,11 +53,74 @@ public class GardenPlantService {
 		}
 
 		GardenPlant planta = optional.get();
-		planta.setLastWatering(LocalDate.now());
+
+		// Impede editar planta de outro usuário
+		if (!planta.getOwner().getId().equals(ownerId)) {
+			return false;
+		}
+
+		// Verifica apelido duplicado
+		if (gardenPlantRepository.existsByOwnerIdAndNickNameIgnoreCaseAndIdNot(ownerId, gardenPlant.getNickName(),
+				id)) {
+
+			return false;
+		}
+
+		planta.setNickName(gardenPlant.getNickName());
+		planta.setStage(gardenPlant.getStage());
+
+		if (gardenPlant.getLastWatering() != null) {
+			planta.setLastWatering(gardenPlant.getLastWatering());
+		}
 
 		gardenPlantRepository.save(planta);
 
 		return true;
 	}
 
+	// EXCLUIR
+
+	public boolean excluirPlanta(UUID id, UUID ownerId) {
+
+		Optional<GardenPlant> optional = gardenPlantRepository.findById(id);
+
+		if (optional.isEmpty()) {
+			return false;
+		}
+
+		GardenPlant planta = optional.get();
+
+		// Não permite excluir planta de outro usuário
+		if (!planta.getOwner().getId().equals(ownerId)) {
+			return false;
+		}
+
+		gardenPlantRepository.delete(planta);
+
+		return true;
+	}
+
+	// REGAR
+
+	public boolean registrarRega(UUID id, UUID ownerId) {
+
+		Optional<GardenPlant> optional = gardenPlantRepository.findById(id);
+
+		if (optional.isEmpty()) {
+			return false;
+		}
+
+		GardenPlant planta = optional.get();
+
+		// Não permite regar planta de outro usuário
+		if (!planta.getOwner().getId().equals(ownerId)) {
+			return false;
+		}
+
+		planta.setLastWatering(LocalDate.now());
+
+		gardenPlantRepository.save(planta);
+
+		return true;
+	}
 }

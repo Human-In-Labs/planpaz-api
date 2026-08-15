@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.humanin.planpaz.model.GardenPlant;
 
 public interface GardenPlantRepository extends JpaRepository<GardenPlant, UUID> {
+
 	List<GardenPlant> findByOwnerId(UUID ownerId);
 
 	boolean existsByOwnerIdAndNickNameIgnoreCase(UUID ownerId, String nickName);

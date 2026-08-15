@@ -63,5 +63,14 @@ public class PlantController {
 
 		return ResponseEntity.ok("Planta deletada com sucesso.");
 	}
+	
+	
+	@GetMapping("/{id}")
+	public ResponseEntity<Plant> buscarPorId(@PathVariable UUID id) {
+
+	    Plant plant = plantService.buscarPorId(id);
+
+	    return ResponseEntity.ok(plant);
+	}
 
 }

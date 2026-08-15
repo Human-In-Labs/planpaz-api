@@ -31,4 +31,5 @@ public class PlantsStages {
 	private int days;
 	private String description;
 	private String imagePath;
+	
 }
