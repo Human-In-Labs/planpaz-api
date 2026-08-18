@@ -35,6 +35,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/clima").permitAll() //PARA TESTES
+                        .requestMatchers("/error").permitAll() // <--- PARA TESTES
                         .anyRequest().authenticated() // todas as outras endpoints
                 )
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class);  // aplica o filtro antes de passar a requisição pro controller

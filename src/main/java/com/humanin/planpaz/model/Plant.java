@@ -16,8 +16,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 
 //anotações do JPA
 @Entity
@@ -25,9 +23,6 @@ import lombok.NoArgsConstructor;
 //anotações do Lombok
 //@Getter
 //@Setter
-@AllArgsConstructor
-@NoArgsConstructor
-
 public class Plant {
 
 	// campos da tabela

@@ -3,6 +3,7 @@ package com.humanin.planpaz.model;
 import java.time.LocalDate;
 import java.util.UUID;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -10,34 +11,33 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 
-//anotações do JPA
 @Entity
 @Table(name = "garden_plant")
-//anotações do Lombok
-//@Getter
-//@Setter
-@AllArgsConstructor
-@NoArgsConstructor
-public class GardenPlant extends Plant {
-	// campos da tabela
+public class GardenPlant {
+
 	@Id
-	@GeneratedValue(strategy = GenerationType.UUID)
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	private UUID id;
 
-	@ManyToOne
-	@JoinColumn(name = "owner_id") /// chave estrangeira para o usuario
-	private User owner;
-	@ManyToOne
-	@JoinColumn(name = "plant_id") // chave estrangeira para a planta do catalogo
-	private Plant plant;
-
+	@Column(name = "nick_name")
 	private String nickName;
+
+	@Column(name = "last_watering")
+	private LocalDate lastWatering;
+
+	@Column(name = "planted_at")
 	private LocalDate plantedAt;
-	private int stage;
-	private LocalDate lastWatering; // adicionei isso pq precisamos saber quando foi a ulti,a rega
+
+	private Integer stage;
+
+	@ManyToOne
+	@JoinColumn(name = "owner_id")
+	private User owner;
+
+	@ManyToOne
+	@JoinColumn(name = "plant_id")
+	private Plant plant;
 
 	public UUID getId() {
 		return id;
@@ -45,6 +45,38 @@ public class GardenPlant extends Plant {
 
 	public void setId(UUID id) {
 		this.id = id;
+	}
+
+	public String getNickName() {
+		return nickName;
+	}
+
+	public void setNickName(String nickName) {
+		this.nickName = nickName;
+	}
+
+	public LocalDate getLastWatering() {
+		return lastWatering;
+	}
+
+	public void setLastWatering(LocalDate lastWatering) {
+		this.lastWatering = lastWatering;
+	}
+
+	public LocalDate getPlantedAt() {
+		return plantedAt;
+	}
+
+	public void setPlantedAt(LocalDate plantedAt) {
+		this.plantedAt = plantedAt;
+	}
+
+	public Integer getStage() {
+		return stage;
+	}
+
+	public void setStage(Integer stage) {
+		this.stage = stage;
 	}
 
 	public User getOwner() {
@@ -61,38 +93,6 @@ public class GardenPlant extends Plant {
 
 	public void setPlant(Plant plant) {
 		this.plant = plant;
-	}
-
-	public String getNickName() {
-		return nickName;
-	}
-
-	public void setNickName(String plantNickName) {
-		this.nickName = plantNickName;
-	}
-
-	public LocalDate getPlantedAt() {
-		return plantedAt;
-	}
-
-	public void setPlantedAt(LocalDate plantedAt) {
-		this.plantedAt = plantedAt;
-	}
-
-	public int getStage() {
-		return stage;
-	}
-
-	public void setStage(int stage) {
-		this.stage = stage;
-	}
-
-	public LocalDate getLastWatering() {
-		return lastWatering;
-	}
-
-	public void setLastWatering(LocalDate lastWatering) {
-		this.lastWatering = lastWatering;
 	}
 
 }

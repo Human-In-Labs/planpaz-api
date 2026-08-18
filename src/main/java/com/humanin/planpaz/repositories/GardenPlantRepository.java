@@ -1,6 +1,7 @@
 package com.humanin.planpaz.repositories;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,4 +15,6 @@ public interface GardenPlantRepository extends JpaRepository<GardenPlant, UUID> 
 	boolean existsByOwnerIdAndNickNameIgnoreCase(UUID ownerId, String nickName);
 
 	boolean existsByOwnerIdAndNickNameIgnoreCaseAndIdNot(UUID ownerId, String nickName, UUID id);
+
+	Optional<GardenPlant> findByIdAndOwnerId(UUID id, UUID ownerId);
 }
