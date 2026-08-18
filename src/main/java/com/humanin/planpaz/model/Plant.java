@@ -2,6 +2,7 @@ package com.humanin.planpaz.model;
 
 import java.util.UUID;
 
+import com.humanin.planpaz.model.enums.ExperienceLevel;
 import com.humanin.planpaz.model.enums.LuminosityLevel;
 import com.humanin.planpaz.model.enums.Size;
 import com.humanin.planpaz.model.enums.TemperatureLevel;
@@ -44,6 +45,8 @@ public class Plant {
 	@Enumerated(EnumType.STRING)
 	private Type type;
 	private String imagePath;
+	@Enumerated(EnumType.STRING)
+	private ExperienceLevel experienceLevel;
 
 	public UUID getId() {
 		return id;
