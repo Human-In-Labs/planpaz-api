@@ -15,13 +15,22 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "garden_plant")
 public class GardenPlant {
-
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.UUID)
 	private UUID id;
 
-	@Column(name = "nick_name")
-	private String nickName;
+	@Column(name = "nickname")
+	private String nickname;
+
+	private String imagePath;
+
+	public String getImagePath() {
+		return imagePath;
+	}
+
+	public void setImagePath(String imagePath) {
+		this.imagePath = imagePath;
+	}
 
 	@Column(name = "last_watering")
 	private LocalDate lastWatering;
@@ -29,7 +38,7 @@ public class GardenPlant {
 	@Column(name = "planted_at")
 	private LocalDate plantedAt;
 
-	private Integer stage;
+	private int stage;
 
 	@ManyToOne
 	@JoinColumn(name = "owner_id")
@@ -47,12 +56,12 @@ public class GardenPlant {
 		this.id = id;
 	}
 
-	public String getNickName() {
-		return nickName;
+	public String getNickname() {
+		return nickname;
 	}
 
-	public void setNickName(String nickName) {
-		this.nickName = nickName;
+	public void setNickname(String nickname) {
+		this.nickname = nickname;
 	}
 
 	public LocalDate getLastWatering() {
@@ -75,7 +84,7 @@ public class GardenPlant {
 		return stage;
 	}
 
-	public void setStage(Integer stage) {
+	public void setStage(int stage) {
 		this.stage = stage;
 	}
 

@@ -2,14 +2,14 @@ package com.humanin.planpaz.controller;
 
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.humanin.planpaz.dto.LoginRequestDTO;
 import com.humanin.planpaz.dto.RegisterRequestDTO;
@@ -35,7 +35,9 @@ public class AuthController {
 		System.out.println("========== LOGIN CHEGOU NO CONTROLLER ==========");
 		System.out.println("EMAIL RECEBIDO: " + body.email());
 		
-		User user = this.repository.findByEmail(body.email()).orElseThrow(() -> new RuntimeException("User not found"));  // aprender a tratar as exceções melhor
+		User user = this.repository.findByEmail(body.email())
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+		
 		System.out.println("[WARN] Tentativa de login no usuário " + user.getEmail() + ".");
 		if (passwordEncoder.matches(body.password(), user.getPassword())) {
 

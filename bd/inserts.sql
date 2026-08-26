@@ -4,7 +4,7 @@ DELETE FROM public.plant;
 
 -- Inserção do catálogo completo
 INSERT INTO public.plant (
-    id, description, image, luminosity_level, name, scientific_name, size, temperature_level, type, watering_level, experience_level
+    id, description, image_path, luminosity_level, name, scientific_name, size, temperature_level, type, watering_level, experience_level
 ) VALUES 
 (gen_random_uuid(), 'Planta ornamental de fácil cultivo e folhagem marcante.', NULL, 'MEDIUM', 'Jibóia', 'Epipremnum aureum', 'MEDIUM', 'MEDIUM', 'OTHER', 'WEEKLY', 'BEGINNER'),
 (gen_random_uuid(), 'Erva aromática muito utilizada na culinária.', NULL, 'INTENSE', 'Manjericão', 'Ocimum basilicum', 'SMALL', 'HIGH', 'AROMATIC', 'DAILY', 'INTERMEDIATE'),

@@ -3,16 +3,16 @@ package com.humanin.planpaz.service;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
-@Service
-public class EmailService {
+import lombok.RequiredArgsConstructor;
 
-	@Autowired
-	private JavaMailSender mailSender;
+@Service
+@RequiredArgsConstructor
+public class EmailService {
+	private final JavaMailSender mailSender;
 
 	// Lista de frases motivacionais e reflexivas
 	private final List<String> frasesMotivacionais = List.of(

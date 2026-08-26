@@ -1,6 +1,5 @@
 package com.humanin.planpaz.infra.security;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -15,15 +14,15 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import lombok.RequiredArgsConstructor;
+
 @Configuration  // classes de configuração são carregadas antes de tudo
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
 
-    @Autowired
-    private CustomUserDetailsService userDetailsService;
-
-    @Autowired
-    SecurityFilter securityFilter;
+    // private final CustomUserDetailsService userDetailsService;
+    private final SecurityFilter securityFilter;
     
     // por padrão, o Spring Security bloqueia todos os endpoints da aplicação, e nessa função nós estamos liberando o /login e /register
     @Bean
@@ -35,6 +34,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/test", "/test.html").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/clima").permitAll() //PARA TESTES
                         .requestMatchers("/error").permitAll() // <--- PARA TESTES
                         .anyRequest().authenticated() // todas as outras endpoints
@@ -43,7 +43,7 @@ public class SecurityConfig {
         return http.build();
     }
 
-    @Bean  // TODO: ESTUDAR O QUE É ISSO
+    @Bean  
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }

@@ -12,9 +12,9 @@ public interface GardenPlantRepository extends JpaRepository<GardenPlant, UUID> 
 
 	List<GardenPlant> findByOwnerId(UUID ownerId);
 
-	boolean existsByOwnerIdAndNickNameIgnoreCase(UUID ownerId, String nickName);
+	boolean existsByOwnerIdAndNicknameIgnoreCase(UUID ownerId, String nickname);
 
-	boolean existsByOwnerIdAndNickNameIgnoreCaseAndIdNot(UUID ownerId, String nickName, UUID id);
+	boolean existsByOwnerIdAndNicknameIgnoreCaseAndIdNot(UUID ownerId, String nickname, UUID id);
 
 	Optional<GardenPlant> findByIdAndOwnerId(UUID id, UUID ownerId);
 }

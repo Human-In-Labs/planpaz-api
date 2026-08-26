@@ -9,7 +9,6 @@ import com.humanin.planpaz.model.enums.TemperatureLevel;
 import com.humanin.planpaz.model.enums.Type;
 import com.humanin.planpaz.model.enums.WateringLevel;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -25,26 +24,32 @@ import jakarta.persistence.Table;
 //@Getter
 //@Setter
 public class Plant {
-
 	// campos da tabela
 	@Id
 	@GeneratedValue(strategy = GenerationType.UUID)
 	private UUID id;
-	@Column(unique = true)
+
 	private String name;
 	private String scientificName;
 	private String description;
+
 	@Enumerated(EnumType.STRING)
 	private WateringLevel wateringLevel;
+
 	@Enumerated(EnumType.STRING)
 	private LuminosityLevel luminosityLevel;
+
 	@Enumerated(EnumType.STRING)
 	private TemperatureLevel temperatureLevel;
+
 	@Enumerated(EnumType.STRING)
 	private Size size;
+
 	@Enumerated(EnumType.STRING)
 	private Type type;
+
 	private String imagePath;
+
 	@Enumerated(EnumType.STRING)
 	private ExperienceLevel experienceLevel;
 

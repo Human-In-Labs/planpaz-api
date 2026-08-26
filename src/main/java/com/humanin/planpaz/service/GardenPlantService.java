@@ -5,20 +5,19 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.humanin.planpaz.model.GardenPlant;
 import com.humanin.planpaz.repositories.GardenPlantRepository;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class GardenPlantService {
 
-	@Autowired
-	private GardenPlantRepository gardenPlantRepository;
-
-	@Autowired
-	private EmailService emailService;
+	private final GardenPlantRepository gardenPlantRepository;
+	private final EmailService emailService;
 
 	// email
 	public String verificarEEnviarStatusRega(UUID gardenPlantId, String cidade) {
@@ -31,7 +30,7 @@ public class GardenPlantService {
 
 		// 3. Pegar o e-mail do dono da horta
 		String emailUsuario = gardenPlant.getOwner().getEmail();
-		String nomePlanta = gardenPlant.getNickName();
+		String nomePlanta = gardenPlant.getNickname();
 
 		// 4. Disparar o e-mail
 		emailService.enviarAlertaRega(emailUsuario, nomePlanta, statusRega);
@@ -51,8 +50,8 @@ public class GardenPlantService {
 		gardenPlant.setPlantedAt(LocalDate.now());
 		gardenPlant.setLastWatering(LocalDate.now());
 
-		if (gardenPlantRepository.existsByOwnerIdAndNickNameIgnoreCase(gardenPlant.getOwner().getId(),
-				gardenPlant.getNickName())) {
+		if (gardenPlantRepository.existsByOwnerIdAndNicknameIgnoreCase(gardenPlant.getOwner().getId(),
+				gardenPlant.getNickname())) {
 
 			return false;
 		}
@@ -93,13 +92,13 @@ public class GardenPlantService {
 		}
 
 		// Verifica apelido duplicado
-		if (gardenPlantRepository.existsByOwnerIdAndNickNameIgnoreCaseAndIdNot(ownerId, gardenPlant.getNickName(),
+		if (gardenPlantRepository.existsByOwnerIdAndNicknameIgnoreCaseAndIdNot(ownerId, gardenPlant.getNickname(),
 				id)) {
 
 			return false;
 		}
 
-		planta.setNickName(gardenPlant.getNickName());
+		planta.setNickname(gardenPlant.getNickname());
 		planta.setStage(gardenPlant.getStage());
 
 		if (gardenPlant.getLastWatering() != null) {

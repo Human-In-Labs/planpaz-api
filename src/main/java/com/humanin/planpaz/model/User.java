@@ -11,6 +11,7 @@ import com.humanin.planpaz.model.enums.RoomLuminosity;
 import com.humanin.planpaz.model.enums.SpaceDisponibility;
 import com.humanin.planpaz.model.enums.TimeAvailability;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -30,31 +31,47 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class User {
-
-	// campos da tabela
+	// atributos obrigatórios
 	@Id
 	@GeneratedValue(strategy = GenerationType.UUID)
 	private UUID id;
+	
+	@Column(nullable = false)
 	private String name;
+
+	@Column(nullable = false)
 	private String email;
+
+	@Column(nullable = false)
 	private String password;
+
+	@Column(nullable = false)
 	@CreationTimestamp // quando criar um usuario, ja puxa o horario e a data sozinho
 	private LocalDateTime createdAt;
+
+	// opcionais
 	private String bio;
-	private LocalDateTime birthday;
-	private int gender; // int pq no banco é 0 e 1
-	private int countryId;
+	private LocalDateTime birthdate;
+	private int gender; // int porque no banco é 0 e 1
+
+	// preferências para personalização
 	@Enumerated(EnumType.STRING)
 	private MainGoal mainGoal;
+
 	@Enumerated(EnumType.STRING)
 	private RoomLuminosity roomLuminosity;
+
 	@Enumerated(EnumType.STRING)
 	private SpaceDisponibility spaceDisponibility;
+
 	@Enumerated(EnumType.STRING)
 	private ExperienceLevel experienceLevel;
+
 	@Enumerated(EnumType.STRING)
 	private TimeAvailability timeAvailability;
 
+
+	// getters e setters
 	public UUID getId() {
 		return id;
 	}
@@ -103,12 +120,12 @@ public class User {
 		this.bio = bio;
 	}
 
-	public LocalDateTime getBirthday() {
-		return birthday;
+	public LocalDateTime getbirthdate() {
+		return birthdate;
 	}
 
-	public void setBirthday(LocalDateTime birthday) {
-		this.birthday = birthday;
+	public void setbirthdate(LocalDateTime birthdate) {
+		this.birthdate = birthdate;
 	}
 
 	public int getGender() {
@@ -118,14 +135,6 @@ public class User {
 	public void setGender(int gender) {
 		this.gender = gender;
 	}	
-
-	public int getCountryId() {
-		return countryId;
-	}
-
-	public void setCountryId(int countryId) {
-		this.countryId = countryId;
-	}
 
 	public MainGoal getMainGoal() {
 		return mainGoal;

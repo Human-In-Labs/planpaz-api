@@ -3,7 +3,6 @@ package com.humanin.planpaz.controller;
 import java.util.List;
 import java.util.UUID;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -25,21 +24,17 @@ import com.humanin.planpaz.service.EmailService;
 import com.humanin.planpaz.service.GardenPlantService;
 import com.humanin.planpaz.service.RegaService;
 
+import lombok.RequiredArgsConstructor;
+
 @RestController
 @RequestMapping({ "/garden-plants", "/api/plantas" })
+@RequiredArgsConstructor
 public class GardenPlantController {
 
-	@Autowired
-	private GardenPlantService gardenPlantService;
-
-	@Autowired
-	private ClimaService climaService;
-
-	@Autowired
-	private RegaService agendamentoRegaService;
-
-	@Autowired
-	private EmailService emailService;
+	private final GardenPlantService gardenPlantService;
+	private final ClimaService climaService;
+	private final RegaService agendamentoRegaService;
+	private final EmailService emailService;
 
 	private User getAuthenticatedUser(Authentication authentication) {
 		return (User) authentication.getPrincipal();
@@ -150,9 +145,9 @@ public class GardenPlantController {
 		String recomendacao = agendamentoRegaService.calcularProximaRega(planta, clima);
 
 		// Dispara o e-mail de notificação para o usuário autenticado
-		emailService.enviarAlertaRega(user.getEmail(), planta.getNickName(), recomendacao);
+		emailService.enviarAlertaRega(user.getEmail(), planta.getNickname(), recomendacao);
 
-		StatusRegaDTO resposta = new StatusRegaDTO(planta.getId(), planta.getNickName(), cidade, clima.getTemperatura(),
+		StatusRegaDTO resposta = new StatusRegaDTO(planta.getId(), planta.getNickname(), cidade, clima.getTemperatura(),
 				clima.getUmidade(), clima.isChovendo(), recomendacao);
 
 		return ResponseEntity.ok(resposta);

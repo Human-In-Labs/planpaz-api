@@ -2,7 +2,6 @@ package com.humanin.planpaz.controller;
 
 import java.util.List;
 import java.util.UUID;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,12 +14,13 @@ import org.springframework.web.bind.annotation.RestController;
 import com.humanin.planpaz.model.Plant;
 import com.humanin.planpaz.service.PlantService;
 
+import lombok.RequiredArgsConstructor;
+
 @RestController
 @RequestMapping("/plants")
-
+@RequiredArgsConstructor
 public class PlantController {
-	@Autowired
-	private PlantService plantService;
+	private final PlantService plantService;
 
 	@GetMapping
 	public ResponseEntity<List<Plant>> listar() {

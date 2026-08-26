@@ -3,18 +3,15 @@ package com.humanin.planpaz.service;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import com.humanin.planpaz.model.Plant;
 import com.humanin.planpaz.repositories.PlantRepository;
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class PlantService {
-
-	@Autowired
-	public PlantRepository plantRepository;
+	public final PlantRepository plantRepository;
 
 	public boolean adicionarPlanta(Plant planta) {
 
