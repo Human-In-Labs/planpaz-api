@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planpaz - API Test Dashboard</title>
+    <style>
+        /* CSS resets, fonts, and base variables */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        :root {
+            --primary: #10b981;
+            --primary-dark: #059669;
+            --bg-color: #0f172a;
+            --surface: #1e293b;
+            --surface-hover: #334155;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --danger: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background-color: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        header h1 {
+            font-size: 1.25rem;
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            width: 100%;
+            flex-grow: 1;
+        }
+
+        .card {
+            background-color: var(--surface);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            font-weight: 500;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            border-color: var(--primary);
+        }
+
+        button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+        }
+
+        button:hover {
+            background-color: var(--primary-dark);
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        button.danger {
+            background-color: var(--danger);
+        }
+
+        button.danger:hover {
+            background-color: #dc2626;
+        }
+
+        .btn-sm {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.875rem;
+        }
+
+        /* Grid layout for auth */
+        .auth-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        @media(max-width: 768px) {
+            .auth-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Lists */
+        .item-list {
+            list-style: none;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+
+        .item-card {
+            background-color: rgba(15, 23, 42, 0.5);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        
+        .item-card h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .item-card p {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .item-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+        
+        .alert {
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+        
+        .alert.success {
+            background-color: rgba(16, 185, 129, 0.2);
+            border: 1px solid var(--primary);
+            color: var(--primary);
+        }
+        
+        .alert.error {
+            background-color: rgba(239, 68, 68, 0.2);
+            border: 1px solid var(--danger);
+            color: var(--danger);
+        }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Planpaz API Test</h1>
+        <div id="auth-status">
+            <span class="text-muted">Not authenticated</span>
+        </div>
+    </header>
+
+    <div class="container">
+        
+        <div id="alert-box" class="alert"></div>
+
+        <!-- AUTHENTICATION SECTION -->
+        <section id="auth-section">
+            <div class="auth-grid">
+                <div class="card">
+                    <h2>Login</h2>
+                    <form id="login-form">
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" id="login-email" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Password</label>
+                            <input type="password" id="login-password" required>
+                        </div>
+                        <button type="submit">Log In</button>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <h2>Register</h2>
+                    <form id="register-form">
+                        <div class="form-group">
+                            <label>Name</label>
+                            <input type="text" id="reg-name" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" id="reg-email" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Password</label>
+                            <input type="password" id="reg-password" required>
+                        </div>
+                        <button type="submit">Register</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- DASHBOARD SECTION -->
+        <section id="dashboard-section" class="hidden">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h2 style="border: none; margin: 0;">Dashboard</h2>
+                <button onclick="logout()" class="danger btn-sm">Log Out</button>
+            </div>
+            
+            <div class="card">
+                <h2>Plant Species Catalog</h2>
+                <form id="plant-form" style="display: flex; gap: 1rem; align-items: flex-end; margin-bottom: 1.5rem; flex-wrap: wrap;">
+                    <div class="form-group" style="margin: 0; flex: 1; min-width: 200px;">
+                        <label>Name</label>
+                        <input type="text" id="plant-name" required>
+                    </div>
+                    <button type="submit">Add Species</button>
+                </form>
+                <div id="plants-list" class="item-list"></div>
+            </div>
+
+            <div class="card">
+                <h2>My Garden</h2>
+                <form id="garden-form" style="display: flex; gap: 1rem; align-items: flex-end; margin-bottom: 1.5rem; flex-wrap: wrap;">
+                    <div class="form-group" style="margin: 0; flex: 1; min-width: 200px;">
+                        <label>Nickname</label>
+                        <input type="text" id="garden-nickname" required>
+                    </div>
+                    <div class="form-group" style="margin: 0; flex: 1; min-width: 200px;">
+                        <label>Plant Species</label>
+                        <select id="garden-species" required></select>
+                    </div>
+                    <div class="form-group" style="margin: 0; flex: 1; min-width: 100px;">
+                        <label>Stage</label>
+                        <input type="number" id="garden-stage" value="1" required>
+                    </div>
+                    <button type="submit">Add to Garden</button>
+                </form>
+                <div id="garden-list" class="item-list"></div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // API Base URL
+        const API_URL = ''; // Same origin
+        
+        // State
+        let token = localStorage.getItem('planpaz_token');
+        let speciesCache = [];
+        
+        // DOM Elements
+        const authSection = document.getElementById('auth-section');
+        const dashboardSection = document.getElementById('dashboard-section');
+        const authStatus = document.getElementById('auth-status');
+        const alertBox = document.getElementById('alert-box');
+        
+        // Initialization
+        function init() {
+            if (token) {
+                showDashboard();
+                loadData();
+            } else {
+                showAuth();
+            }
+        }
+        
+        // Utility functions
+        function showMessage(msg, isError = false) {
+            alertBox.textContent = msg;
+            alertBox.className = `alert ${isError ? 'error' : 'success'}`;
+            alertBox.style.display = 'block';
+            setTimeout(() => { alertBox.style.display = 'none'; }, 4000);
+        }
+        
+        function showAuth() {
+            authSection.classList.remove('hidden');
+            dashboardSection.classList.add('hidden');
+            authStatus.innerHTML = '<span class="text-muted">Not authenticated</span>';
+        }
+        
+        function showDashboard() {
+            authSection.classList.add('hidden');
+            dashboardSection.classList.remove('hidden');
+            authStatus.innerHTML = '<span style="color: var(--primary);">Authenticated ✓</span>';
+        }
+        
+        function logout() {
+            token = null;
+            localStorage.removeItem('planpaz_token');
+            showAuth();
+            showMessage('Logged out successfully');
+        }
+        
+        async function fetchAPI(endpoint, method = 'GET', body = null) {
+            const headers = { 'Content-Type': 'application/json' };
+            if (token) headers['Authorization'] = `Bearer ${token}`;
+            
+            try {
+                const res = await fetch(`${API_URL}${endpoint}`, {
+                    method,
+                    headers,
+                    body: body ? JSON.stringify(body) : null
+                });
+                
+                if (res.status === 401 || res.status === 403) {
+                    logout();
+                    throw new Error('Session expired');
+                }
+                
+                const isJson = res.headers.get('content-type')?.includes('application/json');
+                const data = isJson ? await res.json() : await res.text();
+                
+                if (!res.ok) throw new Error(data.message || data || 'API Error');
+                return data;
+            } catch (err) {
+                showMessage(err.message, true);
+                throw err;
+            }
+        }
+        
+        // Auth Handlers
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            try {
+                const data = await fetchAPI('/auth/login', 'POST', { email, password });
+                if (data.token) {
+                    token = data.token;
+                    localStorage.setItem('planpaz_token', token);
+                    showDashboard();
+                    loadData();
+                    showMessage('Login successful!');
+                }
+            } catch(e) {}
+        });
+        
+        document.getElementById('register-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('reg-name').value;
+            const email = document.getElementById('reg-email').value;
+            const password = document.getElementById('reg-password').value;
+            try {
+                const data = await fetchAPI('/auth/register', 'POST', { name, email, password });
+                if (data.token) {
+                    token = data.token;
+                    localStorage.setItem('planpaz_token', token);
+                    showDashboard();
+                    loadData();
+                    showMessage('Registration successful!');
+                }
+            } catch(e) {}
+        });
+        
+        // Data Loaders
+        async function loadData() {
+            await loadSpecies();
+            await loadGarden();
+        }
+        
+        async function loadSpecies() {
+            try {
+                const plants = await fetchAPI('/plants');
+                speciesCache = plants;
+                
+                // Update UI list
+                const list = document.getElementById('plants-list');
+                list.innerHTML = '';
+                
+                // Update select dropdown
+                const select = document.getElementById('garden-species');
+                select.innerHTML = '<option value="">Select a species</option>';
+                
+                plants.forEach(p => {
+                    // List item
+                    const div = document.createElement('div');
+                    div.className = 'item-card';
+                    div.innerHTML = `
+                        <div>
+                            <h3>${p.name || 'Unnamed'}</h3>
+                            <p>ID: ${p.id}</p>
+                        </div>
+                        <div class="item-actions">
+                            <button class="btn-sm danger" onclick="deleteSpecies('${p.id}')">Delete</button>
+                        </div>
+                    `;
+                    list.appendChild(div);
+                    
+                    // Select option
+                    const opt = document.createElement('option');
+                    opt.value = p.id;
+                    opt.textContent = p.name || 'Unnamed';
+                    select.appendChild(opt);
+                });
+            } catch(e) {}
+        }
+        
+        async function loadGarden() {
+            try {
+                const garden = await fetchAPI('/garden-plants');
+                const list = document.getElementById('garden-list');
+                list.innerHTML = '';
+                
+                garden.forEach(g => {
+                    const species = g.plant ? (g.plant.name || g.plant.id) : 'Unknown species';
+                    const div = document.createElement('div');
+                    div.className = 'item-card';
+                    div.innerHTML = `
+                        <div>
+                            <h3>${g.nickname}</h3>
+                            <p>Species: ${species}</p>
+                            <p>Stage: ${g.stage}</p>
+                        </div>
+                        <div class="item-actions" style="flex-wrap: wrap;">
+                            <button class="btn-sm" onclick="waterPlant('${g.id}')">💧 Water</button>
+                            <button class="btn-sm" onclick="checkStatus('${g.id}')">🌤️ Status</button>
+                            <button class="btn-sm danger" onclick="deleteGardenPlant('${g.id}')">Remove</button>
+                        </div>
+                    `;
+                    list.appendChild(div);
+                });
+            } catch(e) {}
+        }
+        
+        // CRUD Handlers
+        document.getElementById('plant-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('plant-name').value;
+            try {
+                await fetchAPI('/plants', 'POST', { name });
+                showMessage('Species added');
+                loadSpecies();
+            } catch(e) {}
+        });
+        
+        async function deleteSpecies(id) {
+            if(!confirm('Are you sure?')) return;
+            try {
+                await fetchAPI(`/plants/${id}`, 'DELETE');
+                showMessage('Species deleted');
+                loadSpecies();
+            } catch(e) {}
+        }
+        
+        document.getElementById('garden-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const nickname = document.getElementById('garden-nickname').value;
+            const plantId = document.getElementById('garden-species').value;
+            const stage = parseInt(document.getElementById('garden-stage').value);
+            
+            try {
+                await fetchAPI('/garden-plants', 'POST', { 
+                    nickname, 
+                    stage, 
+                    plant: { id: plantId } 
+                });
+                showMessage('Added to garden');
+                loadGarden();
+            } catch(e) {}
+        });
+        
+        async function deleteGardenPlant(id) {
+            if(!confirm('Are you sure?')) return;
+            try {
+                await fetchAPI(`/garden-plants/${id}`, 'DELETE');
+                showMessage('Removed from garden');
+                loadGarden();
+            } catch(e) {}
+        }
+        
+        async function waterPlant(id) {
+            try {
+                await fetchAPI(`/garden-plants/${id}/watering`, 'POST');
+                showMessage('Plant watered!');
+            } catch(e) {}
+        }
+        
+        async function checkStatus(id) {
+            const city = prompt("Enter city name (e.g. Sao Paulo):", "Sao Paulo");
+            if (!city) return;
+            
+            try {
+                const data = await fetchAPI(`/garden-plants/${id}/status-rega?cidade=${encodeURIComponent(city)}`);
+                showMessage(`Status for ${data.cidade}: Temp ${data.temperatura}°C, Humidity ${data.umidade}%. Recommendation: ${data.recomendacao}`);
+            } catch(e) {}
+        }
+        
+        // Start app
+        init();
+    </script>
+</body>
+</html>
