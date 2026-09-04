@@ -22,65 +22,67 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/auth")
-@RequiredArgsConstructor  // é a mesma coisa que colocar @Autowired em todas dependências
+@RequiredArgsConstructor
 public class AuthController {
-	// dependências
+
 	private final UserRepository repository;
 	private final PasswordEncoder passwordEncoder;
 	private final TokenService tokenService;
-	
+
 	@PostMapping("/login")
 	public ResponseEntity<ResponseDTO> login(@RequestBody LoginRequestDTO body) {
-		
+
 		System.out.println("========== LOGIN CHEGOU NO CONTROLLER ==========");
 		System.out.println("EMAIL RECEBIDO: " + body.email());
-		
+
 		User user = this.repository.findByEmail(body.email())
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
-		
+
 		System.out.println("[WARN] Tentativa de login no usuário " + user.getEmail() + ".");
 		if (passwordEncoder.matches(body.password(), user.getPassword())) {
 
-		    System.out.println("[SUCESS] Senha autenticada com sucesso.");
-		    System.out.println("EMAIL: " + user.getEmail());
-		    System.out.println("ID: " + user.getId());
+			System.out.println("[SUCCESS] Senha autenticada com sucesso.");
+			System.out.println("EMAIL: " + user.getEmail());
+			System.out.println("ID: " + user.getId());
 
-		    String token = this.tokenService.generateToken(user);
+			String token = this.tokenService.generateToken(user);
 
-		    System.out.println("TOKEN GERADO COM SUCESSO");
+			System.out.println("TOKEN GERADO COM SUCESSO");
 
-		    return ResponseEntity.ok(
-		        new ResponseDTO(user.getName(), token)
-		    );
+			// Retorna o ResponseDTO contendo nome, username e token
+			return ResponseEntity.ok(new ResponseDTO(user.getName(), user.getUsername(), token));
 		}
+
 		System.out.println("[ERROR] As senhas não batem.");
 		return ResponseEntity.badRequest().build();
-		
 	}
-	
-	
+
 	@PostMapping("/register")
 	public ResponseEntity<ResponseDTO> register(@RequestBody RegisterRequestDTO body) {
-		// checagem se já existe
+		// Checagem se já existe por e-mail
 		Optional<User> user = this.repository.findByEmail(body.email());
-		
+
 		if (user.isEmpty()) {
 			System.out.println("[WARN] Registro de usuário novo.");
 			User newUser = new User();
 			newUser.setPassword(passwordEncoder.encode(body.password()));
 			newUser.setEmail(body.email());
 			newUser.setName(body.name());
-			this.repository.save(newUser); 
-			
+
+			// Define o username recebido na requisição
+			newUser.setUsername(body.username());
+
+			this.repository.save(newUser);
+
 			String token = this.tokenService.generateToken(newUser);
-			
-			System.out.println("[SUCESS] Novo usuário " + newUser.getEmail() + " criado, com token autorizado.");
-			return ResponseEntity.ok(new ResponseDTO(newUser.getName(), token));
+
+			System.out.println("[SUCCESS] Novo usuário " + newUser.getEmail() + " criado, com token autorizado.");
+
+			// Retorna o ResponseDTO contendo nome, username e token
+			return ResponseEntity.ok(new ResponseDTO(newUser.getName(), newUser.getUsername(), token));
 		}
-		
+
 		System.out.println("[ERROR] Tentativa de registro de usuário já existente.");
 		return ResponseEntity.badRequest().build();
-		
 	}
-	
 }

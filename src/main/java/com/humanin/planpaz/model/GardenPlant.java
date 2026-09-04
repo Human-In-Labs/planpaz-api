@@ -38,7 +38,7 @@ public class GardenPlant {
 	@Column(name = "planted_at")
 	private LocalDate plantedAt;
 
-	private int stage;
+	private Integer stage;
 
 	@ManyToOne
 	@JoinColumn(name = "owner_id")
@@ -48,6 +48,9 @@ public class GardenPlant {
 	@JoinColumn(name = "plant_id")
 	private Plant plant;
 
+	@Column(name = "direct_rain")
+	private Boolean directRain = false; //esta assim por enquanto somente para testes
+	
 	public UUID getId() {
 		return id;
 	}
@@ -80,13 +83,7 @@ public class GardenPlant {
 		this.plantedAt = plantedAt;
 	}
 
-	public Integer getStage() {
-		return stage;
-	}
-
-	public void setStage(int stage) {
-		this.stage = stage;
-	}
+	
 
 	public User getOwner() {
 		return owner;
@@ -102,6 +99,24 @@ public class GardenPlant {
 
 	public void setPlant(Plant plant) {
 		this.plant = plant;
+	}
+
+	// PARA DESENVOLVIMENTO, ACEITANDO NULL
+		public Boolean getDirectRain() {
+			return directRain != null ? directRain : false;
+		}
+
+		// PARA DESENVOLVIMENTO, ACEITANDO NULL
+		public void setDirectRain(Boolean directRain) {
+			this.directRain = directRain;
+		}
+
+	public Integer getStage() {
+		return stage;
+	}
+
+	public void setStage(Integer stage) {
+		this.stage = stage;
 	}
 
 }

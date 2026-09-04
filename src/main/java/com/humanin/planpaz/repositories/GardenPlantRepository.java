@@ -17,4 +17,6 @@ public interface GardenPlantRepository extends JpaRepository<GardenPlant, UUID> 
 	boolean existsByOwnerIdAndNicknameIgnoreCaseAndIdNot(UUID ownerId, String nickname, UUID id);
 
 	Optional<GardenPlant> findByIdAndOwnerId(UUID id, UUID ownerId);
+	
+	long countByOwnerId(UUID ownerId);
 }
