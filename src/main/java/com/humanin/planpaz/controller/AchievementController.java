@@ -17,7 +17,7 @@ import com.humanin.planpaz.service.AchievementService;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/achievements")
+@RequestMapping("/api/achievements")
 @RequiredArgsConstructor
 public class AchievementController {
 
@@ -36,7 +36,7 @@ public class AchievementController {
 	}
 
 	// LISTAR TODAS AS CONQUISTAS DO SISTEMA (CATÁLOGO)
-	@GetMapping("/catalogo")
+	@GetMapping("/catalog")
 	public ResponseEntity<List<Achievement>> listarCatalogo() {
 		List<Achievement> todas = achievementService.listarTodas();
 		return ResponseEntity.ok(todas);

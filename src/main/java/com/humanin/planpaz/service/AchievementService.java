@@ -6,6 +6,7 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.humanin.planpaz.infra.exception.ResourceNotFoundException;
 import com.humanin.planpaz.model.Achievement;
 import com.humanin.planpaz.model.User;
 import com.humanin.planpaz.model.UserAchievement;
@@ -36,7 +37,7 @@ public class AchievementService {
 		}
 
 		User user = userRepository.findById(userId)
-				.orElseThrow(() -> new RuntimeException("Usuário não encontrado com o ID: " + userId));
+				.orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado com o ID: " + userId));
 
 		UserAchievement userAchievement = new UserAchievement(user, achievement);
 		return userAchievementRepository.save(userAchievement);

@@ -1,9 +1,10 @@
 package com.humanin.planpaz.service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
+import com.humanin.planpaz.infra.exception.BusinessException;
+import com.humanin.planpaz.infra.exception.ResourceNotFoundException;
 import com.humanin.planpaz.model.Plant;
 import com.humanin.planpaz.repositories.PlantRepository;
 import lombok.RequiredArgsConstructor;
@@ -13,33 +14,25 @@ import lombok.RequiredArgsConstructor;
 public class PlantService {
 	public final PlantRepository plantRepository;
 
-	public boolean adicionarPlanta(Plant planta) {
-
+	public Plant adicionarPlanta(Plant planta) {
 		if (plantRepository.existsByNameIgnoreCase(planta.getName())) {
-			return false;
+			throw new BusinessException("Já existe uma planta com esse nome.");
 		}
 
-		plantRepository.save(planta);
-		return true;
+		return plantRepository.save(planta);
 	}
 
 	public List<Plant> listarPlantas() {
 		return plantRepository.findAll();
 	}
 
-	public boolean editarPlanta(Plant planta) {
-//optional pq pode existir uma planta ou nenhuma
-		Optional<Plant> plantaOptional = plantRepository.findById(planta.getId());
-
-		if (plantaOptional.isEmpty()) {
-			return false;
-		}
+	public Plant editarPlanta(Plant planta) {
+		Plant novaPlanta = plantRepository.findById(planta.getId())
+				.orElseThrow(() -> new ResourceNotFoundException("Planta não encontrada com ID: " + planta.getId()));
 
 		if (plantRepository.existsByNameIgnoreCaseAndIdNot(planta.getName(), planta.getId())) {
-			return false;
+			throw new BusinessException("Já existe uma planta com esse nome.");
 		}
-
-		Plant novaPlanta = plantaOptional.get();
 
 		novaPlanta.setName(planta.getName());
 		novaPlanta.setDescription(planta.getDescription());
@@ -51,27 +44,19 @@ public class PlantService {
 		novaPlanta.setType(planta.getType());
 		novaPlanta.setWateringLevel(planta.getWateringLevel());
 
-		plantRepository.save(novaPlanta);
-
-		return true;
+		return plantRepository.save(novaPlanta);
 	}
 
-	public boolean excluirPlanta(UUID idPlanta) {
-
+	public void excluirPlanta(UUID idPlanta) {
 		if (!plantRepository.existsById(idPlanta)) {
-			return false;
+			throw new ResourceNotFoundException("Planta não encontrada com ID: " + idPlanta);
 		}
 
 		plantRepository.deleteById(idPlanta);
-		return true;
 	}
 
 	public Plant buscarPorId(UUID id) {
-
-	    return plantRepository.findById(id)
-	            .orElseThrow(() ->
-	                new RuntimeException("Planta não encontrada.")
-	            );
+		return plantRepository.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("Planta não encontrada com ID: " + id));
 	}
-
 }

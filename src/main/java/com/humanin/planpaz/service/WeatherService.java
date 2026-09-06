@@ -2,6 +2,8 @@ package com.humanin.planpaz.service;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
+import com.humanin.planpaz.infra.exception.ResourceNotFoundException;
 import org.springframework.web.client.RestClient;
 
 import com.humanin.planpaz.dto.WeatherResponseDTO;
@@ -19,14 +21,18 @@ public class WeatherService {
 	}
 
 	public WeatherResponseDTO buscarClimaPorCidade(String cidade) {
-		WeatherResponseDTO response = this.restClient.get()
-				.uri("/weather?q={cidade}&units=metric&lang=pt_br&appid={apiKey}", cidade, apiKey).retrieve()
-				.body(WeatherResponseDTO.class);
+		try {
+			WeatherResponseDTO response = this.restClient.get()
+					.uri("/weather?q={cidade}&units=metric&lang=pt_br&appid={apiKey}", cidade, apiKey).retrieve()
+					.body(WeatherResponseDTO.class);
 
-		if (response == null || response.getMain() == null) {
-			throw new RuntimeException("Não foi possível obter os dados do clima.");
+			if (response == null || response.getMain() == null) {
+				throw new ResourceNotFoundException("Dados meteorológicos não encontrados para a cidade: " + cidade);
+			}
+
+			return response;
+		} catch (HttpClientErrorException.NotFound e) {
+			throw new ResourceNotFoundException("Cidade não encontrada: " + cidade);
 		}
-
-		return response;
 	}
 }

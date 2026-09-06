@@ -16,136 +16,141 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.humanin.planpaz.dto.WeatherResponseDTO;
+import com.humanin.planpaz.dto.WateringReminderDTO;
 import com.humanin.planpaz.dto.WateringStatusDTO;
 import com.humanin.planpaz.model.GardenPlant;
 import com.humanin.planpaz.model.User;
 import com.humanin.planpaz.service.WeatherService;
-import com.humanin.planpaz.service.EmailService;
+// import com.humanin.planpaz.service.EmailService;
 import com.humanin.planpaz.service.GardenPlantService;
 import com.humanin.planpaz.service.WateringService;
 
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping({ "/garden-plants", "/api/plantas" })
+@RequestMapping("/api/garden")
 @RequiredArgsConstructor
 public class GardenPlantController {
-
 	private final GardenPlantService gardenPlantService;
-	private final WeatherService climaService;
-	private final WateringService agendamentoRegaService;
-	private final EmailService emailService;
+	private final WeatherService weatherService;
+	private final WateringService wateringService;
+	// private final EmailService emailService;
 
 	private User getAuthenticatedUser(Authentication authentication) {
 		return (User) authentication.getPrincipal();
 	}
 
 	// =========================
-	// ADICIONAR
+	// ADICIONAR UMA PLANTA AO MEU JARDIM
 	// =========================
 
-	@PostMapping
-	public ResponseEntity<String> adicionar(@RequestBody GardenPlant gardenPlant, Authentication authentication) {
+	@PostMapping("/add")
+	public ResponseEntity<String> addGardenPlant(@RequestBody GardenPlant gardenPlant, Authentication authentication) {
 		User user = getAuthenticatedUser(authentication);
 		gardenPlant.setOwner(user);
-
-		boolean created = gardenPlantService.adicionarPlanta(gardenPlant);
-
-		if (!created) {
-			return ResponseEntity.badRequest().body("Já existe uma planta com esse apelido.");
-		}
-
+		gardenPlantService.adicionarPlanta(gardenPlant);
 		return ResponseEntity.ok("Planta adicionada ao jardim.");
 	}
 
 	// =========================
-	// LISTAR
+	// LISTAR TODAS AS PLANTAS DO MEU JARDIM
 	// =========================
 
 	@GetMapping
-	public ResponseEntity<List<GardenPlant>> listar(Authentication authentication) {
+	public ResponseEntity<List<GardenPlant>> getAllGardenPlants(Authentication authentication) {
 		User user = getAuthenticatedUser(authentication);
 		List<GardenPlant> plantas = gardenPlantService.listarPorUsuario(user.getId());
-
 		return ResponseEntity.ok(plantas);
 	}
 
 	// =========================
-	// EDITAR
+	// RETORNAR PLANTA ÚNICA DO MEU JARDIM
+	// =========================
+
+	@GetMapping("/{id}")
+	public ResponseEntity<GardenPlant> getGardenPlant(@PathVariable UUID id, Authentication authentication) {
+		User user = getAuthenticatedUser(authentication);
+		GardenPlant planta = gardenPlantService.buscarPorIdEUsuario(id, user.getId());
+		return ResponseEntity.ok(planta);
+	}
+
+	// =========================
+	// EDITAR PLANTA DO MEU JARDIM
 	// =========================
 
 	@PutMapping("/{id}")
-	public ResponseEntity<String> editar(@PathVariable UUID id, @RequestBody GardenPlant gardenPlant,
+	public ResponseEntity<String> editGardenPlant(@PathVariable UUID id, @RequestBody GardenPlant gardenPlant,
 			Authentication authentication) {
 		User user = getAuthenticatedUser(authentication);
-
-		boolean updated = gardenPlantService.editar(id, user.getId(), gardenPlant);
-
-		if (!updated) {
-			return ResponseEntity.badRequest().body("Erro ao atualizar a planta.");
-		}
-
+		gardenPlantService.editarPlanta(id, user.getId(), gardenPlant);
 		return ResponseEntity.ok("Planta atualizada com sucesso.");
 	}
 
 	// =========================
-	// EXCLUIR
+	// EXCLUIR PLANTA DO MEU JARDIM
 	// =========================
 
 	@DeleteMapping("/{id}")
-	public ResponseEntity<String> excluir(@PathVariable UUID id, Authentication authentication) {
+	public ResponseEntity<String> deleteGardenPlant(@PathVariable UUID id, Authentication authentication) {
 		User user = getAuthenticatedUser(authentication);
-
-		boolean deleted = gardenPlantService.excluirPlanta(id, user.getId());
-
-		if (!deleted) {
-			return ResponseEntity.badRequest().body("Planta não encontrada.");
-		}
-
+		gardenPlantService.excluirPlanta(id, user.getId());
 		return ResponseEntity.ok("Planta excluída com sucesso.");
 	}
 
 	// =========================
-	// REGAR
+	// RETORNAR A PRÓXIMA REGA
 	// =========================
 
-	@PostMapping("/{id}/watering")
-	public ResponseEntity<String> regar(@PathVariable UUID id, Authentication authentication) {
+	@GetMapping("/next-watering/{id}")
+	public ResponseEntity<WateringReminderDTO> getNextWatering(@PathVariable UUID id, Authentication authentication) {
 		User user = getAuthenticatedUser(authentication);
+		WateringReminderDTO reminder = wateringService.getNextWatering(id, user.getId());
+		return ResponseEntity.ok(reminder);
+	}
 
-		boolean watered = gardenPlantService.registrarRega(id, user.getId());
+	// =========================
+	// RETORNAR AS PRÓXIMAS REGAS
+	// =========================
+	
+	@GetMapping("/next-waterings/{id}")
+	public ResponseEntity<List<WateringReminderDTO>> getNextWaterings(@PathVariable UUID id, Authentication authentication) {
+		User user = getAuthenticatedUser(authentication);
+		List<WateringReminderDTO> reminder = wateringService.getNextWaterings(id, user.getId());
+		return ResponseEntity.ok(reminder);
+	}
 
-		if (!watered) {
-			return ResponseEntity.badRequest().body("Planta não encontrada.");
-		}
+	// =========================
+	// REGAR PLANTA DO MEU JARDIM
+	// =========================
 
+	@PostMapping("/watering/{id}")
+	public ResponseEntity<String> waterGardenPlant(@PathVariable UUID id, Authentication authentication) {
+		User user = getAuthenticatedUser(authentication);
+		wateringService.registrarRega(id, user.getId());
 		return ResponseEntity.ok("Planta regada com sucesso.");
 	}
 
 	// =========================
-	// CONSULTAR STATUS DE REGA + CLIMA + NOTIFICAÇÃO
+	// CONSULTAR STATUS DE REGA + CLIMA + NOTIFICAÇÃO DE EMAIL
 	// =========================
 
-	@GetMapping("/{id}/status-rega")
-	public ResponseEntity<?> verificarStatusRega(@PathVariable UUID id, @RequestParam String cidade,
+	@GetMapping("/watering-status/{id}")
+	public ResponseEntity<?> verifyGardenPlantWateringStatus(@PathVariable UUID id, @RequestParam String cidade,
 			Authentication authentication) {
 
 		User user = getAuthenticatedUser(authentication);
 
 		// Busca a planta garantindo pertencimento ao usuário autenticado
 		GardenPlant planta = gardenPlantService.buscarPorIdEUsuario(id, user.getId());
-		if (planta == null) {
-			return ResponseEntity.badRequest().body("Planta não encontrada para este usuário.");
-		}
 
 		// Busca o clima da cidade informada
-		WeatherResponseDTO clima = climaService.buscarClimaPorCidade(cidade);
+		WeatherResponseDTO clima = weatherService.buscarClimaPorCidade(cidade);
 
 		// Processa a recomendação com base nas regras do sistema
-		String recomendacao = agendamentoRegaService.calcularProximaRega(planta, clima);
+		String recomendacao = wateringService.analisarClima(planta, clima);
 
 		// Dispara o e-mail de notificação para o usuário autenticado
-		emailService.enviarAlertaRega(user.getEmail(), planta.getNickname(), recomendacao);
+		// emailService.enviarAlertaRega(user.getEmail(), planta.getNickname(), recomendacao);
 
 		WateringStatusDTO resposta = new WateringStatusDTO(planta.getId(), planta.getNickname(), cidade, clima.getTemperatura(),
 				clima.getUmidade(), clima.isChovendo(), recomendacao);

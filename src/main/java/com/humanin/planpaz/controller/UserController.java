@@ -9,10 +9,14 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.humanin.planpaz.dto.UserPreferencesDTO;
+import com.humanin.planpaz.dto.UserSettingsDTO;
 import com.humanin.planpaz.dto.UserSummaryDTO;
 import com.humanin.planpaz.model.User;
 import com.humanin.planpaz.service.UserService;
@@ -20,7 +24,7 @@ import com.humanin.planpaz.service.UserService;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/api/user")
 @RequiredArgsConstructor
 public class UserController {
 
@@ -30,6 +34,28 @@ public class UserController {
 	public ResponseEntity<String> getUser() {
 		System.out.println("[SUCESS] Usuário autenticado com token válido.");
 		return ResponseEntity.ok("Sucesso!");
+	}
+
+	@GetMapping("/settings")
+	public ResponseEntity<UserSettingsDTO> getSettings(@AuthenticationPrincipal User currentUser) {
+		UserSettingsDTO settings = userService.getUserSettings(currentUser.getId());
+		return ResponseEntity.ok(settings);
+	}
+
+	@PutMapping("/preferences")
+	public ResponseEntity<UserSettingsDTO> updatePreferences(
+			@AuthenticationPrincipal User currentUser,
+			@RequestBody UserPreferencesDTO preferences) {
+		UserSettingsDTO updated = userService.updatePreferences(currentUser.getId(), preferences);
+		return ResponseEntity.ok(updated);
+	}
+
+	@PutMapping("/settings")
+	public ResponseEntity<UserSettingsDTO> updateSettings(
+			@AuthenticationPrincipal User currentUser,
+			@RequestBody UserSettingsDTO settings) {
+		UserSettingsDTO updated = userService.updateSettings(currentUser.getId(), settings);
+		return ResponseEntity.ok(updated);
 	}
 
 	// 1. Pesquisar usuários por @username
