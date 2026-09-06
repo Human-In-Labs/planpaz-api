@@ -15,14 +15,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.humanin.planpaz.dto.ClimaResponseDTO;
-import com.humanin.planpaz.dto.StatusRegaDTO;
+import com.humanin.planpaz.dto.WeatherResponseDTO;
+import com.humanin.planpaz.dto.WateringStatusDTO;
 import com.humanin.planpaz.model.GardenPlant;
 import com.humanin.planpaz.model.User;
-import com.humanin.planpaz.service.ClimaService;
+import com.humanin.planpaz.service.WeatherService;
 import com.humanin.planpaz.service.EmailService;
 import com.humanin.planpaz.service.GardenPlantService;
-import com.humanin.planpaz.service.RegaService;
+import com.humanin.planpaz.service.WateringService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -32,8 +32,8 @@ import lombok.RequiredArgsConstructor;
 public class GardenPlantController {
 
 	private final GardenPlantService gardenPlantService;
-	private final ClimaService climaService;
-	private final RegaService agendamentoRegaService;
+	private final WeatherService climaService;
+	private final WateringService agendamentoRegaService;
 	private final EmailService emailService;
 
 	private User getAuthenticatedUser(Authentication authentication) {
@@ -139,7 +139,7 @@ public class GardenPlantController {
 		}
 
 		// Busca o clima da cidade informada
-		ClimaResponseDTO clima = climaService.buscarClimaPorCidade(cidade);
+		WeatherResponseDTO clima = climaService.buscarClimaPorCidade(cidade);
 
 		// Processa a recomendação com base nas regras do sistema
 		String recomendacao = agendamentoRegaService.calcularProximaRega(planta, clima);
@@ -147,7 +147,7 @@ public class GardenPlantController {
 		// Dispara o e-mail de notificação para o usuário autenticado
 		emailService.enviarAlertaRega(user.getEmail(), planta.getNickname(), recomendacao);
 
-		StatusRegaDTO resposta = new StatusRegaDTO(planta.getId(), planta.getNickname(), cidade, clima.getTemperatura(),
+		WateringStatusDTO resposta = new WateringStatusDTO(planta.getId(), planta.getNickname(), cidade, clima.getTemperatura(),
 				clima.getUmidade(), clima.isChovendo(), recomendacao);
 
 		return ResponseEntity.ok(resposta);

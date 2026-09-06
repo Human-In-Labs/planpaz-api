@@ -14,18 +14,24 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "comment")
+@Table(
+	name = "likes",
+	uniqueConstraints = {
+		@UniqueConstraint(name = "uk_like_author_post", columnNames = {"author_id", "post_id"})
+	}
+)
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Comment {
+public class Like {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.UUID)
@@ -39,14 +45,12 @@ public class Comment {
 	@JoinColumn(name = "post_id", nullable = false)
 	private Post post;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "comment_id")
-	private Comment parentComment;
-
-	@Column(columnDefinition = "TEXT", nullable = false)
-	private String content;
-
 	@CreationTimestamp
-	@Column(name = "commented_at", nullable = false, updatable = false)
-	private LocalDateTime commentedAt;
+	@Column(name = "liked_at", nullable = false, updatable = false)
+	private LocalDateTime likedAt;
+
+	public Like(User author, Post post) {
+		this.author = author;
+		this.post = post;
+	}
 }

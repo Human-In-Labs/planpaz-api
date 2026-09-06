@@ -60,11 +60,16 @@ public class PlantController {
 	}
 	
 	
+	private final com.humanin.planpaz.repositories.PlantStageRepository plantStageRepository;
+
 	@GetMapping("/{id}")
 	public ResponseEntity<Plant> buscarPorId(@PathVariable UUID id) {
-
 	    Plant plant = plantService.buscarPorId(id);
-
 	    return ResponseEntity.ok(plant);
+	}
+
+	@GetMapping("/{id}/stages")
+	public ResponseEntity<List<com.humanin.planpaz.model.PlantStage>> buscarEstagiosPorPlanta(@PathVariable UUID id) {
+		return ResponseEntity.ok(plantStageRepository.findByPlantIdOrderByOrderAsc(id));
 	}
 }

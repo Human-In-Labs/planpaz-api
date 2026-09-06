@@ -2,7 +2,7 @@ package com.humanin.planpaz.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class ClimaResponseDTO {
+public class WeatherResponseDTO {
 	private Main main;
 	private Weather[] weather;
 

@@ -1,12 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Planpaz - API Test Dashboard</title>
 	<style>
-		/* CSS resets, fonts, and base variables */
 		@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 		:root {
@@ -19,6 +18,7 @@
 			--text-muted: #94a3b8;
 			--border: #334155;
 			--danger: #ef4444;
+			--accent: #3b82f6;
 		}
 
 		* {
@@ -37,7 +37,7 @@
 		}
 
 		header {
-			background-color: rgba(30, 41, 59, 0.7);
+			background-color: rgba(30, 41, 59, 0.85);
 			backdrop-filter: blur(10px);
 			padding: 1rem 2rem;
 			border-bottom: 1px solid var(--border);
@@ -57,7 +57,7 @@
 
 		.container {
 			max-width: 1200px;
-			margin: 2rem auto;
+			margin: 1.5rem auto;
 			padding: 0 1rem;
 			width: 100%;
 			flex-grow: 1;
@@ -69,20 +69,21 @@
 			padding: 1.5rem;
 			border: 1px solid var(--border);
 			margin-bottom: 1.5rem;
-			box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+			box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 			transition: transform 0.2s ease, box-shadow 0.2s ease;
 		}
 
 		.card:hover {
-			box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+			box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.25);
 		}
 
 		h2 {
-			font-size: 1.5rem;
+			font-size: 1.4rem;
 			margin-bottom: 1rem;
-			font-weight: 500;
+			font-weight: 600;
 			border-bottom: 1px solid var(--border);
 			padding-bottom: 0.5rem;
+			color: #38bdf8;
 		}
 
 		h3 {
@@ -90,43 +91,85 @@
 			margin-bottom: 0.5rem;
 		}
 
-		.form-group {
+		.form-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+			gap: 1rem;
 			margin-bottom: 1rem;
+		}
+
+		.form-group {
+			margin-bottom: 0.8rem;
 		}
 
 		.form-group label {
 			display: block;
-			margin-bottom: 0.5rem;
+			margin-bottom: 0.35rem;
 			color: var(--text-muted);
-			font-size: 0.875rem;
+			font-size: 0.85rem;
+			font-weight: 500;
 		}
 
-		.form-group input,
-		.form-group select {
+		.form-group label span.required {
+			color: var(--danger);
+		}
+
+		.form-group label span.optional {
+			color: #64748b;
+			font-size: 0.75rem;
+			font-weight: normal;
+		}
+
+		input, select, textarea {
 			width: 100%;
-			padding: 0.75rem;
+			padding: 0.6rem 0.8rem;
 			border-radius: 6px;
 			border: 1px solid var(--border);
-			background-color: var(--bg-color);
+			background-color: rgba(15, 23, 42, 0.6);
 			color: var(--text-main);
-			outline: none;
-			transition: border-color 0.2s ease;
+			font-size: 0.9rem;
+			transition: border-color 0.2s;
 		}
 
-		.form-group input:focus,
-		.form-group select:focus {
+		input:focus, select, textarea:focus {
+			outline: none;
 			border-color: var(--primary);
+		}
+
+		.checkbox-group {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 0.75rem;
+			background: rgba(15, 23, 42, 0.4);
+			padding: 0.6rem;
+			border-radius: 6px;
+			border: 1px solid var(--border);
+		}
+
+		.checkbox-label {
+			display: flex;
+			align-items: center;
+			gap: 0.4rem;
+			font-size: 0.85rem;
+			cursor: pointer;
+			color: var(--text-main);
+		}
+
+		.checkbox-label input[type="checkbox"] {
+			width: auto;
+			cursor: pointer;
 		}
 
 		button {
 			background-color: var(--primary);
-			color: white;
+			color: #042f2e;
 			border: none;
-			padding: 0.75rem 1.5rem;
 			border-radius: 6px;
+			padding: 0.6rem 1.2rem;
+			font-weight: 600;
+			font-size: 0.9rem;
 			cursor: pointer;
-			font-weight: 500;
-			transition: background-color 0.2s ease, transform 0.1s ease;
+			transition: background-color 0.2s, transform 0.1s;
 		}
 
 		button:hover {
@@ -137,42 +180,28 @@
 			transform: scale(0.98);
 		}
 
+		button.btn-sm {
+			padding: 0.35rem 0.7rem;
+			font-size: 0.8rem;
+		}
+
 		button.danger {
 			background-color: var(--danger);
+			color: #ffffff;
 		}
 
 		button.danger:hover {
 			background-color: #dc2626;
 		}
 
-		.btn-sm {
-			padding: 0.4rem 0.8rem;
-			font-size: 0.875rem;
-		}
-
-		/* Grid layout for auth */
-		.auth-grid {
-			display: grid;
-			grid-template-columns: 1fr 1fr;
-			gap: 2rem;
-		}
-
-		@media(max-width: 768px) {
-			.auth-grid {
-				grid-template-columns: 1fr;
-			}
-		}
-
-		/* Lists */
 		.item-list {
-			list-style: none;
 			display: grid;
-			grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+			grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
 			gap: 1rem;
 		}
 
 		.item-card {
-			background-color: rgba(15, 23, 42, 0.5);
+			background-color: rgba(15, 23, 42, 0.6);
 			border: 1px solid var(--border);
 			border-radius: 8px;
 			padding: 1rem;
@@ -183,14 +212,27 @@
 
 		.item-card p {
 			color: var(--text-muted);
-			font-size: 0.875rem;
-			margin-bottom: 0.5rem;
+			font-size: 0.85rem;
+			margin-bottom: 0.3rem;
 		}
 
 		.item-actions {
 			display: flex;
 			gap: 0.5rem;
-			margin-top: 0.5rem;
+			margin-top: 0.8rem;
+			flex-wrap: wrap;
+		}
+
+		.badge {
+			display: inline-block;
+			padding: 0.2rem 0.5rem;
+			border-radius: 4px;
+			font-size: 0.75rem;
+			font-weight: 600;
+			background: #334155;
+			color: #38bdf8;
+			margin-right: 0.3rem;
+			margin-bottom: 0.3rem;
 		}
 
 		.hidden {
@@ -202,6 +244,7 @@
 			border-radius: 6px;
 			margin-bottom: 1rem;
 			display: none;
+			font-weight: 500;
 		}
 
 		.alert.success {
@@ -221,7 +264,7 @@
 <body>
 
 	<header>
-		<h1>Planpaz API Test</h1>
+		<h1>🌱 Planpaz - API Test Dashboard</h1>
 		<div id="auth-status">
 			<span class="text-muted">Not authenticated</span>
 		</div>
@@ -233,42 +276,138 @@
 
 		<!-- AUTHENTICATION SECTION -->
 		<section id="auth-section">
-			<div class="auth-grid">
+			<div style="display: grid; grid-template-columns: 1fr 1.6fr; gap: 1.5rem;">
+				
+				<!-- LOGIN CARD -->
 				<div class="card">
 					<h2>Login</h2>
 					<form id="login-form">
 						<div class="form-group">
-							<label>Email</label>
-							<input type="email" id="login-email" required>
+							<label>Email <span class="required">*</span></label>
+							<input type="email" id="login-email" required placeholder="seu@email.com">
 						</div>
 						<div class="form-group">
-							<label>Password</label>
-							<input type="password" id="login-password" required>
+							<label>Password <span class="required">*</span></label>
+							<input type="password" id="login-password" required placeholder="Sua senha">
 						</div>
-						<button type="submit">Log In</button>
+						<button type="submit" style="width: 100%;">Log In</button>
 					</form>
 				</div>
 
+				<!-- REGISTER CARD WITH COMPLETE & OPTIONAL FIELDS -->
 				<div class="card">
-					<h2>Register</h2>
+					<h2>Register (Usuário & Preferências)</h2>
 					<form id="register-form">
-						<div class="form-group">
-							<label>Name</label>
-							<input type="text" id="reg-name" required>
+						<!-- Campos Obrigatórios -->
+						<div class="form-grid">
+							<div class="form-group">
+								<label>Name <span class="required">*</span></label>
+								<input type="text" id="reg-name" required placeholder="Nome completo">
+							</div>
+							<div class="form-group">
+								<label>Username <span class="required">*</span></label>
+								<input type="text" id="reg-username" placeholder="@seuusuario" required>
+							</div>
+							<div class="form-group">
+								<label>Email <span class="required">*</span></label>
+								<input type="email" id="reg-email" required placeholder="email@exemplo.com">
+							</div>
+							<div class="form-group">
+								<label>Password <span class="required">*</span></label>
+								<input type="password" id="reg-password" required placeholder="Mínimo 6 caracteres">
+							</div>
 						</div>
-						<div class="form-group">
-							<label>Username</label>
-							<input type="text" id="reg-username" placeholder="@seuusuario" required>
+
+						<h3 style="font-size: 0.95rem; color: #94a3b8; margin: 0.8rem 0 0.5rem 0; border-top: 1px dashed var(--border); padding-top: 0.5rem;">
+							Dados de Perfil (Opcionais)
+						</h3>
+
+						<div class="form-grid">
+							<div class="form-group">
+								<label>Cidade <span class="optional">(opcional)</span></label>
+								<input type="text" id="reg-city" placeholder="Ex: São Paulo">
+							</div>
+							<div class="form-group">
+								<label>Data de Nascimento <span class="optional">(opcional)</span></label>
+								<input type="date" id="reg-birthdate">
+							</div>
+							<div class="form-group">
+								<label>Gênero <span class="optional">(opcional)</span></label>
+								<select id="reg-gender">
+									<option value="">Selecione...</option>
+									<option value="MALE">Masculino (MALE)</option>
+									<option value="FEMALE">Feminino (FEMALE)</option>
+									<option value="PREFER_NOT_TO_SAY">Prefiro não dizer</option>
+									<option value="OTHER">Outro</option>
+								</select>
+							</div>
+							<div class="form-group">
+								<label>Horário Habitual de Rega <span class="optional">(opcional)</span></label>
+								<input type="time" id="reg-watering-time">
+							</div>
 						</div>
+
 						<div class="form-group">
-							<label>Email</label>
-							<input type="email" id="reg-email" required>
+							<label>Biografia / Bio <span class="optional">(opcional)</span></label>
+							<textarea id="reg-bio" rows="2" placeholder="Conte sobre suas plantas..."></textarea>
 						</div>
-						<div class="form-group">
-							<label>Password</label>
-							<input type="password" id="reg-password" required>
+
+						<h3 style="font-size: 0.95rem; color: #94a3b8; margin: 0.8rem 0 0.5rem 0; border-top: 1px dashed var(--border); padding-top: 0.5rem;">
+							Preferências & Perfil de Cultivo (Opcionais)
+						</h3>
+
+						<div class="form-grid">
+							<div class="form-group">
+								<label>Objetivo Principal <span class="optional">(opcional)</span></label>
+								<select id="reg-main-goal">
+									<option value="">Selecione...</option>
+									<option value="DECORATION">Decoração (DECORATION)</option>
+									<option value="ALIMENTATION">Alimentação (ALIMENTATION)</option>
+									<option value="WELL_BEING">Bem-Estar (WELL_BEING)</option>
+									<option value="SUSTAINABILITY">Sustentabilidade (SUSTAINABILITY)</option>
+								</select>
+							</div>
+							<div class="form-group">
+								<label>Nível de Experiência <span class="optional">(opcional)</span></label>
+								<select id="reg-experience">
+									<option value="">Selecione...</option>
+									<option value="BEGINNER">Iniciante (BEGINNER)</option>
+									<option value="INTERMEDIATE">Intermediário (INTERMEDIATE)</option>
+									<option value="ADVANCED">Avançado (ADVANCED)</option>
+								</select>
+							</div>
+							<div class="form-group">
+								<label>Disponibilidade de Tempo <span class="optional">(opcional)</span></label>
+								<select id="reg-time-availability">
+									<option value="">Selecione...</option>
+									<option value="DAILY">Diária (DAILY)</option>
+									<option value="FREQUENT">Frequente (FREQUENT)</option>
+									<option value="WEEKLY">Semanal (WEEKLY)</option>
+									<option value="SPORADIC">Esporádica (SPORADIC)</option>
+								</select>
+							</div>
 						</div>
-						<button type="submit">Register</button>
+
+						<div class="form-grid">
+							<div class="form-group">
+								<label>Luminosidades dos Cômodos <span class="optional">(múltipla escolha)</span></label>
+								<div class="checkbox-group">
+									<label class="checkbox-label"><input type="checkbox" name="reg-room-lum" value="LOW"> Baixa (LOW)</label>
+									<label class="checkbox-label"><input type="checkbox" name="reg-room-lum" value="MEDIUM"> Média (MEDIUM)</label>
+									<label class="checkbox-label"><input type="checkbox" name="reg-room-lum" value="INTENSE"> Intensa (INTENSE)</label>
+								</div>
+							</div>
+							<div class="form-group">
+								<label>Espaços Disponíveis <span class="optional">(múltipla escolha)</span></label>
+								<div class="checkbox-group">
+									<label class="checkbox-label"><input type="checkbox" name="reg-space-avail" value="SMALL"> Pequeno (SMALL)</label>
+									<label class="checkbox-label"><input type="checkbox" name="reg-space-avail" value="MEDIUM"> Médio (MEDIUM)</label>
+									<label class="checkbox-label"><input type="checkbox" name="reg-space-avail" value="LARGE"> Grande (LARGE)</label>
+								</div>
+							</div>
+						</div>
+
+						<button type="submit" style="width: 100%; margin-top: 0.5rem;">Cadastrar Usuário</button>
 					</form>
 				</div>
 			</div>
@@ -277,21 +416,146 @@
 		<!-- DASHBOARD SECTION -->
 		<section id="dashboard-section" class="hidden">
 			<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-				<h2 style="border: none; margin: 0;">Dashboard</h2>
-				<button onclick="logout()" class="danger btn-sm">Log Out</button>
+				<h2 style="border: none; margin: 0; color: var(--primary);">Painel de Controle</h2>
+				<button onclick="logout()" class="danger btn-sm">Sair (Log Out)</button>
 			</div>
 
-			<!-- SOCIAL / USERS SECTION -->
+			<!-- MY GARDEN SECTION -->
 			<div class="card">
-				<h2>Social / Comunidade 👥</h2>
+				<h2>Meu Jardim (Garden Plants) 🪴</h2>
+				<form id="garden-form" style="margin-bottom: 1.5rem;">
+					<div class="form-grid">
+						<div class="form-group">
+							<label>Apelido da Planta <span class="required">*</span></label>
+							<input type="text" id="garden-nickname" required placeholder="Ex: Minha Samambaia da Sala">
+						</div>
+						<div class="form-group">
+							<label>Espécie <span class="required">*</span></label>
+							<select id="garden-species" required onchange="onSpeciesSelected(this.value)">
+								<option value="">Selecione uma espécie...</option>
+							</select>
+						</div>
+						<div class="form-group">
+							<label>Estágio Atual <span class="optional">(opcional)</span></label>
+							<select id="garden-stage">
+								<option value="">Selecione a espécie primeiro...</option>
+							</select>
+						</div>
+						<div class="form-group">
+							<label>Cômodo / Local <span class="optional">(opcional)</span></label>
+							<select id="garden-room">
+								<option value="">Selecione...</option>
+								<option value="LIVING_ROOM">Sala de Estar (LIVING_ROOM)</option>
+								<option value="BEDROOM">Quarto (BEDROOM)</option>
+								<option value="YARD">Quintal / Jardim (YARD)</option>
+								<option value="KITCHEN">Cozinha (KITCHEN)</option>
+								<option value="DINING_ROOM">Sala de Jantar (DINING_ROOM)</option>
+								<option value="BATHROOM">Banheiro (BATHROOM)</option>
+								<option value="OTHER">Outro (OTHER)</option>
+							</select>
+						</div>
+					</div>
+					<div style="display: flex; gap: 1.5rem; margin-bottom: 1rem;">
+						<label class="checkbox-label">
+							<input type="checkbox" id="garden-rain"> Pega chuva direta (direct_rain)
+						</label>
+						<label class="checkbox-label">
+							<input type="checkbox" id="garden-notify" checked> Receber alertas de rega (watering_notification)
+						</label>
+					</div>
+					<button type="submit">Adicionar ao Jardim</button>
+				</form>
+				<div id="garden-list" class="item-list"></div>
+			</div>
 
-				<!-- Search Form -->
-				<form id="search-user-form"
-					style="display: flex; gap: 1rem; align-items: flex-end; margin-bottom: 1.5rem;">
+			<!-- PLANT CATALOG SECTION -->
+			<div class="card">
+				<h2>Catálogo de Espécies (Plant Species) 🌿</h2>
+				<form id="plant-form" style="margin-bottom: 1.5rem;">
+					<div class="form-grid">
+						<div class="form-group">
+							<label>Nome Comum <span class="required">*</span></label>
+							<input type="text" id="plant-name" required placeholder="Ex: Alecrim">
+						</div>
+						<div class="form-group">
+							<label>Nome Científico <span class="optional">(opcional)</span></label>
+							<input type="text" id="plant-scientific" placeholder="Ex: Salvia rosmarinus">
+						</div>
+						<div class="form-group">
+							<label>Tipo <span class="optional">(opcional)</span></label>
+							<select id="plant-type">
+								<option value="">Selecione...</option>
+								<option value="EDIBLE">Comestível (EDIBLE)</option>
+								<option value="AROMATIC">Aromática (AROMATIC)</option>
+								<option value="ORNAMENTAL">Ornamental (ORNAMENTAL)</option>
+								<option value="OTHER">Outro (OTHER)</option>
+							</select>
+						</div>
+						<div class="form-group">
+							<label>Porte / Tamanho <span class="optional">(opcional)</span></label>
+							<select id="plant-size">
+								<option value="">Selecione...</option>
+								<option value="SMALL">Pequeno (SMALL)</option>
+								<option value="MEDIUM">Médio (MEDIUM)</option>
+								<option value="LARGE">Grande (LARGE)</option>
+							</select>
+						</div>
+					</div>
+
+					<div class="form-grid">
+						<div class="form-group">
+							<label>Frequência de Rega <span class="optional">(opcional)</span></label>
+							<select id="plant-watering">
+								<option value="">Selecione...</option>
+								<option value="DAILY">Diária (DAILY)</option>
+								<option value="FREQUENT">Frequente (FREQUENT)</option>
+								<option value="WEEKLY">Semanal (WEEKLY)</option>
+								<option value="SPORADIC">Esporádica (SPORADIC)</option>
+							</select>
+						</div>
+						<div class="form-group">
+							<label>Necessidade de Luz <span class="optional">(opcional)</span></label>
+							<select id="plant-luminosity">
+								<option value="">Selecione...</option>
+								<option value="LOW">Baixa (LOW)</option>
+								<option value="MEDIUM">Média (MEDIUM)</option>
+								<option value="INTENSE">Intensa (INTENSE)</option>
+								<option value="ANY">Qualquer (ANY)</option>
+							</select>
+						</div>
+						<div class="form-group">
+							<label>Temperatura Ideal <span class="optional">(opcional)</span></label>
+							<select id="plant-temperature">
+								<option value="">Selecione...</option>
+								<option value="LOW">Baixa (LOW)</option>
+								<option value="MEDIUM">Média (MEDIUM)</option>
+								<option value="HIGH">Alta (HIGH)</option>
+								<option value="ANY">Qualquer (ANY)</option>
+							</select>
+						</div>
+						<div class="form-group">
+							<label>URL da Imagem <span class="optional">(opcional)</span></label>
+							<input type="text" id="plant-image" placeholder="https://...">
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label>Descrição <span class="optional">(opcional)</span></label>
+						<textarea id="plant-desc" rows="2" placeholder="Dicas de cultivo e cuidados..."></textarea>
+					</div>
+
+					<button type="submit">Cadastrar Espécie</button>
+				</form>
+				<div id="plants-list" class="item-list"></div>
+			</div>
+
+			<!-- SOCIAL / COMMUNITY SECTION -->
+			<div class="card">
+				<h2>Comunidade & Seguidores 👥</h2>
+				<form id="search-user-form" style="display: flex; gap: 1rem; align-items: flex-end; margin-bottom: 1.5rem;">
 					<div class="form-group" style="margin: 0; flex: 1;">
 						<label>Buscar usuário por @username</label>
-						<input type="text" id="search-username-input" placeholder="Digite o username ex: fulano"
-							required>
+						<input type="text" id="search-username-input" placeholder="Digite o username ex: fulano" required>
 					</div>
 					<button type="submit">Buscar</button>
 				</form>
@@ -309,47 +573,12 @@
 				<div id="social-relations-list" class="item-list"></div>
 			</div>
 
-			<div class="card">
-				<h2>Plant Species Catalog</h2>
-				<form id="plant-form"
-					style="display: flex; gap: 1rem; align-items: flex-end; margin-bottom: 1.5rem; flex-wrap: wrap;">
-					<div class="form-group" style="margin: 0; flex: 1; min-width: 200px;">
-						<label>Name</label>
-						<input type="text" id="plant-name" required>
-					</div>
-					<button type="submit">Add Species</button>
-				</form>
-				<div id="plants-list" class="item-list"></div>
-			</div>
-
-			<div class="card">
-				<h2>My Garden</h2>
-				<form id="garden-form"
-					style="display: flex; gap: 1rem; align-items: flex-end; margin-bottom: 1.5rem; flex-wrap: wrap;">
-					<div class="form-group" style="margin: 0; flex: 1; min-width: 200px;">
-						<label>Nickname</label>
-						<input type="text" id="garden-nickname" required>
-					</div>
-					<div class="form-group" style="margin: 0; flex: 1; min-width: 200px;">
-						<label>Plant Species</label>
-						<select id="garden-species" required></select>
-					</div>
-					<div class="form-group" style="margin: 0; flex: 1; min-width: 100px;">
-						<label>Stage</label>
-						<input type="number" id="garden-stage" value="1" required>
-					</div>
-					<button type="submit">Add to Garden</button>
-				</form>
-				<div id="garden-list" class="item-list"></div>
-			</div>
-
 			<!-- ACHIEVEMENTS SECTION -->
 			<div class="card">
-				<h2>Achievements (Conquistas)</h2>
-				<form id="achievement-form"
-					style="display: flex; gap: 1rem; align-items: flex-end; margin-bottom: 1.5rem; flex-wrap: wrap;">
+				<h2>Conquistas & Gamificação 🏆</h2>
+				<form id="achievement-form" style="display: flex; gap: 1rem; align-items: flex-end; margin-bottom: 1.5rem; flex-wrap: wrap;">
 					<div class="form-group" style="margin: 0; flex: 1; min-width: 250px;">
-						<label>Testar Conquista Manualmente</label>
+						<label>Disparar Conquista de Teste</label>
 						<select id="achievement-type" required>
 							<option value="">Selecione uma conquista...</option>
 							<option value="cultivar3">🌿 Cultivar 3 plantas</option>
@@ -366,29 +595,24 @@
 					<button type="submit">Conceder Conquista</button>
 				</form>
 
-				<h3 style="margin-top: 1rem;">Minhas Conquistas</h3>
+				<h3>Minhas Conquistas Desbloqueadas</h3>
 				<div id="achievements-list" class="item-list" style="margin-top: 1rem;"></div>
 			</div>
 		</section>
 	</div>
 
 	<script>
-		// API Base URL
-		const API_URL = ''; // Same origin
-
-		// State
+		const API_URL = '';
 		let token = localStorage.getItem('planpaz_token');
 		let username = localStorage.getItem('planpaz_username') || '';
 		let speciesCache = [];
 		let userAchievementsCount = 0;
 
-		// DOM Elements
 		const authSection = document.getElementById('auth-section');
 		const dashboardSection = document.getElementById('dashboard-section');
 		const authStatus = document.getElementById('auth-status');
 		const alertBox = document.getElementById('alert-box');
 
-		// Initialization
 		function init() {
 			if (token) {
 				showDashboard();
@@ -398,25 +622,24 @@
 			}
 		}
 
-		// Utility functions
 		function showMessage(msg, isError = false) {
 			alertBox.textContent = msg;
 			alertBox.className = `alert ${isError ? 'error' : 'success'}`;
 			alertBox.style.display = 'block';
-			setTimeout(() => {alertBox.style.display = 'none';}, 4000);
+			setTimeout(() => { alertBox.style.display = 'none'; }, 4500);
 		}
 
 		function showAuth() {
 			authSection.classList.remove('hidden');
 			dashboardSection.classList.add('hidden');
-			authStatus.innerHTML = '<span class="text-muted">Not authenticated</span>';
+			authStatus.innerHTML = '<span class="text-muted">Não autenticado</span>';
 		}
 
 		function showDashboard() {
 			authSection.classList.add('hidden');
 			dashboardSection.classList.remove('hidden');
-			const userDisplay = username ? `@${username}` : 'Authenticated';
-			authStatus.innerHTML = `<span style="color: var(--primary);">Logged in as <strong>${userDisplay}</strong> ✓</span>`;
+			const userDisplay = username ? `@${username}` : 'Autenticado';
+			authStatus.innerHTML = `<span style="color: var(--primary);">Conectado como <strong>${userDisplay}</strong> ✓</span>`;
 		}
 
 		function logout() {
@@ -426,11 +649,11 @@
 			localStorage.removeItem('planpaz_username');
 			userAchievementsCount = 0;
 			showAuth();
-			showMessage('Logged out successfully');
+			showMessage('Sessão encerrada com sucesso.');
 		}
 
 		async function fetchAPI(endpoint, method = 'GET', body = null) {
-			const headers = {'Content-Type': 'application/json'};
+			const headers = { 'Content-Type': 'application/json' };
 			if (token) headers['Authorization'] = `Bearer ${token}`;
 
 			try {
@@ -442,13 +665,13 @@
 
 				if (res.status === 401 || res.status === 403) {
 					logout();
-					throw new Error('Session expired');
+					throw new Error('Sessão expirada. Faça login novamente.');
 				}
 
 				const isJson = res.headers.get('content-type')?.includes('application/json');
 				const data = isJson ? await res.json() : await res.text();
 
-				if (!res.ok) throw new Error(data.message || data || 'API Error');
+				if (!res.ok) throw new Error(data.message || data || 'Erro na requisição');
 				return data;
 			} catch (err) {
 				showMessage(err.message, true);
@@ -456,13 +679,13 @@
 			}
 		}
 
-		// Auth Handlers
+		// --- AUTH HANDLERS ---
 		document.getElementById('login-form').addEventListener('submit', async (e) => {
 			e.preventDefault();
 			const email = document.getElementById('login-email').value;
 			const password = document.getElementById('login-password').value;
 			try {
-				const data = await fetchAPI('/auth/login', 'POST', {email, password});
+				const data = await fetchAPI('/auth/login', 'POST', { email, password });
 				if (data.token) {
 					token = data.token;
 					username = data.username || data.user?.username || '';
@@ -470,24 +693,53 @@
 					if (username) localStorage.setItem('planpaz_username', username);
 					showDashboard();
 					loadData();
-					showMessage('Login successful!');
+					showMessage('Login realizado com sucesso!');
 				}
 			} catch (e) { }
 		});
 
 		document.getElementById('register-form').addEventListener('submit', async (e) => {
 			e.preventDefault();
+
+			// Obrigatórios
 			const name = document.getElementById('reg-name').value;
 			const usernameInput = document.getElementById('reg-username').value;
 			const email = document.getElementById('reg-email').value;
 			const password = document.getElementById('reg-password').value;
+
+			// Opcionais
+			const city = document.getElementById('reg-city').value || null;
+			const birthdate = document.getElementById('reg-birthdate').value || null;
+			const gender = document.getElementById('reg-gender').value || null;
+			const wateringTime = document.getElementById('reg-watering-time').value ? document.getElementById('reg-watering-time').value + ":00" : null;
+			const bio = document.getElementById('reg-bio').value || null;
+			const mainGoal = document.getElementById('reg-main-goal').value || null;
+			const experienceLevel = document.getElementById('reg-experience').value || null;
+			const timeAvailability = document.getElementById('reg-time-availability').value || null;
+
+			// Checkboxes múltiplos
+			const roomLuminosity = Array.from(document.querySelectorAll('input[name="reg-room-lum"]:checked')).map(cb => cb.value);
+			const spaceAvailability = Array.from(document.querySelectorAll('input[name="reg-space-avail"]:checked')).map(cb => cb.value);
+
+			const payload = {
+				name,
+				username: usernameInput,
+				email,
+				password,
+				city,
+				birthdate,
+				gender,
+				wateringTime,
+				bio,
+				mainGoal,
+				experienceLevel,
+				timeAvailability,
+				roomLuminosity: roomLuminosity.length > 0 ? roomLuminosity : null,
+				spaceAvailability: spaceAvailability.length > 0 ? spaceAvailability : null
+			};
+
 			try {
-				const data = await fetchAPI('/auth/register', 'POST', {
-					name,
-					username: usernameInput,
-					email,
-					password
-				});
+				const data = await fetchAPI('/auth/register', 'POST', payload);
 				if (data.token) {
 					token = data.token;
 					username = data.username || data.user?.username || usernameInput;
@@ -495,16 +747,214 @@
 					localStorage.setItem('planpaz_username', username);
 					showDashboard();
 					loadData();
-					showMessage('Registration successful!');
+					showMessage('Cadastro realizado com sucesso!');
 				}
 			} catch (e) { }
 		});
 
-		// Data Loaders
 		async function loadData() {
 			await loadSpecies();
 			await loadGarden();
 			await loadAchievements();
+		}
+
+		// --- PLANT & SPECIES HANDLERS ---
+		async function loadSpecies() {
+			try {
+				const plants = await fetchAPI('/plants');
+				speciesCache = plants;
+
+				const list = document.getElementById('plants-list');
+				list.innerHTML = '';
+
+				const select = document.getElementById('garden-species');
+				select.innerHTML = '<option value="">Selecione uma espécie...</option>';
+
+				plants.forEach(p => {
+					const div = document.createElement('div');
+					div.className = 'item-card';
+
+					const badges = [
+						p.wateringLevel ? `<span class="badge">💧 ${p.wateringLevel}</span>` : '',
+						p.luminosityLevel ? `<span class="badge">☀️ ${p.luminosityLevel}</span>` : '',
+						p.temperatureLevel ? `<span class="badge">🌡️ ${p.temperatureLevel}</span>` : '',
+						p.size ? `<span class="badge">📏 ${p.size}</span>` : '',
+						p.type ? `<span class="badge">🌱 ${p.type}</span>` : ''
+					].join(' ');
+
+					div.innerHTML = `
+						<div>
+							<h3>${p.name}</h3>
+							<p><em>${p.scientificName || 'Nome científico não informado'}</em></p>
+							<p>${p.description || 'Sem descrição.'}</p>
+							<div style="margin: 0.5rem 0;">${badges}</div>
+						</div>
+						<div class="item-actions">
+							<button class="btn-sm danger" onclick="deleteSpecies('${p.id}')">Excluir</button>
+						</div>
+					`;
+					list.appendChild(div);
+
+					const opt = document.createElement('option');
+					opt.value = p.id;
+					opt.textContent = p.name + (p.scientificName ? ` (${p.scientificName})` : '');
+					select.appendChild(opt);
+				});
+			} catch (e) { }
+		}
+
+		document.getElementById('plant-form').addEventListener('submit', async (e) => {
+			e.preventDefault();
+			const payload = {
+				name: document.getElementById('plant-name').value,
+				scientificName: document.getElementById('plant-scientific').value || null,
+				description: document.getElementById('plant-desc').value || null,
+				type: document.getElementById('plant-type').value || null,
+				size: document.getElementById('plant-size').value || null,
+				wateringLevel: document.getElementById('plant-watering').value || null,
+				luminosityLevel: document.getElementById('plant-luminosity').value || null,
+				temperatureLevel: document.getElementById('plant-temperature').value || null,
+				imagePath: document.getElementById('plant-image').value || null
+			};
+
+			try {
+				await fetchAPI('/plants', 'POST', payload);
+				showMessage('Espécie cadastrada com sucesso!');
+				document.getElementById('plant-form').reset();
+				loadSpecies();
+			} catch (e) { }
+		});
+
+		async function deleteSpecies(id) {
+			if (!confirm('Deseja realmente excluir esta espécie?')) return;
+			try {
+				await fetchAPI(`/plants/${id}`, 'DELETE');
+				showMessage('Espécie excluída com sucesso!');
+				loadSpecies();
+			} catch (e) { }
+		}
+
+		async function onSpeciesSelected(plantId) {
+			const stageSelect = document.getElementById('garden-stage');
+			stageSelect.innerHTML = '<option value="">Carregando estágios...</option>';
+
+			if (!plantId) {
+				stageSelect.innerHTML = '<option value="">Selecione a espécie primeiro...</option>';
+				return;
+			}
+
+			try {
+				const stages = await fetchAPI(`/plants/${plantId}/stages`);
+				stageSelect.innerHTML = '<option value="">Nenhum estágio definido (opcional)</option>';
+
+				if (!stages || stages.length === 0) {
+					stageSelect.innerHTML = '<option value="">Sem estágios cadastrados para esta espécie</option>';
+					return;
+				}
+
+				stages.forEach(st => {
+					const opt = document.createElement('option');
+					opt.value = st.id;
+					opt.textContent = `${st.order}º - ${st.name} (~${st.days} dias)`;
+					stageSelect.appendChild(opt);
+				});
+			} catch (e) {
+				stageSelect.innerHTML = '<option value="">Erro ao carregar estágios</option>';
+			}
+		}
+
+		// --- GARDEN PLANTS HANDLERS ---
+		async function loadGarden() {
+			try {
+				const garden = await fetchAPI('/garden-plants');
+				const list = document.getElementById('garden-list');
+				list.innerHTML = '';
+
+				if (!garden || garden.length === 0) {
+					list.innerHTML = '<p class="text-muted">Seu jardim ainda não possui plantas. Adicione uma acima!</p>';
+					return;
+				}
+
+				garden.forEach(g => {
+					const speciesName = g.plant?.name || 'Espécie desconhecida';
+					const stageName = g.stage?.name ? `${g.stage.order}º - ${g.stage.name}` : 'Não informado';
+					const roomName = g.room || 'Não informado';
+
+					const div = document.createElement('div');
+					div.className = 'item-card';
+					div.innerHTML = `
+						<div>
+							<h3>${g.nickname}</h3>
+							<p><strong>Espécie:</strong> ${speciesName}</p>
+							<p><strong>Estágio:</strong> ${stageName}</p>
+							<p><strong>Cômodo:</strong> ${roomName}</p>
+							<p><strong>Última rega:</strong> ${g.lastWatering ? new Date(g.lastWatering).toLocaleDateString('pt-BR') : 'Não registrada'}</p>
+							<p><strong>Chuva direta:</strong> ${g.directRain ? 'Sim 🌧️' : 'Não 🏠'}</p>
+						</div>
+						<div class="item-actions">
+							<button class="btn-sm" onclick="waterPlant('${g.id}')">💧 Regar</button>
+							<button class="btn-sm" onclick="checkStatus('${g.id}')">🌤️ Clima & Status</button>
+							<button class="btn-sm danger" onclick="deleteGardenPlant('${g.id}')">Excluir</button>
+						</div>
+					`;
+					list.appendChild(div);
+				});
+			} catch (e) { }
+		}
+
+		document.getElementById('garden-form').addEventListener('submit', async (e) => {
+			e.preventDefault();
+			const nickname = document.getElementById('garden-nickname').value;
+			const plantId = document.getElementById('garden-species').value;
+			const stageId = document.getElementById('garden-stage').value || null;
+			const room = document.getElementById('garden-room').value || null;
+			const directRain = document.getElementById('garden-rain').checked;
+			const wateringNotification = document.getElementById('garden-notify').checked;
+
+			const payload = {
+				nickname,
+				plant: { id: plantId },
+				stage: stageId ? { id: stageId } : null,
+				room,
+				directRain,
+				wateringNotification
+			};
+
+			try {
+				await fetchAPI('/garden-plants', 'POST', payload);
+				showMessage('Planta adicionada ao seu jardim com sucesso!');
+				document.getElementById('garden-form').reset();
+				await loadGarden();
+				await loadAchievements();
+			} catch (e) { }
+		});
+
+		async function waterPlant(id) {
+			try {
+				await fetchAPI(`/garden-plants/${id}/watering`, 'POST');
+				showMessage('Planta regada com sucesso! 💧');
+				await loadGarden();
+				await loadAchievements();
+			} catch (e) { }
+		}
+
+		async function checkStatus(id) {
+			const city = prompt("Digite o nome da cidade para verificar o clima (ex: São Paulo):", "São Paulo");
+			if (!city) return;
+
+			try {
+				const data = await fetchAPI(`/garden-plants/${id}/status-rega?cidade=${encodeURIComponent(city)}`);
+				showMessage(`📍 ${data.cidade}: ${data.temperatura}°C, Umidade ${data.umidade}%. Recomendação: ${data.recomendacao}`);
+			} catch (e) { }
+		}
+
+		async function deleteGardenPlant(id) {
+			if (!confirm('Deseja remover esta planta do seu jardim?')) return;
+			try {
+				await fetchAPI(`/garden-plants/${id}`, 'DELETE');
+				showMessage('Planta removida do jardim.');
+				loadGarden();
+			} catch (e) { }
 		}
 
 		// --- SOCIAL & FOLLOWERS HANDLERS ---
@@ -556,12 +1006,9 @@
 
 		async function loadMyFollowers() {
 			try {
-				// Para ver os seguidores do usuário logado, primeiro fazemos a busca por si mesmo ou passamos o ID
-				// Caso seu backend exija ID, pegamos os resultados da busca ou usaremos o endpoint
 				const list = document.getElementById('social-relations-list');
 				list.innerHTML = '<p class="text-muted">Carregando seguidores...</p>';
 
-				// Como o token representa o usuário logado, vamos primeiro buscar o próprio ID
 				const me = await fetchAPI(`/user/search?username=${username}`);
 				if (!me || me.length === 0) {
 					list.innerHTML = '<p class="text-muted">Não foi possível identificar o usuário logado.</p>';
@@ -596,7 +1043,7 @@
 		async function loadMyFollowing() {
 			try {
 				const list = document.getElementById('social-relations-list');
-				list.innerHTML = '<p class="text-muted">Carregando usuários que você sigo...</p>';
+				list.innerHTML = '<p class="text-muted">Carregando quem você segue...</p>';
 
 				const me = await fetchAPI(`/user/search?username=${username}`);
 				if (!me || me.length === 0) {
@@ -638,67 +1085,7 @@
 			} catch (e) { }
 		}
 
-		// --- PLANT & GARDEN HANDLERS ---
-		async function loadSpecies() {
-			try {
-				const plants = await fetchAPI('/plants');
-				speciesCache = plants;
-
-				const list = document.getElementById('plants-list');
-				list.innerHTML = '';
-
-				const select = document.getElementById('garden-species');
-				select.innerHTML = '<option value="">Select a species</option>';
-
-				plants.forEach(p => {
-					const div = document.createElement('div');
-					div.className = 'item-card';
-					div.innerHTML = `
-                        <div>
-                            <h3>${p.name || 'Unnamed'}</h3>
-                            <p>ID: ${p.id}</p>
-                        </div>
-                        <div class="item-actions">
-                            <button class="btn-sm danger" onclick="deleteSpecies('${p.id}')">Delete</button>
-                        </div>
-                    `;
-					list.appendChild(div);
-
-					const opt = document.createElement('option');
-					opt.value = p.id;
-					opt.textContent = p.name || 'Unnamed';
-					select.appendChild(opt);
-				});
-			} catch (e) { }
-		}
-
-		async function loadGarden() {
-			try {
-				const garden = await fetchAPI('/garden-plants');
-				const list = document.getElementById('garden-list');
-				list.innerHTML = '';
-
-				garden.forEach(g => {
-					const species = g.plant ? (g.plant.name || g.plant.id) : 'Unknown species';
-					const div = document.createElement('div');
-					div.className = 'item-card';
-					div.innerHTML = `
-                        <div>
-                            <h3>${g.nickname}</h3>
-                            <p>Species: ${species}</p>
-                            <p>Stage: ${g.stage}</p>
-                        </div>
-                        <div class="item-actions" style="flex-wrap: wrap;">
-                            <button class="btn-sm" onclick="waterPlant('${g.id}')">💧 Water</button>
-                            <button class="btn-sm" onclick="checkStatus('${g.id}')">🌤️ Status</button>
-                            <button class="btn-sm danger" onclick="deleteGardenPlant('${g.id}')">Remove</button>
-                        </div>
-                    `;
-					list.appendChild(div);
-				});
-			} catch (e) { }
-		}
-
+		// --- ACHIEVEMENTS HANDLERS ---
 		async function loadAchievements() {
 			try {
 				const achievements = await fetchAPI('/achievements');
@@ -713,7 +1100,8 @@
 
 				if (userAchievementsCount > 0 && achievements.length > userAchievementsCount) {
 					const ultimaConquista = achievements[achievements.length - 1];
-					showMessage(`🎉 Nova Conquista Desbloqueada: ${ultimaConquista.description}`);
+					const desc = ultimaConquista.description || ultimaConquista.achievement?.name;
+					showMessage(`🎉 Nova Conquista Desbloqueada: ${desc}`);
 				}
 				userAchievementsCount = achievements.length;
 
@@ -721,58 +1109,23 @@
 					const div = document.createElement('div');
 					div.className = 'item-card';
 
+					const title = ach.achievement ? `${ach.achievement.name}` : (ach.description || 'Conquista');
+					const desc = ach.achievement ? ach.achievement.description : '';
 					const date = ach.unlockedAt || ach.createdAt
 						? new Date(ach.unlockedAt || ach.createdAt).toLocaleDateString('pt-BR')
 						: 'Data Indisponível';
 
 					div.innerHTML = `
-                        <div>
-                            <h3>${ach.description}</h3>
-                            <p>Desbloqueado em: ${date}</p>
-                        </div>
-                    `;
+						<div>
+							<h3>🏆 ${title}</h3>
+							${desc ? `<p>${desc}</p>` : ''}
+							<p style="font-size: 0.75rem; color: #38bdf8; margin-top: 0.4rem;">Desbloqueado em: ${date}</p>
+						</div>
+					`;
 					list.appendChild(div);
 				});
 			} catch (e) { }
 		}
-
-		// CRUD Handlers
-		document.getElementById('plant-form').addEventListener('submit', async (e) => {
-			e.preventDefault();
-			const name = document.getElementById('plant-name').value;
-			try {
-				await fetchAPI('/plants', 'POST', {name});
-				showMessage('Species added');
-				loadSpecies();
-			} catch (e) { }
-		});
-
-		async function deleteSpecies(id) {
-			if (!confirm('Are you sure?')) return;
-			try {
-				await fetchAPI(`/plants/${id}`, 'DELETE');
-				showMessage('Species deleted');
-				loadSpecies();
-			} catch (e) { }
-		}
-
-		document.getElementById('garden-form').addEventListener('submit', async (e) => {
-			e.preventDefault();
-			const nickname = document.getElementById('garden-nickname').value;
-			const plantId = document.getElementById('garden-species').value;
-			const stage = parseInt(document.getElementById('garden-stage').value);
-
-			try {
-				await fetchAPI('/garden-plants', 'POST', {
-					nickname,
-					stage,
-					plant: {id: plantId}
-				});
-				showMessage('Added to garden');
-				await loadGarden();
-				await loadAchievements();
-			} catch (e) { }
-		});
 
 		document.getElementById('achievement-form').addEventListener('submit', async (e) => {
 			e.preventDefault();
@@ -800,44 +1153,6 @@
 			} catch (e) { }
 		});
 
-		async function deleteGardenPlant(id) {
-			if (!confirm('Are you sure?')) return;
-			try {
-				await fetchAPI(`/garden-plants/${id}`, 'DELETE');
-				showMessage('Removed from garden');
-				loadGarden();
-			} catch (e) { }
-		}
-
-		async function waterPlant(id) {
-			try {
-				await fetchAPI(`/garden-plants/${id}/watering`, 'POST');
-				showMessage('Plant watered!');
-				await loadAchievements();
-			} catch (e) { }
-		}
-
-		async function checkStatus(id) {
-			const city = prompt("Enter city name (e.g. Sao Paulo):", "Sao Paulo");
-			if (!city) return;
-
-			try {
-				const data = await fetchAPI(`/garden-plants/${id}/status-rega?cidade=${encodeURIComponent(city)}`);
-				showMessage(`Status for ${data.cidade}: Temp ${data.temperatura}°C, Humidity ${data.umidade}%. Recommendation: ${data.recomendacao}`);
-			} catch (e) { }
-		}
-
-		async function handleFollow(userId) {
-			const btn = document.getElementById('follow-btn');
-			btn.disabled = true; // Evita cliques duplos concorrentes
-			try {
-				await fetchAPI(`/user/${userId}/follow`, 'POST');
-			} finally {
-				btn.disabled = false;
-			}
-		}
-
-		// Start app
 		init();
 	</script>
 </body>

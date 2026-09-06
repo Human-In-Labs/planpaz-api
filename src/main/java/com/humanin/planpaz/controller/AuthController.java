@@ -68,9 +68,20 @@ public class AuthController {
 			newUser.setPassword(passwordEncoder.encode(body.password()));
 			newUser.setEmail(body.email());
 			newUser.setName(body.name());
-
-			// Define o username recebido na requisição
 			newUser.setUsername(body.username());
+
+			// Campos opcionais
+			if (body.bio() != null) newUser.setBio(body.bio());
+			if (body.birthdate() != null) newUser.setBirthdate(body.birthdate());
+			if (body.gender() != null) newUser.setGender(body.gender());
+			if (body.mainGoal() != null) newUser.setMainGoal(body.mainGoal());
+			if (body.roomLuminosity() != null) newUser.setRoomLuminosity(body.roomLuminosity());
+			if (body.spaceAvailability() != null) newUser.setSpaceAvailability(body.spaceAvailability());
+			if (body.experienceLevel() != null) newUser.setExperienceLevel(body.experienceLevel());
+			if (body.timeAvailability() != null) newUser.setTimeAvailability(body.timeAvailability());
+			if (body.wateringTime() != null) newUser.setWateringTime(body.wateringTime());
+			if (body.city() != null) newUser.setCity(body.city());
+			if (body.fcmToken() != null) newUser.setFcmToken(body.fcmToken());
 
 			this.repository.save(newUser);
 

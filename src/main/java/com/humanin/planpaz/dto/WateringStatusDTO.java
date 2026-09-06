@@ -2,7 +2,7 @@ package com.humanin.planpaz.dto;
 
 import java.util.UUID;
 
-public record StatusRegaDTO(
+public record WateringStatusDTO(
     UUID plantaId, 
     String nomePlanta, 
     String cidade, 

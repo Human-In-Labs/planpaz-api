@@ -6,22 +6,22 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.humanin.planpaz.dto.ClimaResponseDTO;
-import com.humanin.planpaz.service.ClimaService;
+import com.humanin.planpaz.dto.WeatherResponseDTO;
+import com.humanin.planpaz.service.WeatherService;
 
 @RestController
 @RequestMapping("/api/clima")
-public class ClimaController {
+public class WeatherController {
 
-	private final ClimaService climaService;
+	private final WeatherService climaService;
 
-	public ClimaController(ClimaService climaService) {
+	public WeatherController(WeatherService climaService) {
 		this.climaService = climaService;
 	}
 
 	@GetMapping
-	public ResponseEntity<ClimaResponseDTO> testarClima(@RequestParam String cidade) {
-		ClimaResponseDTO clima = climaService.buscarClimaPorCidade(cidade);
+	public ResponseEntity<WeatherResponseDTO> testarClima(@RequestParam String cidade) {
+		WeatherResponseDTO clima = climaService.buscarClimaPorCidade(cidade);
 		return ResponseEntity.ok(clima);
 	}
 }

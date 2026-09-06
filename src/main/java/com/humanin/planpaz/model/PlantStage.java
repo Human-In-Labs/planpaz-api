@@ -2,7 +2,9 @@ package com.humanin.planpaz.model;
 
 import java.util.UUID;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -14,28 +16,33 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-//anotações do JPA
 @Entity
-@Table(name = "plants_stages")
-//anotações do Lombok
+@Table(name = "plant_stage")
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class PlantsStages {
+public class PlantStage {
 
-	// campos da tabela
 	@Id
 	@GeneratedValue(strategy = GenerationType.UUID)
 	private UUID id;
-	
-	@ManyToOne
-	@JoinColumn(name = "plant_id")
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "plant_id", nullable = false)
 	private Plant plant;
-	
+
+	@Column(nullable = false, length = 50)
 	private String name;
-	private int days;
+
+	@Column(name = "\"order\"")
+	private Integer order;
+
+	private Integer days;
+
+	@Column(columnDefinition = "TEXT")
 	private String description;
+
+	@Column(name = "image")
 	private String imagePath;
-	
 }

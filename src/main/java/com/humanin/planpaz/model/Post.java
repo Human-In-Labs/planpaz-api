@@ -5,7 +5,9 @@ import java.util.UUID;
 
 import org.hibernate.annotations.CreationTimestamp;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -17,29 +19,31 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-//anotações do JPA
 @Entity
 @Table(name = "post")
-//anotações do Lombok
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-
 public class Post {
-	// campos da tabela
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.UUID)
 	private UUID id;
-	
-	@ManyToOne
-	@JoinColumn(name = "author_id")
-	private User author;
-	
-	@CreationTimestamp 
-	private LocalDateTime postedAT;
-	private String title;
-	private String content;
-	private String mediaPath;
 
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "author_id", nullable = false)
+	private User author;
+
+	@CreationTimestamp
+	@Column(name = "posted_at", nullable = false, updatable = false)
+	private LocalDateTime postedAt;
+
+	@Column(nullable = false, length = 100)
+	private String title;
+
+	@Column(columnDefinition = "TEXT")
+	private String content;
+
+	private String media;
 }

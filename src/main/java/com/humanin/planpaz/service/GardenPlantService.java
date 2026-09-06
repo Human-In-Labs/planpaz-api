@@ -1,6 +1,8 @@
 package com.humanin.planpaz.service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -9,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.humanin.planpaz.model.GardenPlant;
+import com.humanin.planpaz.model.PlantStage;
 import com.humanin.planpaz.repositories.GardenPlantRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -24,7 +27,7 @@ public class GardenPlantService {
 	// EMAIL
 	public String verificarEEnviarStatusRega(UUID gardenPlantId, String cidade) {
 		GardenPlant gardenPlant = gardenPlantRepository.findById(gardenPlantId)
-				.orElseThrow(() -> new RuntimeException("Planta da horta não encontrada com o ID: " + gardenPlantId));
+				.orElseThrow(() -> new RuntimeException("Planta não encontrada com ID: " + gardenPlantId));
 
 		String statusRega = calcularStatusRega(gardenPlant, cidade);
 
@@ -43,7 +46,7 @@ public class GardenPlantService {
 	// ADICIONAR
 	@Transactional
 	public boolean adicionarPlanta(GardenPlant gardenPlant) {
-		gardenPlant.setPlantedAt(LocalDate.now());
+		gardenPlant.setPlantedAt(LocalDateTime.now());
 		gardenPlant.setLastWatering(LocalDate.now());
 
 		UUID ownerId = gardenPlant.getOwner().getId();
@@ -65,12 +68,21 @@ public class GardenPlantService {
 		return gardenPlantRepository.findByOwnerId(ownerId);
 	}
 
+	public List<GardenPlant> listarPlantasDoUsuario(UUID ownerId) {
+		return listarPorUsuario(ownerId);
+	}
+
 	// BUSCAR POR ID E USUÁRIO
 	public GardenPlant buscarPorIdEUsuario(UUID id, UUID ownerId) {
 		return gardenPlantRepository.findByIdAndOwnerId(id, ownerId).orElse(null);
 	}
 
+	public Optional<GardenPlant> buscarPorId(UUID id) {
+		return gardenPlantRepository.findById(id);
+	}
+
 	// EDITAR
+	@Transactional
 	public boolean editar(UUID id, UUID ownerId, GardenPlant gardenPlant) {
 		Optional<GardenPlant> optional = gardenPlantRepository.findById(id);
 
@@ -102,6 +114,11 @@ public class GardenPlantService {
 		verificarConquistasDeEstagio(ownerId, planta.getStage());
 
 		return true;
+	}
+
+	@Transactional
+	public boolean atualizarPlanta(UUID id, UUID ownerId, GardenPlant gardenPlant) {
+		return editar(id, ownerId, gardenPlant);
 	}
 
 	// EXCLUIR
@@ -146,7 +163,7 @@ public class GardenPlantService {
 		return true;
 	}
 
-	// REGRAS DE VERIFICAÇÃO DE CONQUISTAS
+	// MÉTODOS PRIVADOS PARA REGRAS DE CONQUISTAS
 
 	private void verificarConquistasDeCultivo(UUID ownerId) {
 		long totalPlantas = gardenPlantRepository.countByOwnerId(ownerId);
@@ -163,11 +180,12 @@ public class GardenPlantService {
 		}
 	}
 
-	private void verificarConquistasDeEstagio(UUID ownerId, Integer estagio) {
-		if (estagio != null) {
-			if (estagio == 2) { // Exemplo: Estágio 2 = Crescimento
+	private void verificarConquistasDeEstagio(UUID ownerId, PlantStage estagio) {
+		if (estagio != null && estagio.getOrder() != null) {
+			int ordem = estagio.getOrder();
+			if (ordem == 2) { // Estágio 2 = Crescimento
 				achievementService.concederEstagioCrescimento(ownerId);
-			} else if (estagio >= 3) { // Exemplo: Estágio 3 = Colheita/Floração
+			} else if (ordem >= 3) { // Estágio 3 = Colheita/Floração
 				achievementService.concederEstagioColheitaOuFloracao(ownerId);
 			}
 		}
@@ -175,7 +193,7 @@ public class GardenPlantService {
 
 	private void verificarConquistasDeSequencia(UUID ownerId, GardenPlant planta) {
 		if (planta.getPlantedAt() != null) {
-			long diasDeCultivo = java.time.temporal.ChronoUnit.DAYS.between(planta.getPlantedAt(), LocalDate.now());
+			long diasDeCultivo = ChronoUnit.DAYS.between(planta.getPlantedAt().toLocalDate(), LocalDate.now());
 
 			if (diasDeCultivo >= 3) {
 				achievementService.concederCuidarPlanta3Dias(ownerId);

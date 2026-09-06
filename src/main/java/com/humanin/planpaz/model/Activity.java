@@ -5,8 +5,12 @@ import java.util.UUID;
 
 import org.hibernate.annotations.CreationTimestamp;
 
+import com.humanin.planpaz.model.enums.ActivityType;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -20,33 +24,32 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "comment")
+@Table(name = "activity")
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Comment {
+public class Activity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.UUID)
 	private UUID id;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "author_id", nullable = false)
-	private User author;
+	@JoinColumn(name = "user_id", nullable = false)
+	private User user;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "post_id", nullable = false)
-	private Post post;
+	@Enumerated(EnumType.STRING)
+	@Column(name = "activity_type", nullable = false)
+	private ActivityType activityType;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "comment_id")
-	private Comment parentComment;
+	@Column(name = "target_id")
+	private UUID targetId;
 
-	@Column(columnDefinition = "TEXT", nullable = false)
-	private String content;
+	@Column(length = 50)
+	private String description;
 
 	@CreationTimestamp
-	@Column(name = "commented_at", nullable = false, updatable = false)
-	private LocalDateTime commentedAt;
+	@Column(name = "created_at", nullable = false, updatable = false)
+	private LocalDateTime createdAt;
 }

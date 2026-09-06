@@ -50,6 +50,7 @@ public class UserService {
 		followersRepository.deleteByFollowerAndFollowed(currentUser, targetUser);
 	}
 
+	@Transactional(readOnly = true)
 	public List<UserSummaryDTO> getFollowers(UUID userId) {
 		User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("Usuário não encontrado."));
 
@@ -57,6 +58,7 @@ public class UserService {
 				f.getFollower().getName(), f.getFollower().getUsername(), f.getFollower().getEmail())).toList();
 	}
 
+	@Transactional(readOnly = true)
 	public List<UserSummaryDTO> getFollowing(UUID userId) {
 		User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("Usuário não encontrado."));
 

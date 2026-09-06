@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.humanin.planpaz.model.Achievement;
 import com.humanin.planpaz.model.User;
+import com.humanin.planpaz.model.UserAchievement;
 import com.humanin.planpaz.service.AchievementService;
 
 import lombok.RequiredArgsConstructor;
@@ -28,10 +29,17 @@ public class AchievementController {
 
 	// LISTAR CONQUISTAS DO USUÁRIO
 	@GetMapping
-	public ResponseEntity<List<Achievement>> listar(Authentication authentication) {
+	public ResponseEntity<List<UserAchievement>> listar(Authentication authentication) {
 		User user = getAuthenticatedUser(authentication);
-		List<Achievement> conquistas = achievementService.obterConquistasDoUsuario(user.getId());
+		List<UserAchievement> conquistas = achievementService.obterConquistasDoUsuario(user.getId());
 		return ResponseEntity.ok(conquistas);
+	}
+
+	// LISTAR TODAS AS CONQUISTAS DO SISTEMA (CATÁLOGO)
+	@GetMapping("/catalogo")
+	public ResponseEntity<List<Achievement>> listarCatalogo() {
+		List<Achievement> todas = achievementService.listarTodas();
+		return ResponseEntity.ok(todas);
 	}
 
 	// ENDPOINTS DE TESTE MANUAL

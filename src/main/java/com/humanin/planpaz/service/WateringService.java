@@ -4,13 +4,13 @@ import java.time.LocalDate;
 
 import org.springframework.stereotype.Service;
 
-import com.humanin.planpaz.dto.ClimaResponseDTO;
+import com.humanin.planpaz.dto.WeatherResponseDTO;
 import com.humanin.planpaz.model.GardenPlant;
 
 @Service
-public class RegaService {
+public class WateringService {
 
-	public String calcularProximaRega(GardenPlant planta, ClimaResponseDTO clima) {
+	public String calcularProximaRega(GardenPlant planta, WeatherResponseDTO clima) {
 		// Regra 1: Se estiver chovendo, adia a rega para o dia seguinte
 		if (clima.isChovendo()) {
 			planta.setLastWatering(LocalDate.now()); // Considera "regada" pela chuva

@@ -1,6 +1,6 @@
 package com.humanin.planpaz.model.enums;
 
-public enum SpaceDisponibility {
+public enum SpaceAvailability {
 	SMALL, MEDIUM, LARGE
 
 }
