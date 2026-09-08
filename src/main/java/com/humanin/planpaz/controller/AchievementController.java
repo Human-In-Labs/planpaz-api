@@ -26,23 +26,31 @@ public class AchievementController {
 	private User getAuthenticatedUser(Authentication authentication) {
 		return (User) authentication.getPrincipal();
 	}
-
+	
+	// ==========================
 	// LISTAR CONQUISTAS DO USUÁRIO
+	// ==========================
+
 	@GetMapping
-	public ResponseEntity<List<UserAchievement>> listar(Authentication authentication) {
+	public ResponseEntity<List<UserAchievement>> getUserAchievements(Authentication authentication) {
 		User user = getAuthenticatedUser(authentication);
 		List<UserAchievement> conquistas = achievementService.obterConquistasDoUsuario(user.getId());
 		return ResponseEntity.ok(conquistas);
 	}
 
+	// ==========================
 	// LISTAR TODAS AS CONQUISTAS DO SISTEMA (CATÁLOGO)
+	// ==========================
 	@GetMapping("/catalog")
-	public ResponseEntity<List<Achievement>> listarCatalogo() {
+	public ResponseEntity<List<Achievement>> getAchievementsCatalog() {
 		List<Achievement> todas = achievementService.listarTodas();
 		return ResponseEntity.ok(todas);
 	}
 
-	// ENDPOINTS DE TESTE MANUAL
+	// ==========================
+	// ENDPOINTS DE TESTE MANUAL (CONCEDE A CONQUISTA AO USUÁRIO AUTENTICADO AO CHAMAR O ENDPOINT)
+	// ==========================
+
 	@PostMapping("/cultivar-3")
 	public ResponseEntity<Void> concederCultivar3(Authentication authentication) {
 		User user = getAuthenticatedUser(authentication);

@@ -11,9 +11,9 @@ import com.humanin.planpaz.dto.UserSettingsDTO;
 import com.humanin.planpaz.dto.UserSummaryDTO;
 import com.humanin.planpaz.infra.exception.BusinessException;
 import com.humanin.planpaz.infra.exception.ResourceNotFoundException;
-import com.humanin.planpaz.model.Followers;
+import com.humanin.planpaz.model.Follow;
 import com.humanin.planpaz.model.User;
-import com.humanin.planpaz.repositories.FollowersRepository;
+import com.humanin.planpaz.repositories.FollowRepository;
 import com.humanin.planpaz.repositories.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -23,7 +23,7 @@ import lombok.RequiredArgsConstructor;
 public class UserService {
 
 	private final UserRepository userRepository;
-	private final FollowersRepository followersRepository;
+	private final FollowRepository followersRepository;
 
 	@Transactional(readOnly = true)
 	public UserSettingsDTO getUserSettings(UUID userId) {
@@ -44,7 +44,9 @@ public class UserService {
 		if (preferences.experienceLevel() != null) user.setExperienceLevel(preferences.experienceLevel());
 		if (preferences.timeAvailability() != null) user.setTimeAvailability(preferences.timeAvailability());
 		if (preferences.wateringTime() != null) user.setWateringTime(preferences.wateringTime());
-		if (preferences.city() != null) user.setCity(preferences.city());
+		if (preferences.cityName() != null) user.setCityName(preferences.cityName());
+		if (preferences.latitude() != null) user.setLatitude(preferences.latitude());
+		if (preferences.longitude() != null) user.setLongitude(preferences.longitude());
 		if (preferences.fcmToken() != null) user.setFcmToken(preferences.fcmToken());
 
 		User saved = userRepository.save(user);
@@ -82,7 +84,9 @@ public class UserService {
 		if (settings.experienceLevel() != null) user.setExperienceLevel(settings.experienceLevel());
 		if (settings.timeAvailability() != null) user.setTimeAvailability(settings.timeAvailability());
 		if (settings.wateringTime() != null) user.setWateringTime(settings.wateringTime());
-		if (settings.city() != null) user.setCity(settings.city());
+		if (settings.cityName() != null) user.setCityName(settings.cityName());
+		if (settings.latitude() != null) user.setLatitude(settings.latitude());
+		if (settings.longitude() != null) user.setLongitude(settings.longitude());
 		if (settings.fcmToken() != null) user.setFcmToken(settings.fcmToken());
 
 		User saved = userRepository.save(user);
@@ -104,7 +108,7 @@ public class UserService {
 		User targetUser = findUserById(targetUserId);
 
 		if (!followersRepository.existsByFollowerAndFollowed(currentUser, targetUser)) {
-			Followers relation = new Followers(currentUser, targetUser);
+			Follow relation = new Follow(currentUser, targetUser);
 			followersRepository.save(relation);
 		}
 	}

@@ -35,7 +35,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/auth/register").permitAll()
                         .requestMatchers(HttpMethod.GET, "/test", "/test.html").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/clima").permitAll() //PARA TESTES
+                        .requestMatchers(HttpMethod.GET, "/api/clima/**").permitAll() //PARA TESTES
                         .requestMatchers("/error").permitAll() // <--- PARA TESTES
                         .anyRequest().authenticated() // todas as outras endpoints
                 )

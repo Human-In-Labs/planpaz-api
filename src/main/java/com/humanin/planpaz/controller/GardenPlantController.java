@@ -109,7 +109,7 @@ public class GardenPlantController {
 	}
 
 	// =========================
-	// RETORNAR AS PRÓXIMAS REGAS
+	// RETORNAR AS PRÓXIMAS 4 REGAS
 	// =========================
 	
 	@GetMapping("/next-waterings/{id}")
@@ -144,7 +144,7 @@ public class GardenPlantController {
 		GardenPlant planta = gardenPlantService.buscarPorIdEUsuario(id, user.getId());
 
 		// Busca o clima da cidade informada
-		WeatherResponseDTO clima = weatherService.buscarClimaPorCidade(cidade);
+		WeatherResponseDTO clima = weatherService.getCurrentWeather(cidade);
 
 		// Processa a recomendação com base nas regras do sistema
 		String recomendacao = wateringService.analisarClima(planta, clima);

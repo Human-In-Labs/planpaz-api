@@ -24,6 +24,8 @@ public record UserPreferencesDTO(
     ExperienceLevel experienceLevel,
     TimeAvailability timeAvailability,
     LocalTime wateringTime,
-    String city,
+    String cityName,
+    Double longitude,
+    Double latitude,
     String fcmToken
 ) {}

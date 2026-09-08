@@ -100,7 +100,14 @@ public class User {
 	@Column(name = "ecoscore")
 	private Integer ecoscore;
 
-	private String city;
+	@Column(name = "latitude")
+	private Double latitude;
+
+	@Column(name = "longitude")
+	private Double longitude;
+
+	@Column(name = "cityName")
+	private String cityName;
 
 	@Column(name = "fcm_token")
 	private String fcmToken;

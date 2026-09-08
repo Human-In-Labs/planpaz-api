@@ -32,7 +32,9 @@ public record UserSettingsDTO(
     TimeAvailability timeAvailability,
     LocalTime wateringTime,
     Integer ecoscore,
-    String city,
+    String cityName,
+    Double latitude,
+    Double longitude,
     String fcmToken,
     LocalDateTime createdAt
 ) {
@@ -55,7 +57,9 @@ public record UserSettingsDTO(
             user.getTimeAvailability(),
             user.getWateringTime(),
             user.getEcoscore(),
-            user.getCity(),
+            user.getCityName(),
+            user.getLatitude(),
+            user.getLongitude(),
             user.getFcmToken(),
             user.getCreatedAt()
         );

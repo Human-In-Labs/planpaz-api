@@ -18,7 +18,7 @@ import lombok.Setter;
 
 @Entity
 @Table(
-	name = "followers",
+	name = "follow",
 	uniqueConstraints = {
 		@UniqueConstraint(name = "uk_follower_followed", columnNames = {"follower_id", "followed_id"})
 	}
@@ -26,7 +26,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Followers {
+public class Follow {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.UUID)
@@ -41,7 +41,7 @@ public class Followers {
 	@JoinColumn(name = "followed_id", nullable = false)
 	private User followed;
 
-	public Followers(User follower, User followed) {
+	public Follow(User follower, User followed) {
 		this.follower = follower;
 		this.followed = followed;
 	}

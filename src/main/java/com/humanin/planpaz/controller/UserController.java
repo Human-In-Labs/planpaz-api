@@ -30,17 +30,29 @@ public class UserController {
 
 	private final UserService userService;
 
+	// ==========================
+	// 	TESTE: SE O USUÁRIO TIVER UM TOKEN  VÁLIDO ELE VAI PODE ACESSAR ESSE ENDPOINT
+	// ==========================
+
 	@GetMapping
 	public ResponseEntity<String> getUser() {
 		System.out.println("[SUCESS] Usuário autenticado com token válido.");
 		return ResponseEntity.ok("Sucesso!");
 	}
 
+	// ==========================
+	// RETORNA TODOS OS ATRIBUTOS DO USER 
+	// ==========================
+
 	@GetMapping("/settings")
 	public ResponseEntity<UserSettingsDTO> getSettings(@AuthenticationPrincipal User currentUser) {
 		UserSettingsDTO settings = userService.getUserSettings(currentUser.getId());
 		return ResponseEntity.ok(settings);
 	}
+
+	// ==========================
+	// ATUALIZA AS PREFERÊNCIAS OPCIONAIS DO USUÁRIO
+	// ==========================
 
 	@PutMapping("/preferences")
 	public ResponseEntity<UserSettingsDTO> updatePreferences(
@@ -50,6 +62,10 @@ public class UserController {
 		return ResponseEntity.ok(updated);
 	}
 
+	// ==========================
+	// ATUALIZA TODAS AS CONFIGURAÇÕES DO USUÁRIO
+	// ==========================
+
 	@PutMapping("/settings")
 	public ResponseEntity<UserSettingsDTO> updateSettings(
 			@AuthenticationPrincipal User currentUser,
@@ -58,42 +74,61 @@ public class UserController {
 		return ResponseEntity.ok(updated);
 	}
 
-	// 1. Pesquisar usuários por @username
+	
+	// ==========================
+	// PESQUISA USUÁRIOS PELO USERNAME
+	// ==========================
+
 	@GetMapping("/search")
 	public ResponseEntity<List<UserSummaryDTO>> searchUsers(@RequestParam String username) {
 		List<UserSummaryDTO> users = userService.searchByUsername(username);
 		return ResponseEntity.ok(users);
 	}
 
-	// 2. Seguir um usuário pelo ID
+	// ==========================
+	// SEGUE UM USUÁRIO POR ID
+	// ==========================
+
 	@PostMapping("/{id}/follow")
 	public ResponseEntity<Void> followUser(@AuthenticationPrincipal User currentUser, @PathVariable UUID id) {
 		userService.followUser(currentUser, id);
 		return ResponseEntity.ok().build();
 	}
 
-	// 3. Deixar de seguir um usuário (Unfollow)
+	// ==========================
+	// DEIXA DE SEGUIR UM USUÁRIO POR ID
+	// ==========================
+
 	@DeleteMapping("/{id}/unfollow")
 	public ResponseEntity<Void> unfollowUser(@AuthenticationPrincipal User currentUser, @PathVariable UUID id) {
 		userService.unfollowUser(currentUser, id);
 		return ResponseEntity.noContent().build();
 	}
 
-	// 4. Listar quem está seguindo um determinado usuário
+	// ==========================
+	// LISTA DE SEGUIDORES DE UM USUÁRIO
+	// ==========================
+
 	@GetMapping("/{id}/followers")
 	public ResponseEntity<List<UserSummaryDTO>> getFollowers(@PathVariable UUID id) {
 		List<UserSummaryDTO> followers = userService.getFollowers(id);
 		return ResponseEntity.ok(followers);
 	}
 
-	// 5. Listar quem um determinado usuário está seguindo
+	// ==========================
+	// LISTA DE SEGUINDO DE UM USUÁRIO
+	// ==========================
+
 	@GetMapping("/{id}/following")
 	public ResponseEntity<List<UserSummaryDTO>> getFollowing(@PathVariable UUID id) {
 		List<UserSummaryDTO> following = userService.getFollowing(id);
 		return ResponseEntity.ok(following);
 	}
 
-	// 6. Remover alguém da SUA lista de seguidores
+	// ==========================
+	// REMOVE UM SEGUIDOR DA SUA CONTA
+	// ==========================
+	
 	@DeleteMapping("/followers/{followerId}")
 	public ResponseEntity<Void> removeFollower(@AuthenticationPrincipal User currentUser,
 			@PathVariable UUID followerId) {

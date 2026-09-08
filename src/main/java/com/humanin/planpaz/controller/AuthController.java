@@ -17,14 +17,21 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthController {
-
 	private final AuthService authService;
+
+	// ==========================
+	// REALIZA O LOGIN E RETORNA UM TOKEN JWT
+	// ==========================
 
 	@PostMapping("/login")
 	public ResponseEntity<ResponseDTO> login(@RequestBody LoginRequestDTO body) {
 		ResponseDTO response = authService.login(body);
 		return ResponseEntity.ok(response);
 	}
+
+	// ==========================
+	// REALIZA O PRIMEIRO CADASTRO COM DADOS OBRIGATÓRIOS E RETORNA UM TOKEN JWT
+	// ==========================
 
 	@PostMapping("/register")
 	public ResponseEntity<ResponseDTO> register(@RequestBody RegisterRequestDTO body) {
