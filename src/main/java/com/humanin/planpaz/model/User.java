@@ -111,4 +111,16 @@ public class User {
 
 	@Column(name = "fcm_token")
 	private String fcmToken;
+
+	// ===== VERIFICAÇÃO DE E-MAIL =====
+
+	@Column(name = "email_verified", nullable = false)
+	private Boolean emailVerified = false;
+
+	@Column(name = "verification_token")
+	@JsonIgnore
+	private String verificationToken;
+
+	@Column(name = "verification_token_expires_at")
+	private LocalDateTime verificationTokenExpiresAt;
 }

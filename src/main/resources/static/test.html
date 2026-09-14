@@ -3,24 +3,36 @@
 
 <head>
 	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 	<title>Planpaz - API Test Dashboard</title>
 	<style>
-		@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+		@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 		:root {
 			--primary: #10b981;
 			--primary-dark: #059669;
-			--bg-color: #0f172a;
-			--surface: #1e293b;
-			--surface-hover: #334155;
+			--primary-light: #34d399;
+			--primary-glow: rgba(16, 185, 129, 0.35);
+			--bg-color: #0a0f1c;
+			--bg-color-2: #0d1424;
+			--surface: #141b2d;
+			--surface-2: #1a2338;
+			--surface-hover: #212c47;
 			--text-main: #f8fafc;
-			--text-muted: #94a3b8;
-			--border: #334155;
-			--danger: #ef4444;
-			--danger-hover: #dc2626;
+			--text-muted: #8b96ac;
+			--border: #263049;
+			--border-soft: rgba(148, 163, 184, 0.12);
+			--danger: #f43f5e;
+			--danger-hover: #e11d48;
 			--accent: #38bdf8;
 			--warning: #f59e0b;
+			--radius-sm: 8px;
+			--radius-md: 14px;
+			--radius-lg: 20px;
+			--shadow-card: 0 1px 2px rgba(0, 0, 0, 0.24), 0 8px 24px -8px rgba(0, 0, 0, 0.5);
+			--shadow-pop: 0 12px 32px -8px rgba(0, 0, 0, 0.55);
+			--safe-bottom: env(safe-area-inset-bottom, 0px);
+			--safe-top: env(safe-area-inset-top, 0px);
 		}
 
 		* {
@@ -28,259 +40,438 @@
 			margin: 0;
 			padding: 0;
 			font-family: 'Inter', sans-serif;
+			-webkit-tap-highlight-color: transparent;
+		}
+
+		html {
+			-webkit-text-size-adjust: 100%;
 		}
 
 		body {
-			background-color: var(--bg-color);
+			background:
+				radial-gradient(circle at 12% 0%, rgba(16, 185, 129, 0.10), transparent 55%),
+				radial-gradient(circle at 90% 8%, rgba(56, 189, 248, 0.08), transparent 45%),
+				var(--bg-color);
+			background-attachment: fixed;
 			color: var(--text-main);
 			min-height: 100vh;
 			display: flex;
 			flex-direction: column;
+			font-size: 15px;
+			letter-spacing: -0.01em;
+			line-height: 1.5;
+			-webkit-font-smoothing: antialiased;
+		}
+
+		::-webkit-scrollbar {
+			width: 8px;
+			height: 8px;
+		}
+
+		::-webkit-scrollbar-track {
+			background: transparent;
+		}
+
+		::-webkit-scrollbar-thumb {
+			background: var(--surface-hover);
+			border-radius: 8px;
 		}
 
 		header {
-			background-color: rgba(30, 41, 59, 0.9);
-			backdrop-filter: blur(10px);
-			padding: 1rem 2rem;
-			border-bottom: 1px solid var(--border);
+			background: linear-gradient(180deg, rgba(13, 20, 36, 0.97), rgba(10, 15, 28, 0.9));
+			backdrop-filter: blur(14px);
+			-webkit-backdrop-filter: blur(14px);
+			padding: calc(0.85rem + var(--safe-top)) 1rem 0.85rem;
+			border-bottom: 1px solid var(--border-soft);
 			display: flex;
-			justify-content: space-between;
-			align-items: center;
+			flex-direction: column;
+			gap: 0.7rem;
 			position: sticky;
 			top: 0;
 			z-index: 100;
 		}
 
+		@media (min-width: 640px) {
+			header {
+				flex-direction: row;
+				justify-content: space-between;
+				align-items: center;
+				padding: 1rem 1.5rem;
+			}
+		}
+
 		header h1 {
-			font-size: 1.25rem;
-			color: var(--primary);
-			font-weight: 600;
+			font-size: 1.05rem;
+			background: linear-gradient(90deg, var(--primary-light), var(--accent));
+			-webkit-background-clip: text;
+			background-clip: text;
+			color: transparent;
+			font-weight: 800;
 			display: flex;
 			align-items: center;
 			gap: 0.5rem;
+			letter-spacing: -0.02em;
 		}
 
 		.header-right {
 			display: flex;
 			align-items: center;
-			gap: 1rem;
+			justify-content: space-between;
+			gap: 0.6rem;
+			width: 100%;
+		}
+
+		@media (min-width: 640px) {
+			.header-right {
+				width: auto;
+				justify-content: flex-end;
+			}
+		}
+
+		#auth-status {
+			font-size: 0.8rem;
 		}
 
 		.container {
 			max-width: 1250px;
-			margin: 1.5rem auto;
-			padding: 0 1rem;
+			margin: 0.9rem auto;
+			padding: 0 0.8rem;
 			width: 100%;
 			flex-grow: 1;
 		}
 
-		/* NAVIGATION TABS */
+		body:has(#dashboard-section:not(.hidden)) .container {
+			padding-bottom: calc(1rem + var(--safe-bottom));
+		}
+
 		.nav-tabs {
 			display: flex;
-			gap: 0.5rem;
-			margin-bottom: 1.5rem;
-			border-bottom: 1px solid var(--border);
-			padding-bottom: 0.5rem;
+			gap: 0.4rem;
+			margin-bottom: 1.1rem;
+			padding: 0.4rem;
 			overflow-x: auto;
+			-webkit-overflow-scrolling: touch;
+			scrollbar-width: none;
+			background: var(--surface);
+			border: 1px solid var(--border-soft);
+			border-radius: 14px;
+			box-shadow: var(--shadow-card);
+			position: sticky;
+			top: calc(3.6rem + var(--safe-top));
+			z-index: 90;
+		}
+
+		@media (min-width: 640px) {
+			.nav-tabs {
+				top: calc(4.2rem + var(--safe-top));
+			}
+		}
+
+		.nav-tabs::-webkit-scrollbar {
+			display: none;
 		}
 
 		.nav-tab {
 			background: transparent;
 			color: var(--text-muted);
 			border: 1px solid transparent;
-			padding: 0.5rem 1rem;
-			border-radius: 8px;
+			padding: 0.6rem 0.85rem;
+			border-radius: 10px;
 			cursor: pointer;
-			font-weight: 500;
-			transition: all 0.2s;
+			font-weight: 600;
+			transition: background-color 0.18s ease, color 0.18s ease, transform 0.1s ease;
 			white-space: nowrap;
+			font-size: 0.83rem;
+			flex-shrink: 0;
 		}
 
 		.nav-tab:hover {
-			background-color: var(--surface);
+			background-color: var(--surface-hover);
 			color: var(--text-main);
+		}
+
+		.nav-tab:active {
+			transform: scale(0.96);
 		}
 
 		.nav-tab.active {
-			background-color: var(--surface);
-			color: var(--primary);
-			border-color: var(--border);
-			font-weight: 600;
+			background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+			color: #042f2e;
+			box-shadow: 0 4px 14px -4px var(--primary-glow);
+		}
+
+		.auth-grid,
+		.weather-grid {
+			display: grid;
+			grid-template-columns: 1fr;
+			gap: 1rem;
+		}
+
+		@media (min-width: 768px) {
+			.auth-grid {
+				grid-template-columns: 1fr 1.6fr;
+				gap: 1.5rem;
+			}
+
+			.weather-grid {
+				grid-template-columns: 1fr 1fr;
+				gap: 1.5rem;
+			}
 		}
 
 		.card {
-			background-color: var(--surface);
-			border-radius: 12px;
-			padding: 1.5rem;
-			border: 1px solid var(--border);
-			margin-bottom: 1.5rem;
-			box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-			transition: transform 0.2s ease, box-shadow 0.2s ease;
+			background: linear-gradient(180deg, var(--surface-2), var(--surface));
+			border-radius: var(--radius-md);
+			padding: 1.1rem;
+			border: 1px solid var(--border-soft);
+			margin-bottom: 1rem;
+			box-shadow: var(--shadow-card);
+			animation: fadeIn 0.25s ease;
 		}
 
-		.card:hover {
-			box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.25);
+		@keyframes fadeIn {
+			from {
+				opacity: 0;
+				transform: translateY(6px);
+			}
+
+			to {
+				opacity: 1;
+				transform: translateY(0);
+			}
+		}
+
+		@media (min-width: 640px) {
+			.card {
+				padding: 1.4rem;
+				margin-bottom: 1.25rem;
+			}
 		}
 
 		h2 {
-			font-size: 1.3rem;
-			margin-bottom: 1rem;
-			font-weight: 600;
-			border-bottom: 1px solid var(--border);
-			padding-bottom: 0.5rem;
-			color: var(--accent);
+			font-size: 1.05rem;
+			margin-bottom: 1.1rem;
+			font-weight: 700;
+			border-bottom: 1px solid var(--border-soft);
+			padding-bottom: 0.75rem;
+			color: var(--text-main);
 			display: flex;
 			align-items: center;
 			justify-content: space-between;
+			flex-wrap: wrap;
+			gap: 0.5rem;
+			letter-spacing: -0.01em;
 		}
 
 		h3 {
-			font-size: 1.05rem;
-			margin-bottom: 0.6rem;
-			color: var(--text-main);
+			font-size: 0.92rem;
+			margin-bottom: 0.65rem;
+			color: var(--accent);
+			font-weight: 600;
 		}
 
 		.form-grid {
 			display: grid;
-			grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-			gap: 1rem;
+			grid-template-columns: 1fr;
+			gap: 0.85rem;
 			margin-bottom: 1rem;
 		}
 
+		@media (min-width: 640px) {
+			.form-grid {
+				grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+			}
+		}
+
 		.form-group {
-			margin-bottom: 0.8rem;
+			margin-bottom: 0.85rem;
 		}
 
 		.form-group label {
 			display: block;
-			margin-bottom: 0.35rem;
+			margin-bottom: 0.4rem;
 			color: var(--text-muted);
-			font-size: 0.85rem;
-			font-weight: 500;
+			font-size: 0.8rem;
+			font-weight: 600;
+			text-transform: uppercase;
+			letter-spacing: 0.03em;
 		}
 
 		.form-group label span.required {
 			color: var(--danger);
+			text-transform: none;
 		}
 
 		.form-group label span.optional {
-			color: #64748b;
-			font-size: 0.75rem;
-			font-weight: normal;
+			color: #5b6884;
+			font-size: 0.72rem;
+			font-weight: 500;
+			text-transform: none;
 		}
 
 		input,
 		select,
 		textarea {
 			width: 100%;
-			padding: 0.6rem 0.8rem;
-			border-radius: 6px;
-			border: 1px solid var(--border);
-			background-color: rgba(15, 23, 42, 0.7);
+			padding: 0.8rem 0.85rem;
+			border-radius: 10px;
+			border: 1.5px solid var(--border);
+			background-color: rgba(6, 10, 20, 0.55);
 			color: var(--text-main);
-			font-size: 0.9rem;
-			transition: border-color 0.2s;
+			font-size: 16px;
+			transition: border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
+		}
+
+		input::placeholder,
+		textarea::placeholder {
+			color: #55617a;
 		}
 
 		input:focus,
-		select,
+		select:focus,
 		textarea:focus {
 			outline: none;
 			border-color: var(--primary);
+			background-color: rgba(6, 10, 20, 0.85);
+			box-shadow: 0 0 0 4px var(--primary-glow);
+		}
+
+		select {
+			appearance: none;
+			-webkit-appearance: none;
+			background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='9' viewBox='0 0 14 9'%3E%3Cpath fill='none' stroke='%238b96ac' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round' d='M1 1l6 6 6-6'/%3E%3C/svg%3E");
+			background-repeat: no-repeat;
+			background-position: right 0.9rem center;
+			padding-right: 2.2rem;
 		}
 
 		.checkbox-group {
 			display: flex;
-			flex-wrap: wrap;
-			gap: 0.75rem;
-			background: rgba(15, 23, 42, 0.4);
-			padding: 0.6rem;
-			border-radius: 6px;
-			border: 1px solid var(--border);
+			flex-direction: column;
+			gap: 0.8rem;
+			background: rgba(6, 10, 20, 0.4);
+			padding: 0.85rem;
+			border-radius: 10px;
+			border: 1px solid var(--border-soft);
+		}
+
+		@media (min-width: 640px) {
+			.checkbox-group {
+				flex-direction: row;
+				flex-wrap: wrap;
+			}
 		}
 
 		.checkbox-label {
 			display: flex;
 			align-items: center;
-			gap: 0.4rem;
-			font-size: 0.85rem;
+			gap: 0.6rem;
+			font-size: 0.88rem;
 			cursor: pointer;
 			color: var(--text-main);
 		}
 
 		.checkbox-label input[type="checkbox"] {
-			width: auto;
+			width: 1.2rem;
+			height: 1.2rem;
 			cursor: pointer;
+			accent-color: var(--primary);
 		}
 
 		button {
-			background-color: var(--primary);
-			color: #042f2e;
+			background: linear-gradient(135deg, var(--primary-light), var(--primary-dark));
+			color: #04211d;
 			border: none;
-			border-radius: 6px;
-			padding: 0.6rem 1.2rem;
-			font-weight: 600;
-			font-size: 0.9rem;
+			border-radius: 10px;
+			padding: 0.85rem 1.25rem;
+			font-weight: 700;
+			font-size: 0.93rem;
 			cursor: pointer;
-			transition: background-color 0.2s, transform 0.1s;
+			transition: filter 0.18s ease, transform 0.08s ease, box-shadow 0.18s ease;
 			display: inline-flex;
 			align-items: center;
 			justify-content: center;
 			gap: 0.4rem;
+			min-height: 46px;
+			touch-action: manipulation;
+			box-shadow: 0 6px 16px -6px var(--primary-glow);
+			letter-spacing: -0.01em;
 		}
 
 		button:hover {
-			background-color: var(--primary-dark);
+			filter: brightness(1.08);
 		}
 
 		button:active {
-			transform: scale(0.98);
+			transform: scale(0.97);
 		}
 
 		button.btn-sm {
-			padding: 0.35rem 0.7rem;
-			font-size: 0.8rem;
+			padding: 0.55rem 0.85rem;
+			font-size: 0.83rem;
+			min-height: 40px;
+			box-shadow: none;
 		}
 
 		button.btn-secondary {
-			background-color: #334155;
-			color: #f8fafc;
+			background: var(--surface-hover);
+			color: var(--text-main);
+			box-shadow: none;
+			border: 1px solid var(--border-soft);
 		}
 
 		button.btn-secondary:hover {
-			background-color: #475569;
+			background-color: #2a3654;
+			filter: none;
 		}
 
 		button.danger {
-			background-color: var(--danger);
-			color: #ffffff;
+			background: linear-gradient(135deg, #fb7185, var(--danger-hover));
+			color: #2d0a12;
+			box-shadow: 0 6px 16px -6px rgba(244, 63, 94, 0.35);
 		}
 
 		button.danger:hover {
-			background-color: var(--danger-hover);
+			filter: brightness(1.08);
 		}
 
 		.item-list {
 			display: grid;
-			grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-			gap: 1rem;
+			grid-template-columns: 1fr;
+			gap: 0.85rem;
+		}
+
+		@media (min-width: 640px) {
+			.item-list {
+				grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+				gap: 1rem;
+			}
 		}
 
 		.item-card {
-			background-color: rgba(15, 23, 42, 0.6);
-			border: 1px solid var(--border);
-			border-radius: 8px;
+			background: rgba(6, 10, 20, 0.5);
+			border: 1px solid var(--border-soft);
+			border-radius: 12px;
 			padding: 1rem;
 			display: flex;
 			flex-direction: column;
 			justify-content: space-between;
-			position: relative;
+			transition: border-color 0.18s ease, transform 0.12s ease;
+		}
+
+		.item-card:hover {
+			border-color: var(--border);
+		}
+
+		.item-card h3 {
+			color: var(--text-main);
 		}
 
 		.item-card p {
 			color: var(--text-muted);
 			font-size: 0.85rem;
-			margin-bottom: 0.3rem;
+			margin-bottom: 0.35rem;
+			word-break: break-word;
 		}
 
 		.item-card p strong {
@@ -288,31 +479,43 @@
 		}
 
 		.item-actions {
-			display: flex;
+			display: grid;
+			grid-template-columns: repeat(2, 1fr);
 			gap: 0.5rem;
-			margin-top: 0.8rem;
-			flex-wrap: wrap;
+			margin-top: 0.85rem;
+		}
+
+		@media (min-width: 480px) {
+			.item-actions {
+				display: flex;
+				flex-wrap: wrap;
+			}
+
+			.item-actions button {
+				flex: 1 1 auto;
+			}
 		}
 
 		.badge {
 			display: inline-block;
-			padding: 0.2rem 0.5rem;
-			border-radius: 4px;
-			font-size: 0.75rem;
-			font-weight: 600;
-			background: #334155;
+			padding: 0.28rem 0.55rem;
+			border-radius: 6px;
+			font-size: 0.72rem;
+			font-weight: 700;
+			background: var(--surface-hover);
 			color: var(--accent);
 			margin-right: 0.3rem;
 			margin-bottom: 0.3rem;
+			letter-spacing: 0.01em;
 		}
 
 		.badge.success {
-			background: rgba(16, 185, 129, 0.2);
-			color: var(--primary);
+			background: rgba(16, 185, 129, 0.18);
+			color: var(--primary-light);
 		}
 
 		.badge.warning {
-			background: rgba(245, 158, 11, 0.2);
+			background: rgba(245, 158, 11, 0.18);
 			color: var(--warning);
 		}
 
@@ -320,85 +523,149 @@
 			display: none !important;
 		}
 
+		/* ALERT CONTAINER FLUTUANTE (OVERLAY) */
 		.alert {
-			padding: 1rem;
-			border-radius: 6px;
-			margin-bottom: 1rem;
+			position: fixed;
+			top: 20px;
+			right: 20px;
+			left: 20px;
+			max-width: 480px;
+			margin: 0 auto;
+			z-index: 10000;
+			padding: 1rem 1.25rem;
+			border-radius: 14px;
 			display: none;
-			font-weight: 500;
+			font-weight: 600;
+			font-size: 0.92rem;
+			word-break: break-word;
+			box-shadow: 0 12px 32px -8px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.08);
+			backdrop-filter: blur(12px);
+			-webkit-backdrop-filter: blur(12px);
+			animation: slideInDown 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+		}
+
+		@keyframes slideInDown {
+			from {
+				opacity: 0;
+				transform: translateY(-30px) scale(0.95);
+			}
+
+			to {
+				opacity: 1;
+				transform: translateY(0) scale(1);
+			}
 		}
 
 		.alert.success {
-			background-color: rgba(16, 185, 129, 0.2);
-			border: 1px solid var(--primary);
-			color: var(--primary);
+			background-color: rgba(16, 185, 129, 0.92);
+			border: 1px solid rgba(52, 211, 153, 0.5);
+			color: #022c22;
 		}
 
 		.alert.error {
-			background-color: rgba(239, 68, 68, 0.2);
-			border: 1px solid var(--danger);
-			color: var(--danger);
+			background-color: rgba(244, 63, 94, 0.92);
+			border: 1px solid rgba(251, 113, 133, 0.5);
+			color: #4c0519;
 		}
 
-		/* MODAL */
+		.text-muted {
+			color: var(--text-muted);
+		}
+
 		.modal-overlay {
 			position: fixed;
 			top: 0;
 			left: 0;
 			right: 0;
 			bottom: 0;
-			background: rgba(0, 0, 0, 0.7);
-			backdrop-filter: blur(4px);
+			background: rgba(4, 7, 15, 0.75);
+			backdrop-filter: blur(6px);
+			-webkit-backdrop-filter: blur(6px);
 			display: flex;
-			align-items: center;
+			align-items: flex-end;
 			justify-content: center;
 			z-index: 1000;
+			padding: 0;
+			animation: fadeIn 0.18s ease;
+		}
+
+		@media (min-width: 640px) {
+			.modal-overlay {
+				align-items: center;
+				padding: 1rem;
+			}
 		}
 
 		.modal-content {
-			background: var(--surface);
-			border: 1px solid var(--border);
-			border-radius: 12px;
-			padding: 1.5rem;
-			max-width: 550px;
-			width: 90%;
+			background: linear-gradient(180deg, var(--surface-2), var(--surface));
+			border: 1px solid var(--border-soft);
+			border-top: 1px solid var(--border);
+			border-radius: 20px 20px 0 0;
+			padding: 1.5rem 1.25rem calc(1.25rem + var(--safe-bottom));
+			width: 100%;
 			max-height: 85vh;
 			overflow-y: auto;
+			box-shadow: var(--shadow-pop);
+			position: relative;
+		}
+
+		.modal-content::before {
+			content: '';
+			position: absolute;
+			top: 0.55rem;
+			left: 50%;
+			transform: translateX(-50%);
+			width: 40px;
+			height: 4px;
+			border-radius: 4px;
+			background: var(--border);
+		}
+
+		@media (min-width: 640px) {
+			.modal-content {
+				border-radius: 16px;
+				max-width: 550px;
+				padding: 1.5rem;
+			}
+
+			.modal-content::before {
+				display: none;
+			}
 		}
 
 		.forecast-grid {
 			display: grid;
-			grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-			gap: 0.75rem;
+			grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+			gap: 0.5rem;
 			margin-top: 1rem;
 		}
 
 		.forecast-box {
-			background: rgba(15, 23, 42, 0.6);
-			border: 1px solid var(--border);
-			border-radius: 8px;
-			padding: 0.75rem;
+			background: rgba(6, 10, 20, 0.55);
+			border: 1px solid var(--border-soft);
+			border-radius: 10px;
+			padding: 0.6rem;
 			text-align: center;
 		}
 
-		/* FEED STYLES */
 		.post-card {
-			background-color: rgba(15, 23, 42, 0.7);
-			border: 1px solid var(--border);
-			border-radius: 10px;
-			padding: 1.25rem;
-			margin-bottom: 1.25rem;
+			background: rgba(6, 10, 20, 0.55);
+			border: 1px solid var(--border-soft);
+			border-radius: 14px;
+			padding: 1rem;
+			margin-bottom: 0.9rem;
 		}
 
 		.post-header {
 			display: flex;
 			justify-content: space-between;
-			align-items: center;
+			align-items: flex-start;
 			margin-bottom: 0.75rem;
+			gap: 0.5rem;
 		}
 
 		.post-author {
-			font-weight: 600;
+			font-weight: 700;
 			color: var(--accent);
 		}
 
@@ -408,10 +675,11 @@
 		}
 
 		.post-title {
-			font-size: 1.1rem;
-			font-weight: 600;
+			font-size: 1rem;
+			font-weight: 700;
 			color: var(--text-main);
 			margin-bottom: 0.5rem;
+			word-break: break-word;
 		}
 
 		.post-content {
@@ -419,40 +687,48 @@
 			color: var(--text-muted);
 			margin-bottom: 1rem;
 			white-space: pre-line;
+			word-break: break-word;
 		}
 
 		.post-media {
 			max-width: 100%;
-			border-radius: 8px;
+			width: 100%;
+			border-radius: 10px;
 			margin-bottom: 1rem;
-			max-height: 350px;
+			max-height: 250px;
 			object-fit: cover;
 		}
 
 		.post-actions {
 			display: flex;
-			gap: 1rem;
-			border-top: 1px solid var(--border);
+			gap: 0.5rem;
+			border-top: 1px solid var(--border-soft);
 			padding-top: 0.75rem;
+			flex-wrap: wrap;
+		}
+
+		.post-actions button {
+			flex: 1 1 auto;
 		}
 
 		.comments-section {
 			margin-top: 1rem;
 			padding-top: 1rem;
-			border-top: 1px dashed var(--border);
+			border-top: 1px dashed var(--border-soft);
 		}
 
 		.comment-box {
-			background: rgba(30, 41, 59, 0.5);
-			border: 1px solid var(--border);
-			border-radius: 6px;
-			padding: 0.6rem;
+			background: rgba(20, 27, 45, 0.6);
+			border: 1px solid var(--border-soft);
+			border-radius: 8px;
+			padding: 0.65rem;
 			margin-bottom: 0.5rem;
 			font-size: 0.85rem;
+			word-break: break-word;
 		}
 
 		.reply-box {
-			margin-left: 1.5rem;
+			margin-left: 0.5rem;
 			border-left: 2px solid var(--accent);
 			padding-left: 0.5rem;
 		}
@@ -464,10 +740,10 @@
 	<header>
 		<h1>🌱 Planpaz - API Test Dashboard</h1>
 		<div class="header-right">
-			<button id="btn-quick-weather" class="btn-sm btn-secondary" onclick="openPublicWeatherModal()">🌤️ Consultar
-				Clima (Sem Login)</button>
+			<button id="btn-quick-weather" class="btn-sm btn-secondary" onclick="openPublicWeatherModal()">🌤️ Clima
+				(Sem Login)</button>
 			<div id="auth-status">
-				<span class="text-muted">Não autenticado</span>
+				<span class="text-muted" style="font-size: 0.8rem;">Não autenticado</span>
 			</div>
 		</div>
 	</header>
@@ -478,7 +754,7 @@
 
 		<!-- AUTHENTICATION SECTION -->
 		<section id="auth-section">
-			<div style="display: grid; grid-template-columns: 1fr 1.6fr; gap: 1.5rem;">
+			<div class="auth-grid">
 
 				<!-- LOGIN CARD -->
 				<div class="card">
@@ -521,7 +797,7 @@
 
 						<h3
 							style="font-size: 0.95rem; color: #94a3b8; margin: 0.8rem 0 0.5rem 0; border-top: 1px dashed var(--border); padding-top: 0.5rem;">
-							Preferências & Onboarding Inicial (Salvo via /api/user/preferences)
+							Preferências & Onboarding Inicial
 						</h3>
 
 						<div class="form-grid">
@@ -552,7 +828,7 @@
 						<div class="form-group">
 							<label>Biografia / Apresentação <span class="optional">(opcional)</span></label>
 							<textarea id="reg-bio" rows="2"
-								placeholder="Amante de suculentas, ervas e hortas em apartamento..."></textarea>
+								placeholder="Amante de suculentas, ervas e hortas..."></textarea>
 						</div>
 
 						<div class="form-grid">
@@ -576,7 +852,7 @@
 								</select>
 							</div>
 							<div class="form-group">
-								<label>Disponibilidade de Tempo <span class="optional">(opcional)</span></label>
+								<label>Disponibilidade <span class="optional">(opcional)</span></label>
 								<select id="reg-time-availability">
 									<option value="">Selecione...</option>
 									<option value="DAILY">Diária (DAILY)</option>
@@ -598,30 +874,30 @@
 
 			<!-- TAB CONTROLS -->
 			<div class="nav-tabs">
-				<button class="nav-tab active" onclick="switchTab('garden')">🪴 Meu Jardim</button>
-				<button class="nav-tab" onclick="switchTab('feed')">📰 Feed & Posts</button>
-				<button class="nav-tab" onclick="switchTab('species')">🌿 Catálogo de Espécies</button>
-				<button class="nav-tab" onclick="switchTab('weather')">🌤️ Clima & Previsão</button>
-				<button class="nav-tab" onclick="switchTab('profile')">⚙️ Perfil & Preferências</button>
-				<button class="nav-tab" onclick="switchTab('social')">👥 Comunidade & Seguidores</button>
-				<button class="nav-tab" onclick="switchTab('achievements')">🏆 Conquistas & Gamificação</button>
-				<button onclick="logout()" class="danger btn-sm" style="margin-left: auto;">🚪 Sair (Log Out)</button>
+				<button class="nav-tab active" onclick="switchTab('garden')">🪴 Jardim</button>
+				<button class="nav-tab" onclick="switchTab('feed')">📰 Feed</button>
+				<button class="nav-tab" onclick="switchTab('species')">🌿 Espécies</button>
+				<button class="nav-tab" onclick="switchTab('weather')">🌤️ Clima</button>
+				<button class="nav-tab" onclick="switchTab('profile')">⚙️ Perfil</button>
+				<button class="nav-tab" onclick="switchTab('social')">👥 Social</button>
+				<button class="nav-tab" onclick="switchTab('achievements')">🏆 Conquistas</button>
+				<button onclick="logout()" class="danger btn-sm" style="margin-left: auto; flex-shrink: 0;">🚪
+					Sair</button>
 			</div>
 
 			<!-- TAB 1: MEU JARDIM -->
 			<div id="tab-garden" class="tab-content">
 				<div class="card">
 					<h2>
-						<span>Meu Jardim (Plantas Cultivadas) - /api/garden</span>
-						<button class="btn-sm btn-secondary" onclick="loadGarden()">🔄 Atualizar Jardim</button>
+						<span>Meu Jardim</span>
+						<button class="btn-sm btn-secondary" onclick="loadGarden()">🔄 Atualizar</button>
 					</h2>
 
 					<form id="garden-form" style="margin-bottom: 1.5rem;">
 						<div class="form-grid">
 							<div class="form-group">
 								<label>Apelido da Planta <span class="required">*</span></label>
-								<input type="text" id="garden-nickname" required
-									placeholder="Ex: Minha Samambaia da Sala">
+								<input type="text" id="garden-nickname" required placeholder="Ex: Minha Samambaia">
 							</div>
 							<div class="form-group">
 								<label>Espécie <span class="required">*</span></label>
@@ -639,44 +915,43 @@
 								<label>Cômodo / Local <span class="optional">(opcional)</span></label>
 								<select id="garden-room">
 									<option value="">Selecione...</option>
-									<option value="LIVING_ROOM">Sala de Estar (LIVING_ROOM)</option>
-									<option value="BEDROOM">Quarto (BEDROOM)</option>
-									<option value="YARD">Quintal / Jardim (YARD)</option>
-									<option value="KITCHEN">Cozinha (KITCHEN)</option>
-									<option value="DINING_ROOM">Sala de Jantar (DINING_ROOM)</option>
-									<option value="BATHROOM">Banheiro (BATHROOM)</option>
-									<option value="OTHER">Outro (OTHER)</option>
+									<option value="LIVING_ROOM">Sala de Estar</option>
+									<option value="BEDROOM">Quarto</option>
+									<option value="YARD">Quintal / Jardim</option>
+									<option value="KITCHEN">Cozinha</option>
+									<option value="DINING_ROOM">Sala de Jantar</option>
+									<option value="BATHROOM">Banheiro</option>
+									<option value="OTHER">Outro</option>
 								</select>
 							</div>
 						</div>
-						<div style="display: flex; gap: 1.5rem; margin-bottom: 1rem;">
+						<div class="checkbox-group" style="margin-bottom: 1rem;">
 							<label class="checkbox-label">
-								<input type="checkbox" id="garden-rain"> Pega chuva direta (direct_rain)
+								<input type="checkbox" id="garden-rain"> Pega chuva direta
 							</label>
 							<label class="checkbox-label">
-								<input type="checkbox" id="garden-notify" checked> Notificações ativadas
-								(watering_notification)
+								<input type="checkbox" id="garden-notify" checked> Notificações de rega
 							</label>
 						</div>
-						<button type="submit">➕ Adicionar ao Jardim (/api/garden/add)</button>
+						<button type="submit" style="width: 100%;">➕ Adicionar ao Jardim</button>
 					</form>
 
 					<div id="garden-list" class="item-list"></div>
 				</div>
 			</div>
 
-			<!-- TAB NEW: FEED & POSTS -->
+			<!-- TAB 2: FEED & POSTS -->
 			<div id="tab-feed" class="tab-content hidden">
 				<div class="card">
 					<h2>
-						<span>Feed da Comunidade - /api/posts</span>
-						<button class="btn-sm btn-secondary" onclick="loadFeed()">🔄 Recarregar Feed</button>
+						<span>Feed da Comunidade</span>
+						<button class="btn-sm btn-secondary" onclick="loadFeed()">🔄 Recarregar</button>
 					</h2>
 
 					<!-- NOVO POST FORM -->
 					<form id="post-form"
-						style="margin-bottom: 1.5rem; background: rgba(15, 23, 42, 0.4); padding: 1rem; border-radius: 8px; border: 1px solid var(--border);">
-						<h3>✍️ Criar Nova Publicação</h3>
+						style="margin-bottom: 1.5rem; background: rgba(15, 23, 42, 0.4); padding: 0.9rem; border-radius: 8px; border: 1px solid var(--border);">
+						<h3>✍️ Nova Publicação</h3>
 						<div class="form-group">
 							<label>Título <span class="required">*</span></label>
 							<input type="text" id="post-title" required
@@ -685,13 +960,13 @@
 						<div class="form-group">
 							<label>Conteúdo <span class="required">*</span></label>
 							<textarea id="post-content" rows="3" required
-								placeholder="Escreva sobre suas plantas, dicas ou conquistas..."></textarea>
+								placeholder="Escreva sobre suas plantas..."></textarea>
 						</div>
 						<div class="form-group">
-							<label>URL da Imagem/Mídia <span class="optional">(opcional)</span></label>
+							<label>URL da Imagem <span class="optional">(opcional)</span></label>
 							<input type="text" id="post-media" placeholder="https://exemplo.com/imagem.jpg">
 						</div>
-						<button type="submit">📢 Publicar (/api/posts)</button>
+						<button type="submit" style="width: 100%;">📢 Publicar</button>
 					</form>
 
 					<!-- LISTA DO FEED -->
@@ -699,12 +974,12 @@
 				</div>
 			</div>
 
-			<!-- TAB 2: CATÁLOGO DE ESPÉCIES -->
+			<!-- TAB 3: CATÁLOGO DE ESPÉCIES -->
 			<div id="tab-species" class="tab-content hidden">
 				<div class="card">
 					<h2>
-						<span>Catálogo de Espécies - /api/species</span>
-						<button class="btn-sm btn-secondary" onclick="loadSpecies()">🔄 Atualizar Catálogo</button>
+						<span>Catálogo de Espécies</span>
+						<button class="btn-sm btn-secondary" onclick="loadSpecies()">🔄 Atualizar</button>
 					</h2>
 
 					<form id="plant-form" style="margin-bottom: 1.5rem;">
@@ -721,153 +996,152 @@
 								<label>Tipo <span class="optional">(opcional)</span></label>
 								<select id="plant-type">
 									<option value="">Selecione...</option>
-									<option value="EDIBLE">Comestível (EDIBLE)</option>
-									<option value="AROMATIC">Aromática (AROMATIC)</option>
-									<option value="ORNAMENTAL">Ornamental (ORNAMENTAL)</option>
-									<option value="OTHER">Outro (OTHER)</option>
+									<option value="EDIBLE">Comestível</option>
+									<option value="AROMATIC">Aromática</option>
+									<option value="ORNAMENTAL">Ornamental</option>
+									<option value="OTHER">Outro</option>
 								</select>
 							</div>
 							<div class="form-group">
-								<label>Porte / Tamanho <span class="optional">(opcional)</span></label>
+								<label>Porte <span class="optional">(opcional)</span></label>
 								<select id="plant-size">
 									<option value="">Selecione...</option>
-									<option value="SMALL">Pequeno (SMALL)</option>
-									<option value="MEDIUM">Médio (MEDIUM)</option>
-									<option value="LARGE">Grande (LARGE)</option>
+									<option value="SMALL">Pequeno</option>
+									<option value="MEDIUM">Médio</option>
+									<option value="LARGE">Grande</option>
 								</select>
 							</div>
 						</div>
 
 						<div class="form-grid">
 							<div class="form-group">
-								<label>Frequência de Rega <span class="optional">(opcional)</span></label>
+								<label>Frequência de Rega</label>
 								<select id="plant-watering">
 									<option value="">Selecione...</option>
-									<option value="DAILY">Diária (DAILY)</option>
-									<option value="FREQUENT">Frequente (FREQUENT)</option>
-									<option value="WEEKLY">Semanal (WEEKLY)</option>
-									<option value="SPORADIC">Esporádica (SPORADIC)</option>
+									<option value="DAILY">Diária</option>
+									<option value="FREQUENT">Frequente</option>
+									<option value="WEEKLY">Semanal</option>
+									<option value="SPORADIC">Esporádica</option>
 								</select>
 							</div>
 							<div class="form-group">
-								<label>Luminosidade <span class="optional">(opcional)</span></label>
+								<label>Luminosidade</label>
 								<select id="plant-luminosity">
 									<option value="">Selecione...</option>
-									<option value="LOW">Baixa (LOW)</option>
-									<option value="MEDIUM">Média (MEDIUM)</option>
-									<option value="INTENSE">Intensa (INTENSE)</option>
-									<option value="ANY">Qualquer (ANY)</option>
+									<option value="LOW">Baixa</option>
+									<option value="MEDIUM">Média</option>
+									<option value="INTENSE">Intensa</option>
+									<option value="ANY">Qualquer</option>
 								</select>
 							</div>
 							<div class="form-group">
-								<label>Temperatura <span class="optional">(opcional)</span></label>
+								<label>Temperatura</label>
 								<select id="plant-temperature">
 									<option value="">Selecione...</option>
-									<option value="LOW">Baixa (LOW)</option>
-									<option value="MEDIUM">Média (MEDIUM)</option>
-									<option value="HIGH">Alta (HIGH)</option>
-									<option value="ANY">Qualquer (ANY)</option>
+									<option value="LOW">Baixa</option>
+									<option value="MEDIUM">Média</option>
+									<option value="HIGH">Alta</option>
+									<option value="ANY">Qualquer</option>
 								</select>
 							</div>
 							<div class="form-group">
-								<label>URL da Imagem <span class="optional">(opcional)</span></label>
+								<label>URL da Imagem</label>
 								<input type="text" id="plant-image" placeholder="https://...">
 							</div>
 						</div>
 
 						<div class="form-group">
-							<label>Descrição & Dicas de Cultivo <span class="optional">(opcional)</span></label>
-							<textarea id="plant-desc" rows="2"
-								placeholder="Dicas de solo, poda e adubação..."></textarea>
+							<label>Descrição & Dicas</label>
+							<textarea id="plant-desc" rows="2" placeholder="Dicas de solo e poda..."></textarea>
 						</div>
 
-						<button type="submit">Cadastrar Espécie (/api/species)</button>
+						<button type="submit" style="width: 100%;">Cadastrar Espécie</button>
 					</form>
 
 					<div id="plants-list" class="item-list"></div>
 				</div>
 			</div>
 
-			<!-- TAB 3: CLIMA & PREVISÃO -->
+			<!-- TAB 4: CLIMA & PREVISÃO -->
 			<div id="tab-weather" class="tab-content hidden">
 				<div class="card">
-					<h2>Previsão Climática em Tempo Real (/api/clima) 🌤️</h2>
+					<h2>Previsão Climática 🌤️</h2>
 
-					<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+					<div class="weather-grid">
 						<!-- BUSCA POR CIDADE -->
 						<div
-							style="background: rgba(15,23,42,0.4); padding: 1rem; border-radius: 8px; border: 1px solid var(--border);">
-							<h3>Buscar por Nome da Cidade</h3>
+							style="background: rgba(15,23,42,0.4); padding: 0.9rem; border-radius: 8px; border: 1px solid var(--border);">
+							<h3>Buscar por Cidade</h3>
 							<div class="form-group">
 								<label>Nome da Cidade</label>
-								<input type="text" id="weather-city-input"
-									placeholder="Ex: São Paulo, Campinas, Curitiba">
+								<input type="text" id="weather-city-input" placeholder="Ex: São Paulo">
 							</div>
 							<div style="display: flex; gap: 0.5rem;">
-								<button type="button" class="btn-sm" onclick="consultWeatherByCity(false)">Clima
-									Atual</button>
-								<button type="button" class="btn-sm btn-secondary"
-									onclick="consultWeatherByCity(true)">Previsão 24h (Forecast)</button>
+								<button type="button" class="btn-sm" style="flex: 1;"
+									onclick="consultWeatherByCity(false)">Clima Atual</button>
+								<button type="button" class="btn-sm btn-secondary" style="flex: 1;"
+									onclick="consultWeatherByCity(true)">Previsão 24h</button>
 							</div>
 						</div>
 
 						<!-- BUSCA POR COORDENADAS -->
 						<div
-							style="background: rgba(15,23,42,0.4); padding: 1rem; border-radius: 8px; border: 1px solid var(--border);">
-							<h3>Buscar por Coordenadas (GPS)</h3>
+							style="background: rgba(15,23,42,0.4); padding: 0.9rem; border-radius: 8px; border: 1px solid var(--border);">
+							<h3>Buscar por GPS</h3>
 							<div style="display: flex; gap: 0.5rem;">
 								<div class="form-group" style="flex: 1;">
-									<label>Latitude</label>
+									<label>Lat</label>
 									<input type="number" step="0.00001" id="weather-lat-input" placeholder="-23.5505">
 								</div>
 								<div class="form-group" style="flex: 1;">
-									<label>Longitude</label>
+									<label>Lon</label>
 									<input type="number" step="0.00001" id="weather-lon-input" placeholder="-46.6333">
 								</div>
 							</div>
 							<div style="display: flex; gap: 0.5rem;">
-								<button type="button" class="btn-sm" onclick="consultWeatherByCoords(false)">Clima
-									Atual</button>
-								<button type="button" class="btn-sm btn-secondary"
-									onclick="consultWeatherByCoords(true)">Previsão 24h (Forecast)</button>
+								<button type="button" class="btn-sm" style="flex: 1;"
+									onclick="consultWeatherByCoords(false)">Clima Atual</button>
+								<button type="button" class="btn-sm btn-secondary" style="flex: 1;"
+									onclick="consultWeatherByCoords(true)">Previsão 24h</button>
 							</div>
 						</div>
 					</div>
 
 					<!-- RESULTADO DO CLIMA -->
-					<div id="weather-display-result" style="display: none;">
+					<div id="weather-display-result" style="display: none; margin-top: 1rem;">
 						<h3 id="weather-result-title">Condições Climáticas</h3>
 						<div id="weather-current-card" class="card" style="background: rgba(15, 23, 42, 0.8);"></div>
 						<div id="weather-forecast-container" style="display: none;">
-							<h3 style="margin-top: 1rem;">Previsão por Horário (Forecast)</h3>
+							<h3 style="margin-top: 1rem;">Previsão por Horário</h3>
 							<div id="forecast-grid" class="forecast-grid"></div>
 						</div>
 					</div>
 				</div>
 			</div>
 
-			<!-- TAB 4: PERFIL & PREFERÊNCIAS -->
+			<!-- TAB 5: PERFIL & PREFERÊNCIAS -->
 			<div id="tab-profile" class="tab-content hidden">
 				<div class="card">
 					<h2>
-						<span>Perfil & Configurações do Usuário (/api/user/settings) ⚙️</span>
-						<button class="btn-sm btn-secondary" onclick="loadUserProfile()">🔄 Recarregar Perfil</button>
+						<span>Perfil & Configurações ⚙️</span>
+						<button class="btn-sm btn-secondary" onclick="loadUserProfile()">🔄 Recarregar</button>
 					</h2>
 
 					<!-- RESUMO ATUAL DO PERFIL -->
 					<div id="profile-summary"
-						style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; background: rgba(15, 23, 42, 0.5); padding: 1rem; border-radius: 8px; border: 1px solid var(--border);">
+						style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 0.6rem; margin-bottom: 1.5rem; background: rgba(15, 23, 42, 0.5); padding: 0.8rem; border-radius: 8px; border: 1px solid var(--border); font-size: 0.85rem;">
 						<div><strong>Nome:</strong> <span id="prof-disp-name">-</span></div>
-						<div><strong>Username:</strong> <span id="prof-disp-username">-</span></div>
-						<div><strong>Email:</strong> <span id="prof-disp-email">-</span></div>
-						<div><strong>Ecoscore:</strong> <span id="prof-disp-ecoscore" class="badge success">0 pts</span>
+						<div><strong>User:</strong> <span id="prof-disp-username">-</span></div>
+						<div><strong>Email:</strong> <span id="prof-disp-email" style="word-break: break-all;">-</span>
+						</div>
+						<div><strong>Score:</strong> <span id="prof-disp-ecoscore" class="badge success">0 pts</span>
 						</div>
 						<div><strong>Cidade:</strong> <span id="prof-disp-city">-</span></div>
-						<div><strong>Horário Rega:</strong> <span id="prof-disp-watering">-</span></div>
+						<div><strong>Rega:</strong> <span id="prof-disp-watering">-</span></div>
 					</div>
 
 					<form id="preferences-form">
-						<h3>Editar Preferências de Cultivo (/api/user/preferences)</h3>
+						<h3>Editar Preferências</h3>
 						<div class="form-grid">
 							<div class="form-group">
 								<label>Cidade</label>
@@ -878,18 +1152,18 @@
 								<input type="time" id="pref-watering-time">
 							</div>
 							<div class="form-group">
-								<label>Latitude (Opcional)</label>
+								<label>Latitude</label>
 								<input type="number" step="0.00001" id="pref-latitude" placeholder="-23.5505">
 							</div>
 							<div class="form-group">
-								<label>Longitude (Opcional)</label>
+								<label>Longitude</label>
 								<input type="number" step="0.00001" id="pref-longitude" placeholder="-46.6333">
 							</div>
 						</div>
 
 						<div class="form-group">
 							<label>Biografia</label>
-							<textarea id="pref-bio" rows="2" placeholder="Sua biografia de jardineiro..."></textarea>
+							<textarea id="pref-bio" rows="2" placeholder="Sua biografia..."></textarea>
 						</div>
 
 						<div class="form-grid">
@@ -897,114 +1171,109 @@
 								<label>Objetivo Principal</label>
 								<select id="pref-main-goal">
 									<option value="">Selecione...</option>
-									<option value="DECORATION">Decoração (DECORATION)</option>
-									<option value="ALIMENTATION">Alimentação (ALIMENTATION)</option>
-									<option value="WELL_BEING">Bem-Estar (WELL_BEING)</option>
-									<option value="SUSTAINABILITY">Sustentabilidade (SUSTAINABILITY)</option>
+									<option value="DECORATION">Decoração</option>
+									<option value="ALIMENTATION">Alimentação</option>
+									<option value="WELL_BEING">Bem-Estar</option>
+									<option value="SUSTAINABILITY">Sustentabilidade</option>
 								</select>
 							</div>
 							<div class="form-group">
-								<label>Nível de Experiência</label>
+								<label>Experiência</label>
 								<select id="pref-experience">
 									<option value="">Selecione...</option>
-									<option value="BEGINNER">Iniciante (BEGINNER)</option>
-									<option value="INTERMEDIATE">Intermediário (INTERMEDIATE)</option>
-									<option value="ADVANCED">Avançado (ADVANCED)</option>
+									<option value="BEGINNER">Iniciante</option>
+									<option value="INTERMEDIATE">Intermediário</option>
+									<option value="ADVANCED">Avançado</option>
 								</select>
 							</div>
 							<div class="form-group">
-								<label>Disponibilidade de Tempo</label>
+								<label>Disponibilidade</label>
 								<select id="pref-time-availability">
 									<option value="">Selecione...</option>
-									<option value="DAILY">Diária (DAILY)</option>
-									<option value="FREQUENT">Frequente (FREQUENT)</option>
-									<option value="WEEKLY">Semanal (WEEKLY)</option>
-									<option value="SPORADIC">Esporádica (SPORADIC)</option>
+									<option value="DAILY">Diária</option>
+									<option value="FREQUENT">Frequente</option>
+									<option value="WEEKLY">Semanal</option>
+									<option value="SPORADIC">Esporádica</option>
 								</select>
 							</div>
 							<div class="form-group">
 								<label>Gênero</label>
 								<select id="pref-gender">
 									<option value="">Selecione...</option>
-									<option value="MALE">Masculino (MALE)</option>
-									<option value="FEMALE">Feminino (FEMALE)</option>
+									<option value="MALE">Masculino</option>
+									<option value="FEMALE">Feminino</option>
 									<option value="PREFER_NOT_TO_SAY">Prefiro não dizer</option>
 									<option value="OTHER">Outro</option>
 								</select>
 							</div>
 						</div>
 
-						<button type="submit">Salvar Preferências (/api/user/preferences)</button>
+						<button type="submit" style="width: 100%;">Salvar Preferências</button>
 					</form>
 				</div>
 			</div>
 
-			<!-- TAB 5: COMUNIDADE & SOCIAL -->
+			<!-- TAB 6: COMUNIDADE & SOCIAL -->
 			<div id="tab-social" class="tab-content hidden">
 				<div class="card">
-					<h2>Comunidade & Seguidores (/api/user) 👥</h2>
+					<h2>Comunidade 👥</h2>
 					<form id="search-user-form"
-						style="display: flex; gap: 1rem; align-items: flex-end; margin-bottom: 1.5rem;">
-						<div class="form-group" style="margin: 0; flex: 1;">
-							<label>Buscar usuário por @username (/api/user/search)</label>
-							<input type="text" id="search-username-input" placeholder="Digite o username (ex: maria)"
-								required>
+						style="display: flex; gap: 0.5rem; margin-bottom: 1.5rem; flex-direction: column;">
+						<div class="form-group" style="margin: 0;">
+							<label>Buscar usuário por @username</label>
+							<input type="text" id="search-username-input" placeholder="Digite o username" required>
 						</div>
 						<button type="submit">🔍 Buscar</button>
 					</form>
 
-					<h3>Resultados da Busca</h3>
+					<h3>Resultados</h3>
 					<div id="search-results-list" class="item-list" style="margin-bottom: 1.5rem;">
 						<p class="text-muted">Faça uma busca para encontrar outros cultivadores.</p>
 					</div>
 
-					<div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
-						<button onclick="loadMyFollowers()" class="btn-sm btn-secondary">👥 Ver Meus Seguidores
-							(/api/user/{id}/followers)</button>
-						<button onclick="loadMyFollowing()" class="btn-sm btn-secondary">➡️ Quem Eu Sigo
-							(/api/user/{id}/following)</button>
+					<div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
+						<button onclick="loadMyFollowers()" class="btn-sm btn-secondary" style="flex: 1;">👥
+							Seguidores</button>
+						<button onclick="loadMyFollowing()" class="btn-sm btn-secondary" style="flex: 1;">➡️ Quem
+							Sigo</button>
 					</div>
 
 					<div id="social-relations-list" class="item-list"></div>
 				</div>
 			</div>
 
-			<!-- TAB 6: CONQUISTAS & GAMIFICAÇÃO -->
+			<!-- TAB 7: CONQUISTAS & GAMIFICAÇÃO -->
 			<div id="tab-achievements" class="tab-content hidden">
 				<div class="card">
 					<h2>
-						<span>Conquistas & Gamificação (/api/achievements) 🏆</span>
-						<button class="btn-sm btn-secondary" onclick="loadAchievementsCatalog()">📖 Ver Catálogo
-							Completo</button>
+						<span>Conquistas 🏆</span>
+						<button class="btn-sm btn-secondary" onclick="loadAchievementsCatalog()">📖 Catálogo</button>
 					</h2>
 
 					<form id="achievement-form"
-						style="display: flex; gap: 1rem; align-items: flex-end; margin-bottom: 1.5rem; flex-wrap: wrap;">
-						<div class="form-group" style="margin: 0; flex: 1; min-width: 250px;">
-							<label>Disparar Gatilho de Conquista de Teste</label>
+						style="display: flex; gap: 0.5rem; margin-bottom: 1.5rem; flex-direction: column;">
+						<div class="form-group" style="margin: 0;">
+							<label>Gatilho de Conquista (Teste)</label>
 							<select id="achievement-type" required>
-								<option value="">Selecione uma conquista...</option>
-								<option value="cultivar3">🌿 Cultivar 3 plantas (/api/achievements/cultivar-3)</option>
-								<option value="cultivar5">🌿 Cultivar 5 plantas (/api/achievements/cultivar-5)</option>
-								<option value="cultivar10">🌳 Cultivar 10 plantas (/api/achievements/cultivar-10)
-								</option>
-								<option value="cuidar3">🌱 Cuidar por 3 dias (/api/achievements/cuidar-3-dias)</option>
-								<option value="cuidar5">🪴 Cuidar por 5 dias (/api/achievements/cuidar-5-dias)</option>
-								<option value="cuidar10">⭐ Cuidar por 10 dias (/api/achievements/cuidar-10-dias)
-								</option>
-								<option value="crescimento">🍃 Estágio de Crescimento
-									(/api/achievements/estagio-crescimento)</option>
-								<option value="colheita">🌸 Estágio de Colheita/Floração
-									(/api/achievements/estagio-colheita)</option>
+								<option value="">Selecione...</option>
+								<option value="cultivar3">🌿 Cultivar 3 plantas</option>
+								<option value="cultivar5">🌿 Cultivar 5 plantas</option>
+								<option value="cultivar10">🌳 Cultivar 10 plantas</option>
+								<option value="cuidar3">🌱 Cuidar por 3 dias</option>
+								<option value="cuidar5">🪴 Cuidar por 5 dias</option>
+								<option value="cuidar10">⭐ Cuidar por 10 dias</option>
+								<option value="crescimento">🍃 Estágio de Crescimento</option>
+								<option value="colheita">🌸 Estágio de Colheita</option>
 							</select>
 						</div>
 						<button type="submit">Conceder Conquista</button>
 					</form>
 
-					<div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
-						<button class="btn-sm" onclick="loadAchievements()">🏆 Minhas Conquistas Desbloqueadas</button>
-						<button class="btn-sm btn-secondary" onclick="loadAchievementsCatalog()">📚 Catálogo Completo do
-							Sistema</button>
+					<div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
+						<button class="btn-sm" style="flex: 1;" onclick="loadAchievements()">🏆 Minhas
+							Conquistas</button>
+						<button class="btn-sm btn-secondary" style="flex: 1;" onclick="loadAchievementsCatalog()">📚
+							Catálogo Geral</button>
 					</div>
 
 					<div id="achievements-list" class="item-list"></div>
@@ -1030,7 +1299,7 @@
 	<div id="public-weather-modal" class="modal-overlay hidden" onclick="closePublicWeatherModal(event)">
 		<div class="modal-content" onclick="event.stopPropagation()">
 			<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-				<h3 style="margin: 0; color: var(--accent);">🌤️ Consulta Rápida de Clima (Pública)</h3>
+				<h3 style="margin: 0; color: var(--accent);">🌤️ Consulta Rápida</h3>
 				<button class="btn-sm btn-secondary"
 					onclick="document.getElementById('public-weather-modal').classList.add('hidden')">✕ Fechar</button>
 			</div>
@@ -1039,16 +1308,17 @@
 				<input type="text" id="quick-weather-city" placeholder="Ex: Rio de Janeiro" value="São Paulo">
 			</div>
 			<div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
-				<button type="button" class="btn-sm" onclick="quickFetchWeather(false)">Clima Atual</button>
-				<button type="button" class="btn-sm btn-secondary" onclick="quickFetchWeather(true)">Previsão
-					24h</button>
+				<button type="button" class="btn-sm" style="flex: 1;" onclick="quickFetchWeather(false)">Clima
+					Atual</button>
+				<button type="button" class="btn-sm btn-secondary" style="flex: 1;"
+					onclick="quickFetchWeather(true)">Previsão 24h</button>
 			</div>
 			<div id="quick-weather-output" style="margin-top: 1rem;"></div>
 		</div>
 	</div>
 
 	<script>
-		const API_URL = '';
+		const API_URL = 'https://debunk-quail-revert.ngrok-free.dev';
 		let token = localStorage.getItem('planpaz_token');
 		let username = localStorage.getItem('planpaz_username') || '';
 		let currentUserId = localStorage.getItem('planpaz_userid') || '';
@@ -1061,6 +1331,7 @@
 		const alertBox = document.getElementById('alert-box');
 
 		function init() {
+			checkEmailVerificationToken();
 			if (token) {
 				showDashboard();
 				loadData();
@@ -1069,11 +1340,46 @@
 			}
 		}
 
+		async function checkEmailVerificationToken() {
+			const urlParams = new URLSearchParams(window.location.search);
+			const verifyToken = urlParams.get('token');
+
+			if (verifyToken) {
+				try {
+					const res = await fetch(`${API_URL}/api/auth/verify-email?token=${verifyToken}`, {
+						headers: {'ngrok-skip-browser-warning': 'true'}
+					});
+					const isJson = res.headers.get('content-type')?.includes('application/json');
+					const data = isJson ? await res.json() : await res.text();
+
+					if (res.ok) {
+						showMessage('E-mail verificado com sucesso! Você já pode fazer login.');
+					} else {
+						const errorMsg = (typeof data === 'object' && data.message) ? data.message : (typeof data === 'string' && data ? data : 'Link inválido ou expirado.');
+						showMessage(`Falha na verificação: ${errorMsg}`, true);
+					}
+				} catch (err) {
+					showMessage('Erro de conexão ao verificar o e-mail.', true);
+				}
+			}
+		}
+
+		let alertTimer = null;
+
 		function showMessage(msg, isError = false) {
+			// Cancela contagem regressiva anterior caso já exista uma mensagem na tela
+			if (alertTimer) {
+				clearTimeout(alertTimer);
+			}
+
 			alertBox.textContent = msg;
 			alertBox.className = `alert ${isError ? 'error' : 'success'}`;
 			alertBox.style.display = 'block';
-			setTimeout(() => {alertBox.style.display = 'none';}, 4500);
+
+			// Mantém a mensagem visível por 10 segundos
+			alertTimer = setTimeout(() => {
+				alertBox.style.display = 'none';
+			}, 10000);
 		}
 
 		function switchTab(tabId) {
@@ -1101,14 +1407,14 @@
 		function showAuth() {
 			authSection.classList.remove('hidden');
 			dashboardSection.classList.add('hidden');
-			authStatus.innerHTML = '<span class="text-muted">Não autenticado</span>';
+			authStatus.innerHTML = '<span class="text-muted" style="font-size: 0.8rem;">Não autenticado</span>';
 		}
 
 		function showDashboard() {
 			authSection.classList.add('hidden');
 			dashboardSection.classList.remove('hidden');
 			const userDisplay = username ? `@${username}` : 'Autenticado';
-			authStatus.innerHTML = `<span style="color: var(--primary);">Conectado como <strong>${userDisplay}</strong> ✓</span>`;
+			authStatus.innerHTML = `<span style="color: var(--primary); font-size: 0.85rem;">Conectado como <strong>${userDisplay}</strong> ✓</span>`;
 		}
 
 		function logout() {
@@ -1124,7 +1430,10 @@
 		}
 
 		async function fetchAPI(endpoint, method = 'GET', body = null) {
-			const headers = {'Content-Type': 'application/json'};
+			const headers = {
+				'Content-Type': 'application/json',
+				'ngrok-skip-browser-warning': 'true'
+			};
 			if (token) headers['Authorization'] = `Bearer ${token}`;
 
 			try {
@@ -1224,7 +1533,9 @@
 
 					showDashboard();
 					loadData();
-					showMessage('Cadastro realizado com sucesso!');
+					showMessage(`Cadastro realizado! Um e-mail de verificação foi enviado para ${email}.`);
+				} else {
+					showMessage(`Cadastro realizado! Por favor, verifique a caixa de entrada de ${email} para confirmar a conta.`);
 				}
 			} catch (e) { }
 		});
@@ -1319,13 +1630,13 @@
 
 						<div class="post-actions">
 							<button class="btn-sm ${isLiked ? 'danger' : 'btn-secondary'}" onclick="toggleLike('${post.id}', ${isLiked})">
-								${isLiked ? '❤️ Curtido' : '🤍 Curtir'} (${post.likesCount || 0})
+								${isLiked ? '❤️' : '🤍'} ${post.likesCount || 0}
 							</button>
 							<button class="btn-sm btn-secondary" onclick="toggleCommentsSection('${post.id}')">
-								💬 Comentários (${post.commentsCount || 0})
+								💬 ${post.commentsCount || 0}
 							</button>
 							${currentUserId && currentUserId === post.authorId ? `
-								<button class="btn-sm danger" style="margin-left: auto;" onclick="deletePost('${post.id}')">🗑️ Excluir</button>
+								<button class="btn-sm danger" style="margin-left: auto;" onclick="deletePost('${post.id}')">🗑️</button>
 							` : ''}
 						</div>
 
@@ -1333,7 +1644,7 @@
 							<div class="form-group" style="margin-bottom: 0.5rem;">
 								<input type="text" id="comment-input-${post.id}" placeholder="Escreva um comentário..." style="font-size: 0.85rem;">
 							</div>
-							<button class="btn-sm" onclick="submitComment('${post.id}')">Enviar Comentário</button>
+							<button class="btn-sm" style="width: 100%;" onclick="submitComment('${post.id}')">Enviar Comentário</button>
 							
 							<div id="comments-list-${post.id}" style="margin-top: 1rem;">
 								<p class="text-muted" style="font-size: 0.8rem;">Carregando comentários...</p>
@@ -1386,8 +1697,7 @@
 				await fetchAPI(`/api/posts/${postId}/likes`, 'POST', {
 					authorId: currentUserId
 				});
-
-				loadFeed(); // Recarrega para atualizar o número e estado das curtidas
+				loadFeed();
 			} catch (error) {
 				alert('Erro ao processar curtida: ' + error.message);
 			}
@@ -1411,7 +1721,7 @@
 				list.innerHTML = '';
 
 				if (!comments || comments.length === 0) {
-					list.innerHTML = '<p class="text-muted" style="font-size: 0.8rem;">Nenhum comentário ainda. Seja o primeiro a comentar!</p>';
+					list.innerHTML = '<p class="text-muted" style="font-size: 0.8rem;">Nenhum comentário ainda.</p>';
 					return;
 				}
 
@@ -1421,20 +1731,20 @@
 					const date = comment.commentedAt ? new Date(comment.commentedAt).toLocaleString('pt-BR') : '';
 
 					div.innerHTML = `
-						<div style="display: flex; justify-content: space-between; margin-bottom: 0.2rem;">
+						<div style="display: flex; justify-content: space-between; margin-bottom: 0.2rem; flex-wrap: wrap;">
 							<strong style="color: var(--accent);">@${comment.authorUsername || 'usuario'}</strong>
 							<span class="text-muted" style="font-size: 0.75rem;">${date}</span>
 						</div>
 						<div>${comment.content}</div>
-						<div style="margin-top: 0.4rem; display: flex; gap: 0.5rem; align-items: center;">
-							<button class="btn-sm btn-secondary" style="font-size: 0.7rem; padding: 0.2rem 0.4rem;" onclick="showReplyBox('${comment.id}')">Responder</button>
+						<div style="margin-top: 0.4rem; display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+							<button class="btn-sm btn-secondary" style="font-size: 0.75rem; padding: 0.25rem 0.5rem;" onclick="showReplyBox('${comment.id}')">Responder</button>
 							${currentUserId && currentUserId === comment.authorId ? `
-								<button class="btn-sm danger" style="font-size: 0.7rem; padding: 0.2rem 0.4rem;" onclick="deleteComment('${postId}', '${comment.id}')">Excluir</button>
+								<button class="btn-sm danger" style="font-size: 0.75rem; padding: 0.25rem 0.5rem;" onclick="deleteComment('${postId}', '${comment.id}')">Excluir</button>
 							` : ''}
 						</div>
 						<div id="reply-input-box-${comment.id}" class="hidden" style="margin-top: 0.5rem;">
 							<input type="text" id="reply-text-${comment.id}" placeholder="Escreva sua resposta..." style="font-size: 0.8rem; margin-bottom: 0.3rem;">
-							<button class="btn-sm" style="font-size: 0.75rem;" onclick="submitReply('${postId}', '${comment.id}')">Enviar Resposta</button>
+							<button class="btn-sm" style="font-size: 0.75rem; width: 100%;" onclick="submitReply('${postId}', '${comment.id}')">Enviar Resposta</button>
 						</div>
 						<div id="replies-list-${comment.id}" class="reply-box" style="margin-top: 0.5rem;"></div>
 					`;
@@ -1459,7 +1769,7 @@
 						div.className = 'comment-box';
 						div.style.background = 'rgba(15, 23, 42, 0.4)';
 						div.innerHTML = `
-							<div style="display: flex; justify-content: space-between;">
+							<div style="display: flex; justify-content: space-between; flex-wrap: wrap;">
 								<strong style="color: var(--primary);">@${r.authorUsername || 'usuario'}</strong>
 								<span class="text-muted" style="font-size: 0.7rem;">${r.commentedAt ? new Date(r.commentedAt).toLocaleString('pt-BR') : ''}</span>
 							</div>
@@ -1630,14 +1940,14 @@
 				stageSelect.innerHTML = '<option value="">Nenhum estágio definido (opcional)</option>';
 
 				if (!stages || stages.length === 0) {
-					stageSelect.innerHTML = '<option value="">Sem estágios cadastrados para esta espécie</option>';
+					stageSelect.innerHTML = '<option value="">Sem estágios cadastrados</option>';
 					return;
 				}
 
 				stages.forEach(st => {
 					const opt = document.createElement('option');
 					opt.value = st.id;
-					opt.textContent = `${st.order}º - ${st.name} (~${st.days} dias)`;
+					opt.textContent = `${st.order}º - ${st.name} (~${st.days} d)`;
 					stageSelect.appendChild(opt);
 				});
 			} catch (e) {
@@ -1653,7 +1963,7 @@
 				list.innerHTML = '';
 
 				if (!garden || garden.length === 0) {
-					list.innerHTML = '<p class="text-muted">Seu jardim ainda não possui plantas. Adicione uma acima!</p>';
+					list.innerHTML = '<p class="text-muted">Seu jardim ainda não possui plantas.</p>';
 					return;
 				}
 
@@ -1675,8 +1985,8 @@
 						</div>
 						<div class="item-actions">
 							<button class="btn-sm" onclick="waterPlant('${g.id}')">💧 Regar</button>
-							<button class="btn-sm btn-secondary" onclick="viewUpcomingWaterings('${g.id}', '${g.nickname}')">📅 Próximas Regas</button>
-							<button class="btn-sm btn-secondary" onclick="checkStatus('${g.id}')">🌤️ Clima & Status</button>
+							<button class="btn-sm btn-secondary" onclick="viewUpcomingWaterings('${g.id}', '${g.nickname}')">📅 Regas</button>
+							<button class="btn-sm btn-secondary" onclick="checkStatus('${g.id}')">🌤️ Clima</button>
 							<button class="btn-sm danger" onclick="deleteGardenPlant('${g.id}')">Excluir</button>
 						</div>
 					`;
@@ -1705,7 +2015,7 @@
 
 			try {
 				await fetchAPI('/api/garden/add', 'POST', payload);
-				showMessage('Planta adicionada ao seu jardim com sucesso!');
+				showMessage('Planta adicionada com sucesso!');
 				document.getElementById('garden-form').reset();
 				await loadGarden();
 				await loadAchievements();
@@ -1722,7 +2032,7 @@
 		}
 
 		async function checkStatus(id) {
-			const city = prompt("Digite o nome da cidade para verificar o clima e a recomendação de rega:", "São Paulo");
+			const city = prompt("Digite o nome da cidade para verificar o clima:", "São Paulo");
 			if (!city) return;
 
 			try {
@@ -1738,15 +2048,15 @@
 				const modalTitle = document.getElementById('modal-plant-title');
 				const modalList = document.getElementById('modal-waterings-list');
 
-				modalTitle.textContent = `📅 Próximas 4 Regas: ${nickname}`;
+				modalTitle.textContent = `📅 Próximas Regas: ${nickname}`;
 				modalList.innerHTML = '';
 
 				if (!reminders || reminders.length === 0) {
-					modalList.innerHTML = '<p class="text-muted">Nenhum agendamento de rega projetado no momento.</p>';
+					modalList.innerHTML = '<p class="text-muted">Nenhum agendamento projetado.</p>';
 				} else {
 					reminders.forEach(r => {
 						const div = document.createElement('div');
-						div.style.cssText = 'background: rgba(15,23,42,0.6); padding: 0.8rem; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center;';
+						div.style.cssText = 'background: rgba(15,23,42,0.6); padding: 0.8rem; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center; gap: 0.5rem;';
 						div.innerHTML = `
 							<div>
 								<strong>${r.order}ª Rega:</strong> ${r.date} às ${r.time}
@@ -1766,10 +2076,10 @@
 		}
 
 		async function deleteGardenPlant(id) {
-			if (!confirm('Deseja remover esta planta do seu jardim?')) return;
+			if (!confirm('Deseja remover esta planta do jardim?')) return;
 			try {
 				await fetchAPI(`/api/garden/${id}`, 'DELETE');
-				showMessage('Planta removida do jardim.');
+				showMessage('Planta removida.');
 				loadGarden();
 			} catch (e) { }
 		}
@@ -1810,7 +2120,7 @@
 
 				if (isForecast) {
 					forecastContainer.style.display = 'block';
-					currentCard.innerHTML = `<h3>Previsão para ${locationTitle}</h3><p class="text-muted">Mostrando os próximos períodos previstos:</p>`;
+					currentCard.innerHTML = `<h3>Previsão para ${locationTitle}</h3><p class="text-muted">Próximos períodos:</p>`;
 					forecastGrid.innerHTML = '';
 
 					if (Array.isArray(data)) {
@@ -1818,10 +2128,10 @@
 							const box = document.createElement('div');
 							box.className = 'forecast-box';
 							box.innerHTML = `
-								<div style="font-size: 0.8rem; color: var(--accent); font-weight: 600;">${item.horario || item.dataHora?.split(' ')[1] || ''}</div>
-								<div style="font-size: 1.25rem; font-weight: bold; margin: 0.3rem 0;">${item.temperatura}°C</div>
-								<div style="font-size: 0.8rem; color: var(--text-muted);">${item.descricao || ''}</div>
-								<div style="font-size: 0.75rem; margin-top: 0.3rem;">💧 ${item.umidade}% | 🌧️ ${item.probabilidadeChuva || 0}%</div>
+								<div style="font-size: 0.75rem; color: var(--accent); font-weight: 600;">${item.horario || item.dataHora?.split(' ')[1] || ''}</div>
+								<div style="font-size: 1rem; font-weight: bold; margin: 0.2rem 0;">${item.temperatura}°C</div>
+								<div style="font-size: 0.7rem; color: var(--text-muted);">${item.descricao || ''}</div>
+								<div style="font-size: 0.65rem; margin-top: 0.2rem;">💧 ${item.umidade}%</div>
 							`;
 							forecastGrid.appendChild(box);
 						});
@@ -1830,13 +2140,13 @@
 					forecastContainer.style.display = 'none';
 					currentCard.innerHTML = `
 						<h3>${data.cidade || locationTitle}</h3>
-						<div style="display: flex; gap: 1.5rem; align-items: center; margin-top: 0.5rem; flex-wrap: wrap;">
-							<div style="font-size: 2.2rem; font-weight: bold; color: var(--primary);">${data.temperatura}°C</div>
-							<div>
+						<div style="display: flex; gap: 1rem; align-items: center; margin-top: 0.5rem; flex-wrap: wrap;">
+							<div style="font-size: 1.8rem; font-weight: bold; color: var(--primary);">${data.temperatura}°C</div>
+							<div style="font-size: 0.85rem;">
 								<p><strong>Condição:</strong> ${data.descricao || 'Tempo aberto'}</p>
-								<p><strong>Sensação Térmica:</strong> ${data.sensacaoTermica}°C</p>
-								<p><strong>Umidade do Ar:</strong> ${data.umidade}%</p>
-								<p><strong>Chovendo agora?</strong> ${data.chovendo ? 'Sim 🌧️' : 'Não ☀️'}</p>
+								<p><strong>Sensação:</strong> ${data.sensacaoTermica}°C</p>
+								<p><strong>Umidade:</strong> ${data.umidade}%</p>
+								<p><strong>Chuva:</strong> ${data.chovendo ? 'Sim 🌧️' : 'Não ☀️'}</p>
 							</div>
 						</div>
 					`;
@@ -1858,10 +2168,12 @@
 			if (!city) return;
 			const endpoint = isForecast ? `/api/clima/forecast?cidade=${encodeURIComponent(city)}` : `/api/clima/current?cidade=${encodeURIComponent(city)}`;
 			const output = document.getElementById('quick-weather-output');
-			output.innerHTML = '<p class="text-muted">Consultando serviço OpenWeather...</p>';
+			output.innerHTML = '<p class="text-muted">Consultando clima...</p>';
 
 			try {
-				const res = await fetch(`${API_URL}${endpoint}`);
+				const res = await fetch(`${API_URL}${endpoint}`, {
+					headers: {'ngrok-skip-browser-warning': 'true'}
+				});
 				const data = await res.json();
 
 				if (isForecast && Array.isArray(data)) {
@@ -1873,19 +2185,19 @@
 							<div class="forecast-box">
 								<div style="font-size: 0.75rem; color: var(--accent);">${item.horario || ''}</div>
 								<strong>${item.temperatura}°C</strong>
-								<div style="font-size: 0.75rem;">${item.descricao || ''}</div>
+								<div style="font-size: 0.7rem;">${item.descricao || ''}</div>
 							</div>
 						`;
 					});
 					output.appendChild(grid);
 				} else {
 					output.innerHTML = `
-						<div style="background: rgba(15,23,42,0.7); padding: 1rem; border-radius: 8px;">
+						<div style="background: rgba(15,23,42,0.7); padding: 0.8rem; border-radius: 8px;">
 							<h4>${data.cidade || city}</h4>
-							<p style="font-size: 1.8rem; font-weight: bold; color: var(--primary);">${data.temperatura}°C</p>
-							<p><strong>Condição:</strong> ${data.descricao}</p>
-							<p><strong>Umidade:</strong> ${data.umidade}% | <strong>Sensação:</strong> ${data.sensacaoTermica}°C</p>
-							<p><strong>Chuva:</strong> ${data.chovendo ? '🌧️ Chovendo no local' : '☀️ Sem chuva'}</p>
+							<p style="font-size: 1.5rem; font-weight: bold; color: var(--primary);">${data.temperatura}°C</p>
+							<p style="font-size: 0.85rem;"><strong>Condição:</strong> ${data.descricao}</p>
+							<p style="font-size: 0.85rem;"><strong>Umidade:</strong> ${data.umidade}% | <strong>Sensação:</strong> ${data.sensacaoTermica}°C</p>
+							<p style="font-size: 0.85rem;"><strong>Chuva:</strong> ${data.chovendo ? '🌧️ Sim' : '☀️ Não'}</p>
 						</div>
 					`;
 				}
@@ -1904,7 +2216,7 @@
 				list.innerHTML = '';
 
 				if (!users || users.length === 0) {
-					list.innerHTML = '<p class="text-muted">Nenhum usuário encontrado com este username.</p>';
+					list.innerHTML = '<p class="text-muted">Nenhum usuário encontrado.</p>';
 					return;
 				}
 
@@ -1915,7 +2227,7 @@
 						<div>
 							<h3>${u.name}</h3>
 							<p>@${u.username}</p>
-							<p>${u.email}</p>
+							<p style="word-break: break-all;">${u.email}</p>
 						</div>
 						<div class="item-actions">
 							<button class="btn-sm" onclick="followUser('${u.id}')">➕ Seguir</button>
@@ -1930,7 +2242,7 @@
 		async function followUser(userId) {
 			try {
 				await fetchAPI(`/api/user/${userId}/follow`, 'POST');
-				showMessage('Agora você está seguindo este usuário!');
+				showMessage('Você começou a seguir este usuário!');
 			} catch (e) { }
 		}
 
@@ -1944,7 +2256,7 @@
 		async function loadMyFollowers() {
 			try {
 				const list = document.getElementById('social-relations-list');
-				list.innerHTML = '<p class="text-muted">Carregando seguidores...</p>';
+				list.innerHTML = '<p class="text-muted">Carregando...</p>';
 
 				if (!currentUserId) {
 					await loadUserProfile();
@@ -1954,7 +2266,7 @@
 				list.innerHTML = '';
 
 				if (!followers || followers.length === 0) {
-					list.innerHTML = '<p class="text-muted">Você ainda não possui seguidores.</p>';
+					list.innerHTML = '<p class="text-muted">Você não possui seguidores.</p>';
 					return;
 				}
 
@@ -1967,7 +2279,7 @@
 							<p>@${u.username}</p>
 						</div>
 						<div class="item-actions">
-							<button class="btn-sm danger" onclick="removeFollower('${u.id}')">❌ Remover Seguidor</button>
+							<button class="btn-sm danger" onclick="removeFollower('${u.id}')">❌ Remover</button>
 						</div>
 					`;
 					list.appendChild(div);
@@ -1978,7 +2290,7 @@
 		async function loadMyFollowing() {
 			try {
 				const list = document.getElementById('social-relations-list');
-				list.innerHTML = '<p class="text-muted">Carregando quem você segue...</p>';
+				list.innerHTML = '<p class="text-muted">Carregando...</p>';
 
 				if (!currentUserId) {
 					await loadUserProfile();
@@ -1988,7 +2300,7 @@
 				list.innerHTML = '';
 
 				if (!following || following.length === 0) {
-					list.innerHTML = '<p class="text-muted">Você ainda não está seguindo ninguém.</p>';
+					list.innerHTML = '<p class="text-muted">Você não segue ninguém.</p>';
 					return;
 				}
 
@@ -2010,10 +2322,10 @@
 		}
 
 		async function removeFollower(followerId) {
-			if (!confirm('Remover este seguidor da sua lista?')) return;
+			if (!confirm('Remover este seguidor?')) return;
 			try {
 				await fetchAPI(`/api/user/followers/${followerId}`, 'DELETE');
-				showMessage('Seguidor removido com sucesso!');
+				showMessage('Seguidor removido!');
 				loadMyFollowers();
 			} catch (e) { }
 		}
@@ -2026,7 +2338,7 @@
 				list.innerHTML = '';
 
 				if (!achievements || achievements.length === 0) {
-					list.innerHTML = '<p class="text-muted">Nenhuma conquista desbloqueada ainda.</p>';
+					list.innerHTML = '<p class="text-muted">Nenhuma conquista desbloqueada.</p>';
 					userAchievementsCount = 0;
 					return;
 				}
@@ -2034,7 +2346,7 @@
 				if (userAchievementsCount > 0 && achievements.length > userAchievementsCount) {
 					const ultimaConquista = achievements[achievements.length - 1];
 					const desc = ultimaConquista.description || ultimaConquista.achievement?.name;
-					showMessage(`🎉 Nova Conquista Desbloqueada: ${desc}`);
+					showMessage(`🎉 Nova Conquista: ${desc}`);
 				}
 				userAchievementsCount = achievements.length;
 
@@ -2046,13 +2358,13 @@
 					const desc = ach.achievement ? ach.achievement.description : '';
 					const date = ach.unlockedAt || ach.createdAt
 						? new Date(ach.unlockedAt || ach.createdAt).toLocaleDateString('pt-BR')
-						: 'Data Indisponível';
+						: 'Data N/I';
 
 					div.innerHTML = `
 						<div>
 							<h3>🏆 ${title}</h3>
 							${desc ? `<p>${desc}</p>` : ''}
-							<p style="font-size: 0.75rem; color: var(--accent); margin-top: 0.4rem;">Desbloqueado em: ${date}</p>
+							<p style="font-size: 0.75rem; color: var(--accent); margin-top: 0.3rem;">Desbloqueado em: ${date}</p>
 						</div>
 					`;
 					list.appendChild(div);
@@ -2067,7 +2379,7 @@
 				list.innerHTML = '';
 
 				if (!catalog || catalog.length === 0) {
-					list.innerHTML = '<p class="text-muted">Catálogo vazio ou não inicializado no banco.</p>';
+					list.innerHTML = '<p class="text-muted">Catálogo vazio.</p>';
 					return;
 				}
 
@@ -2083,7 +2395,7 @@
 					`;
 					list.appendChild(div);
 				});
-				showMessage('Catálogo geral de conquistas carregado.');
+				showMessage('Catálogo carregado.');
 			} catch (e) { }
 		}
 
@@ -2107,7 +2419,7 @@
 
 			try {
 				await fetchAPI(targetEndpoint, 'POST');
-				showMessage('Conquista registrada com sucesso!');
+				showMessage('Conquista registrada!');
 				loadAchievements();
 			} catch (e) { }
 		});

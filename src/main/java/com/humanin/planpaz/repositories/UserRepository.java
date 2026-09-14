@@ -18,4 +18,7 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
 	// Busca usuários cujo username contenha o texto pesquisado (case insensitive)
 	List<User> findByUsernameContainingIgnoreCase(String username);
+
+	// Usado para validar o link de verificação de e-mail
+	Optional<User> findByVerificationToken(String verificationToken);
 }

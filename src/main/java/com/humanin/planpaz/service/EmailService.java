@@ -7,6 +7,8 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
+import com.humanin.planpaz.dto.PlantWateringStatusDTO;
+
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -65,5 +67,70 @@ public class EmailService {
 				"Até logo! 🌱\n" + "Equipe PlanPaz");
 
 		mailSender.send(message);
+	}
+
+	// ======================================
+	// E-MAIL DE VERIFICAÇÃO DE CADASTRO
+	// ======================================
+
+	public void enviarEmailDeVerificacao(String para, String nomeUsuario, String linkDeVerificacao) {
+		SimpleMailMessage message = new SimpleMailMessage();
+
+		message.setTo(para);
+		message.setSubject("🌱 PlanPaz | Confirme seu e-mail");
+
+		message.setText("Olá, " + nomeUsuario + "! 🌿\n\n" +
+
+				"Falta só um passo para começar a cultivar seu jardim no PlanPaz.\n\n" +
+
+				"Clique no link abaixo para confirmar seu e-mail e ativar sua conta:\n\n" +
+
+				linkDeVerificacao + "\n\n" +
+
+				"Esse link expira em 24 horas. Se você não fez esse cadastro, pode ignorar este e-mail.\n\n" +
+
+				"Até logo! 🌱\n" + "Equipe PlanPaz");
+
+		mailSender.send(message);
+	}
+
+	// ======================================
+	// E-MAIL DE RESUMO DIÁRIO (ENVIADO TODOS OS DIAS ÀS 9H)
+	// ======================================
+
+	public void enviarResumoDiario(String para, String nomeUsuario, List<PlantWateringStatusDTO> plantas) {
+		String fraseDoDia = obterFraseAleatoria();
+
+		StringBuilder corpo = new StringBuilder();
+		corpo.append("Bom dia, ").append(nomeUsuario).append("! 🌞\n\n");
+		corpo.append("Aqui está o resumo do seu jardim hoje:\n\n");
+
+		for (PlantWateringStatusDTO planta : plantas) {
+			corpo.append(formatarStatusRega(planta.status())).append(" ").append(planta.nickname()).append("\n");
+		}
+
+		corpo.append("\n");
+		corpo.append(fraseDoDia);
+
+		corpo.append("O PlanPaz está aqui para ajudar você nessa jornada! 💚\n\n");
+		corpo.append("Até logo! 🌱\n").append("Equipe PlanPaz");
+
+		SimpleMailMessage message = new SimpleMailMessage();
+		message.setTo(para);
+		message.setSubject("🌱 PlanPaz | Resumo do seu jardim de hoje");
+		message.setText(corpo.toString());
+
+		mailSender.send(message);
+	}
+
+	private String formatarStatusRega(String status) {
+		if (status == null) {
+			return "🌿 Em dia -";
+		}
+		return switch (status) {
+			case "atrasado" -> "🔴 Atrasada -";
+			case "hoje" -> "💧 Regar hoje -";
+			default -> "🌿 Em dia -";
+		};
 	}
 }

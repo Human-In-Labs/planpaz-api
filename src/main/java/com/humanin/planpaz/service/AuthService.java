@@ -1,5 +1,9 @@
 package com.humanin.planpaz.service;
 
+import java.time.LocalDateTime;
+import java.util.UUID;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -24,6 +28,13 @@ public class AuthService {
 	private final UserRepository userRepository;
 	private final PasswordEncoder passwordEncoder;
 	private final TokenService tokenService;
+	private final EmailService emailService;
+
+	@Value("${app.base-url}")
+	private String baseUrl;
+
+	// Tempo de validade do link de verificação de e-mail
+	private static final long VERIFICATION_TOKEN_HOURS = 24;
 
 	@Transactional(readOnly = true)
 	public ResponseDTO login(LoginRequestDTO body) {
@@ -35,6 +46,12 @@ public class AuthService {
 		if (!passwordEncoder.matches(body.password(), user.getPassword())) {
 			log.warn("Falha de autenticação (senha incorreta) para o e-mail: {}", body.email());
 			throw new BadCredentialsException("Credenciais inválidas.");
+		}
+
+		if (!Boolean.TRUE.equals(user.getEmailVerified())) {
+			log.warn("Tentativa de login com e-mail não verificado: {}", body.email());
+			throw new BusinessException(
+					"Seu e-mail ainda não foi verificado. Confira sua caixa de entrada ou peça um novo link em /api/auth/resend-verification.");
 		}
 
 		String token = tokenService.generateToken(user);
@@ -76,11 +93,72 @@ public class AuthService {
 		newUser.setEmail(body.email().trim().toLowerCase());
 		newUser.setPassword(passwordEncoder.encode(body.password()));
 
+		// Conta começa não verificada, com um token de confirmação válido por 24h
+		newUser.setEmailVerified(false);
+		newUser.setVerificationToken(UUID.randomUUID().toString());
+		newUser.setVerificationTokenExpiresAt(LocalDateTime.now().plusHours(VERIFICATION_TOKEN_HOURS));
+
 		userRepository.save(newUser);
 
-		String token = tokenService.generateToken(newUser);
-		log.info("Novo usuário registrado com sucesso: {}", newUser.getUsername());
+		enviarEmailDeVerificacao(newUser);
 
-		return new ResponseDTO(newUser.getName(), newUser.getUsername(), token);
+		log.info("Novo usuário registrado (aguardando verificação de e-mail): {}", newUser.getUsername());
+
+		// Sem token de acesso aqui de propósito: o login só libera após confirmar o e-mail
+		return new ResponseDTO(newUser.getName(), newUser.getUsername(), null,
+				"Cadastro realizado! Verifique seu e-mail para ativar a conta antes de fazer login.");
+	}
+
+	// ==========================
+	// CONFIRMA O E-MAIL A PARTIR DO LINK ENVIADO NO CADASTRO
+	// ==========================
+
+	@Transactional
+	public void verifyEmail(String token) {
+		User user = userRepository.findByVerificationToken(token)
+				.orElseThrow(() -> new BusinessException("Link de verificação inválido."));
+
+		if (Boolean.TRUE.equals(user.getEmailVerified())) {
+			return; // já verificado, clicar de novo no link não deve dar erro
+		}
+
+		if (user.getVerificationTokenExpiresAt() == null
+				|| user.getVerificationTokenExpiresAt().isBefore(LocalDateTime.now())) {
+			throw new BusinessException("Este link de verificação expirou. Solicite um novo cadastro ou reenvio.");
+		}
+
+		user.setEmailVerified(true);
+		user.setVerificationToken(null);
+		user.setVerificationTokenExpiresAt(null);
+		userRepository.save(user);
+
+		log.info("E-mail verificado com sucesso para o usuário: {}", user.getUsername());
+	}
+
+	// ==========================
+	// REENVIA O E-MAIL DE VERIFICAÇÃO (LINK EXPIRADO OU PERDIDO)
+	// ==========================
+
+	@Transactional
+	public void resendVerification(String email) {
+		User user = userRepository.findByEmail(email)
+				.orElseThrow(() -> new BusinessException("Nenhum usuário encontrado com este e-mail."));
+
+		if (Boolean.TRUE.equals(user.getEmailVerified())) {
+			throw new BusinessException("Este e-mail já foi verificado. Você já pode fazer login.");
+		}
+
+		user.setVerificationToken(UUID.randomUUID().toString());
+		user.setVerificationTokenExpiresAt(LocalDateTime.now().plusHours(VERIFICATION_TOKEN_HOURS));
+		userRepository.save(user);
+
+		enviarEmailDeVerificacao(user);
+
+		log.info("Link de verificação reenviado para: {}", email);
+	}
+
+	private void enviarEmailDeVerificacao(User user) {
+		String link = baseUrl + "/api/auth/verify-email?token=" + user.getVerificationToken();
+		emailService.enviarEmailDeVerificacao(user.getEmail(), user.getName(), link);
 	}
 }

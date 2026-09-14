@@ -1,8 +1,7 @@
 package com.humanin.planpaz.infra.security;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -15,46 +14,35 @@ import com.humanin.planpaz.model.User;
 
 @Service
 public class TokenService {
-	// pega o valor dessa variável no application.properties
+
 	@Value("${api.security.token.secret}")
 	private String secret;
-	
+
 	public String generateToken(User user) {
 		try {
 			Algorithm algorithm = Algorithm.HMAC256(secret);
-			
-			String token = JWT.create()
-					.withIssuer("planpaz-api")
-					.withSubject(user.getEmail())
-					.withExpiresAt(this.generateExpirationDate())
-					.sign(algorithm);
-			
-			return token;
-			
+
+			return JWT.create().withIssuer("planpaz-api").withSubject(user.getEmail())
+					.withExpiresAt(this.generateExpirationDate()).sign(algorithm);
+
 		} catch (JWTCreationException e) {
-			throw new RuntimeException("Error while authenticating.");
+			throw new RuntimeException("Error while authenticating.", e);
 		}
 	}
-	
-	
-	// função que valida o token gerado
+
 	public String validateToken(String token) {
 		try {
 			Algorithm algorithm = Algorithm.HMAC256(secret);
-			return JWT.require(algorithm)
-					.withIssuer("planpaz-api")
-					.build()
-					.verify(token)
-					.getSubject();  // pega o email
-			
+			return JWT.require(algorithm).withIssuer("planpaz-api").build().verify(token).getSubject();
+
 		} catch (JWTVerificationException e) {
+			// Retorna nulo se o token estiver expirado ou com assinatura inválida
 			return null;
 		}
 	}
-	
-	
-	// função que gera uma data de expiração para o token
+
+	// Gera expiração correta de 2 horas a partir do momento atual em UTC
 	private Instant generateExpirationDate() {
-		return LocalDateTime.now().plusHours(2).toInstant(ZoneOffset.of("-3"));
+		return Instant.now().plus(2, ChronoUnit.HOURS);
 	}
 }

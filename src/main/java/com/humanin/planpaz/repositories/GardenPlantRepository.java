@@ -19,4 +19,7 @@ public interface GardenPlantRepository extends JpaRepository<GardenPlant, UUID> 
 	Optional<GardenPlant> findByIdAndOwnerId(UUID id, UUID ownerId);
 	
 	long countByOwnerId(UUID ownerId);
+
+	// Usado pelo job diário de e-mail: só notifica quem manteve o checkbox ativado
+	List<GardenPlant> findByWateringNotificationTrue();
 }
