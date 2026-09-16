@@ -443,7 +443,7 @@
 
 		@media (min-width: 640px) {
 			.item-list {
-				grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+				grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
 				gap: 1rem;
 			}
 		}
@@ -519,11 +519,135 @@
 			color: var(--warning);
 		}
 
+		.care-box {
+			background: rgba(16, 185, 129, 0.08);
+			border: 1px solid rgba(16, 185, 129, 0.25);
+			border-radius: 8px;
+			padding: 0.7rem;
+			margin-top: 0.6rem;
+			font-size: 0.8rem;
+			color: #d1fae5;
+			white-space: pre-line;
+		}
+
+		/* ESTILOS REFINADOS DA BIBLIOTECA DE ESPÉCIES (PLANT CARD VISUAL) */
+		.plant-card-view {
+			background: linear-gradient(180deg, var(--surface-2), rgba(10, 15, 28, 0.8));
+			border: 1px solid var(--border-soft);
+			border-radius: 16px;
+			overflow: hidden;
+			display: flex;
+			flex-direction: column;
+			justify-content: space-between;
+			box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+			transition: transform 0.2s ease, border-color 0.2s ease;
+		}
+
+		.plant-card-view:hover {
+			transform: translateY(-3px);
+			border-color: rgba(16, 185, 129, 0.4);
+		}
+
+		.plant-card-header {
+			background: linear-gradient(135deg, rgba(16, 185, 129, 0.25), rgba(56, 189, 248, 0.15));
+			padding: 1rem 1.1rem;
+			border-bottom: 1px solid var(--border-soft);
+		}
+
+		.plant-card-header-top {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			margin-bottom: 0.5rem;
+		}
+
+		.plant-card-title {
+			font-size: 1.2rem;
+			font-weight: 800;
+			color: #ffffff;
+			line-height: 1.2;
+		}
+
+		.plant-card-scientific {
+			font-style: italic;
+			font-size: 0.82rem;
+			color: var(--primary-light);
+			margin-top: 0.15rem;
+		}
+
+		.plant-quick-stats {
+			display: grid;
+			grid-template-columns: repeat(3, 1fr);
+			gap: 0.5rem;
+			padding: 0.75rem 1rem;
+			background: rgba(6, 10, 20, 0.4);
+			border-bottom: 1px solid var(--border-soft);
+		}
+
+		.quick-stat-item {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			text-align: center;
+		}
+
+		.quick-stat-label {
+			font-size: 0.65rem;
+			text-transform: uppercase;
+			color: var(--text-muted);
+			font-weight: 700;
+			letter-spacing: 0.05em;
+		}
+
+		.quick-stat-value {
+			font-size: 0.8rem;
+			font-weight: 700;
+			color: var(--text-main);
+			margin-top: 0.1rem;
+		}
+
+		.plant-card-body {
+			padding: 1rem;
+			display: flex;
+			flex-direction: column;
+			gap: 0.85rem;
+			flex-grow: 1;
+		}
+
+		.plant-card-body p {
+			font-size: 0.85rem;
+			color: var(--text-muted);
+			line-height: 1.45;
+		}
+
+		.plant-care-panel {
+			background: rgba(16, 185, 129, 0.06);
+			border: 1px solid rgba(16, 185, 129, 0.2);
+			border-radius: 10px;
+			padding: 0.8rem;
+		}
+
+		.plant-care-title {
+			font-size: 0.8rem;
+			font-weight: 700;
+			color: var(--primary-light);
+			margin-bottom: 0.4rem;
+			display: flex;
+			align-items: center;
+			gap: 0.3rem;
+		}
+
+		.plant-care-text {
+			font-size: 0.8rem;
+			color: #e2e8f0;
+			white-space: pre-line;
+			line-height: 1.5;
+		}
+
 		.hidden {
 			display: none !important;
 		}
 
-		/* ALERT CONTAINER FLUTUANTE (OVERLAY) */
 		.alert {
 			position: fixed;
 			top: 20px;
@@ -876,7 +1000,7 @@
 			<div class="nav-tabs">
 				<button class="nav-tab active" onclick="switchTab('garden')">🪴 Jardim</button>
 				<button class="nav-tab" onclick="switchTab('feed')">📰 Feed</button>
-				<button class="nav-tab" onclick="switchTab('species')">🌿 Espécies</button>
+				<button class="nav-tab" onclick="switchTab('species')">🌿 Biblioteca de Espécies</button>
 				<button class="nav-tab" onclick="switchTab('weather')">🌤️ Clima</button>
 				<button class="nav-tab" onclick="switchTab('profile')">⚙️ Perfil</button>
 				<button class="nav-tab" onclick="switchTab('social')">👥 Social</button>
@@ -974,89 +1098,15 @@
 				</div>
 			</div>
 
-			<!-- TAB 3: CATÁLOGO DE ESPÉCIES -->
+			<!-- TAB 3: CATÁLOGO / BIBLIOTECA DE ESPÉCIES -->
 			<div id="tab-species" class="tab-content hidden">
 				<div class="card">
 					<h2>
-						<span>Catálogo de Espécies</span>
+						<span>Biblioteca de Espécies</span>
 						<button class="btn-sm btn-secondary" onclick="loadSpecies()">🔄 Atualizar</button>
 					</h2>
-
-					<form id="plant-form" style="margin-bottom: 1.5rem;">
-						<div class="form-grid">
-							<div class="form-group">
-								<label>Nome Comum <span class="required">*</span></label>
-								<input type="text" id="plant-name" required placeholder="Ex: Alecrim">
-							</div>
-							<div class="form-group">
-								<label>Nome Científico <span class="optional">(opcional)</span></label>
-								<input type="text" id="plant-scientific" placeholder="Ex: Salvia rosmarinus">
-							</div>
-							<div class="form-group">
-								<label>Tipo <span class="optional">(opcional)</span></label>
-								<select id="plant-type">
-									<option value="">Selecione...</option>
-									<option value="EDIBLE">Comestível</option>
-									<option value="AROMATIC">Aromática</option>
-									<option value="ORNAMENTAL">Ornamental</option>
-									<option value="OTHER">Outro</option>
-								</select>
-							</div>
-							<div class="form-group">
-								<label>Porte <span class="optional">(opcional)</span></label>
-								<select id="plant-size">
-									<option value="">Selecione...</option>
-									<option value="SMALL">Pequeno</option>
-									<option value="MEDIUM">Médio</option>
-									<option value="LARGE">Grande</option>
-								</select>
-							</div>
-						</div>
-
-						<div class="form-grid">
-							<div class="form-group">
-								<label>Frequência de Rega</label>
-								<select id="plant-watering">
-									<option value="">Selecione...</option>
-									<option value="DAILY">Diária</option>
-									<option value="FREQUENT">Frequente</option>
-									<option value="WEEKLY">Semanal</option>
-									<option value="SPORADIC">Esporádica</option>
-								</select>
-							</div>
-							<div class="form-group">
-								<label>Luminosidade</label>
-								<select id="plant-luminosity">
-									<option value="">Selecione...</option>
-									<option value="LOW">Baixa</option>
-									<option value="MEDIUM">Média</option>
-									<option value="INTENSE">Intensa</option>
-									<option value="ANY">Qualquer</option>
-								</select>
-							</div>
-							<div class="form-group">
-								<label>Temperatura</label>
-								<select id="plant-temperature">
-									<option value="">Selecione...</option>
-									<option value="LOW">Baixa</option>
-									<option value="MEDIUM">Média</option>
-									<option value="HIGH">Alta</option>
-									<option value="ANY">Qualquer</option>
-								</select>
-							</div>
-							<div class="form-group">
-								<label>URL da Imagem</label>
-								<input type="text" id="plant-image" placeholder="https://...">
-							</div>
-						</div>
-
-						<div class="form-group">
-							<label>Descrição & Dicas</label>
-							<textarea id="plant-desc" rows="2" placeholder="Dicas de solo e poda..."></textarea>
-						</div>
-
-						<button type="submit" style="width: 100%;">Cadastrar Espécie</button>
-					</form>
+					<p class="text-muted" style="margin-bottom: 1rem;">Consulte abaixo os guias de cuidados e
+						informações detalhadas de cada espécie cadastrada no sistema.</p>
 
 					<div id="plants-list" class="item-list"></div>
 				</div>
@@ -1318,7 +1368,7 @@
 	</div>
 
 	<script>
-		const API_URL = 'https://debunk-quail-revert.ngrok-free.dev';
+		const API_URL = 'http://localhost:8080';
 		let token = localStorage.getItem('planpaz_token');
 		let username = localStorage.getItem('planpaz_username') || '';
 		let currentUserId = localStorage.getItem('planpaz_userid') || '';
@@ -1329,6 +1379,32 @@
 		const dashboardSection = document.getElementById('dashboard-section');
 		const authStatus = document.getElementById('auth-status');
 		const alertBox = document.getElementById('alert-box');
+
+		function formatEnumLabel(value) {
+			if (!value) return 'Não informado';
+			const map = {
+				'DAILY': 'Diária',
+				'WEEKLY': 'Semanal',
+				'SPORADIC': 'Esporádica',
+				'FREQUENT': 'Frequente',
+				'HIGH': 'Alta',
+				'MEDIUM': 'Média',
+				'LOW': 'Baixa',
+				'SMALL': 'Pequeno',
+				'MEDIUM_SIZE': 'Médio',
+				'LARGE': 'Grande',
+				'INDOOR': 'Interno',
+				'OUTDOOR': 'Externo',
+				'DECORATION': 'Decoração',
+				'ALIMENTATION': 'Alimentação',
+				'WELL_BEING': 'Bem-Estar',
+				'SUSTAINABILITY': 'Sustentabilidade',
+				'BEGINNER': 'Iniciante',
+				'INTERMEDIATE': 'Intermediário',
+				'ADVANCED': 'Avançado'
+			};
+			return map[value] || value;
+		}
 
 		function init() {
 			checkEmailVerificationToken();
@@ -1367,7 +1443,6 @@
 		let alertTimer = null;
 
 		function showMessage(msg, isError = false) {
-			// Cancela contagem regressiva anterior caso já exista uma mensagem na tela
 			if (alertTimer) {
 				clearTimeout(alertTimer);
 			}
@@ -1376,7 +1451,6 @@
 			alertBox.className = `alert ${isError ? 'error' : 'success'}`;
 			alertBox.style.display = 'block';
 
-			// Mantém a mensagem visível por 10 segundos
 			alertTimer = setTimeout(() => {
 				alertBox.style.display = 'none';
 			}, 10000);
@@ -1464,7 +1538,6 @@
 			}
 		}
 
-		// --- AUTH HANDLERS ---
 		document.getElementById('login-form').addEventListener('submit', async (e) => {
 			e.preventDefault();
 			const email = document.getElementById('login-email').value;
@@ -1547,7 +1620,6 @@
 			await loadAchievements();
 		}
 
-		// --- USER PROFILE & PREFERENCES HANDLERS ---
 		async function loadUserProfile() {
 			try {
 				const settings = await fetchAPI('/api/user/settings');
@@ -1596,7 +1668,6 @@
 			} catch (e) { }
 		});
 
-		// --- FEED, LIKES & COMMENTS HANDLERS ---
 		async function loadFeed() {
 			try {
 				const query = currentUserId ? `?currentUserId=${currentUserId}` : '';
@@ -1837,7 +1908,6 @@
 			} catch (e) { }
 		}
 
-		// --- PLANT & SPECIES HANDLERS ---
 		async function loadSpecies() {
 			try {
 				const plants = await fetchAPI('/api/species');
@@ -1851,26 +1921,51 @@
 
 				plants.forEach(p => {
 					const div = document.createElement('div');
-					div.className = 'item-card';
+					div.className = 'plant-card-view';
 
-					const badges = [
-						p.wateringLevel ? `<span class="badge">💧 ${p.wateringLevel}</span>` : '',
-						p.luminosityLevel ? `<span class="badge">☀️ ${p.luminosityLevel}</span>` : '',
-						p.temperatureLevel ? `<span class="badge">🌡️ ${p.temperatureLevel}</span>` : '',
-						p.size ? `<span class="badge">📏 ${p.size}</span>` : '',
-						p.type ? `<span class="badge">🌱 ${p.type}</span>` : ''
-					].join(' ');
+					const careGuideText = p.careGuide || p.care_guide || p.careInstruction || '';
 
 					div.innerHTML = `
 						<div>
-							<h3>${p.name}</h3>
-							<p><em>${p.scientificName || 'Nome científico não informado'}</em></p>
-							<p>${p.description || 'Sem descrição.'}</p>
-							<div style="margin: 0.5rem 0;">${badges}</div>
+							<div class="plant-card-header">
+								<div class="plant-card-header-top">
+									${p.type ? `<span class="badge success">${formatEnumLabel(p.type)}</span>` : '<span></span>'}
+									${p.size ? `<span class="badge warning">Porte: ${formatEnumLabel(p.size)}</span>` : ''}
+								</div>
+								<div class="plant-card-title">${p.name}</div>
+								<div class="plant-card-scientific">${p.scientificName || 'Espécie não classificada'}</div>
+							</div>
+
+							${p.imagePath ? `<img src="${p.imagePath}" style="width:100%; max-height:180px; object-fit:cover;" onerror="this.style.display='none'">` : ''}
+
+							<div class="plant-quick-stats">
+								<div class="quick-stat-item">
+									<span class="quick-stat-label">💧 Rega</span>
+									<span class="quick-stat-value">${formatEnumLabel(p.wateringLevel)}</span>
+								</div>
+								<div class="quick-stat-item">
+									<span class="quick-stat-label">☀️ Luz</span>
+									<span class="quick-stat-value">${formatEnumLabel(p.luminosityLevel)}</span>
+								</div>
+								<div class="quick-stat-item">
+									<span class="quick-stat-label">🌡️ Temp</span>
+									<span class="quick-stat-value">${formatEnumLabel(p.temperatureLevel)}</span>
+								</div>
+							</div>
+
+							<div class="plant-card-body">
+								${p.description ? `<p>${p.description}</p>` : ''}
+								
+								${careGuideText ? `
+									<div class="plant-care-panel">
+										<div class="plant-care-title">📖 Guia de Manejo e Cuidados</div>
+										<div class="plant-care-text">${careGuideText}</div>
+									</div>
+								` : ''}
+							</div>
 						</div>
-						<div class="item-actions">
-							<button class="btn-sm btn-secondary" onclick="viewSpeciesStages('${p.id}', '${p.name}')">🌱 Estágios</button>
-							<button class="btn-sm danger" onclick="deleteSpecies('${p.id}')">Excluir</button>
+						<div style="padding: 1rem; border-top: 1px solid var(--border-soft);">
+							<button class="btn-sm btn-secondary" style="width: 100%;" onclick="viewSpeciesStages('${p.id}', '${p.name}')">🌱 Ver Estágios de Cultivo</button>
 						</div>
 					`;
 					list.appendChild(div);
@@ -1892,37 +1987,6 @@
 				}
 				const stageDetails = stages.map(s => `• ${s.order}º estágio: ${s.name} (~${s.days} dias)`).join('\n');
 				alert(`Estágios de ${speciesName}:\n\n${stageDetails}`);
-			} catch (e) { }
-		}
-
-		document.getElementById('plant-form').addEventListener('submit', async (e) => {
-			e.preventDefault();
-			const payload = {
-				name: document.getElementById('plant-name').value,
-				scientificName: document.getElementById('plant-scientific').value || null,
-				description: document.getElementById('plant-desc').value || null,
-				type: document.getElementById('plant-type').value || null,
-				size: document.getElementById('plant-size').value || null,
-				wateringLevel: document.getElementById('plant-watering').value || null,
-				luminosityLevel: document.getElementById('plant-luminosity').value || null,
-				temperatureLevel: document.getElementById('plant-temperature').value || null,
-				imagePath: document.getElementById('plant-image').value || null
-			};
-
-			try {
-				await fetchAPI('/api/species', 'POST', payload);
-				showMessage('Espécie cadastrada com sucesso!');
-				document.getElementById('plant-form').reset();
-				loadSpecies();
-			} catch (e) { }
-		});
-
-		async function deleteSpecies(id) {
-			if (!confirm('Deseja realmente excluir esta espécie do catálogo?')) return;
-			try {
-				await fetchAPI(`/api/species/${id}`, 'DELETE');
-				showMessage('Espécie excluída com sucesso!');
-				loadSpecies();
 			} catch (e) { }
 		}
 
@@ -1955,7 +2019,6 @@
 			}
 		}
 
-		// --- GARDEN PLANTS HANDLERS ---
 		async function loadGarden() {
 			try {
 				const garden = await fetchAPI('/api/garden');
@@ -1971,6 +2034,7 @@
 					const speciesName = g.plant?.name || 'Espécie desconhecida';
 					const stageName = g.stage?.name ? `${g.stage.order}º - ${g.stage.name}` : 'Não informado';
 					const roomName = g.room || 'Não informado';
+					const careGuideText = g.plant?.careGuide || g.plant?.care_guide || g.plant?.careInstruction || '';
 
 					const div = document.createElement('div');
 					div.className = 'item-card';
@@ -1982,6 +2046,12 @@
 							<p><strong>Cômodo:</strong> ${roomName}</p>
 							<p><strong>Última rega:</strong> ${g.lastWatering ? new Date(g.lastWatering).toLocaleDateString('pt-BR') : 'Não registrada'}</p>
 							<p><strong>Chuva direta:</strong> ${g.directRain ? 'Sim 🌧️' : 'Não 🏠'}</p>
+
+							${careGuideText ? `
+								<div class="care-box">
+									<strong>📖 Care Guide (${speciesName}):</strong><br>${careGuideText}
+								</div>
+							` : ''}
 						</div>
 						<div class="item-actions">
 							<button class="btn-sm" onclick="waterPlant('${g.id}')">💧 Regar</button>
@@ -2084,7 +2154,6 @@
 			} catch (e) { }
 		}
 
-		// --- WEATHER & FORECAST HANDLERS ---
 		async function consultWeatherByCity(isForecast = false) {
 			const city = document.getElementById('weather-city-input').value.trim();
 			if (!city) {
@@ -2154,7 +2223,6 @@
 			} catch (e) { }
 		}
 
-		// QUICK WEATHER MODAL (PUBLIC ACCESS)
 		function openPublicWeatherModal() {
 			document.getElementById('public-weather-modal').classList.remove('hidden');
 		}
@@ -2206,7 +2274,6 @@
 			}
 		}
 
-		// --- SOCIAL & FOLLOWERS HANDLERS ---
 		document.getElementById('search-user-form').addEventListener('submit', async (e) => {
 			e.preventDefault();
 			const query = document.getElementById('search-username-input').value;
@@ -2330,7 +2397,6 @@
 			} catch (e) { }
 		}
 
-		// --- ACHIEVEMENTS HANDLERS ---
 		async function loadAchievements() {
 			try {
 				const achievements = await fetchAPI('/api/achievements');

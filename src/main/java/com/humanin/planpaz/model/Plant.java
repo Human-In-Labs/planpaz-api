@@ -42,6 +42,9 @@ public class Plant {
 	@Column(columnDefinition = "TEXT")
 	private String description;
 
+	@Column(name = "care_guide", columnDefinition = "TEXT")
+	private String careGuide;
+
 	@Enumerated(EnumType.STRING)
 	@Column(name = "watering_level")
 	private WateringLevel wateringLevel;

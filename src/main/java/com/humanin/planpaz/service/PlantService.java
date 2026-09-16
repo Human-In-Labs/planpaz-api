@@ -36,6 +36,7 @@ public class PlantService {
 
 		novaPlanta.setName(planta.getName());
 		novaPlanta.setDescription(planta.getDescription());
+		novaPlanta.setCareGuide(planta.getCareGuide()); // <--- ADICIONADO AQUI
 		novaPlanta.setImagePath(planta.getImagePath());
 		novaPlanta.setLuminosityLevel(planta.getLuminosityLevel());
 		novaPlanta.setScientificName(planta.getScientificName());

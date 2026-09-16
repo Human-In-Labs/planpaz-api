@@ -28,13 +28,13 @@ public class AuthService {
 	private final UserRepository userRepository;
 	private final PasswordEncoder passwordEncoder;
 	private final TokenService tokenService;
-	private final EmailService emailService;
+	// private final EmailService emailService; // TEMPORARIAMENTE DESATIVADO
 
 	@Value("${app.base-url}")
 	private String baseUrl;
 
 	// Tempo de validade do link de verificação de e-mail
-	private static final long VERIFICATION_TOKEN_HOURS = 24;
+	// private static final long VERIFICATION_TOKEN_HOURS = 24;
 
 	@Transactional(readOnly = true)
 	public ResponseDTO login(LoginRequestDTO body) {
@@ -48,11 +48,13 @@ public class AuthService {
 			throw new BadCredentialsException("Credenciais inválidas.");
 		}
 
+		/* TEMPORARIAMENTE DESATIVADO: Validação de e-mail no login
 		if (!Boolean.TRUE.equals(user.getEmailVerified())) {
 			log.warn("Tentativa de login com e-mail não verificado: {}", body.email());
 			throw new BusinessException(
 					"Seu e-mail ainda não foi verificado. Confira sua caixa de entrada ou peça um novo link em /api/auth/resend-verification.");
 		}
+		*/
 
 		String token = tokenService.generateToken(user);
 		log.info("Login bem-sucedido para o usuário: {}", user.getUsername());
@@ -93,26 +95,33 @@ public class AuthService {
 		newUser.setEmail(body.email().trim().toLowerCase());
 		newUser.setPassword(passwordEncoder.encode(body.password()));
 
-		// Conta começa não verificada, com um token de confirmação válido por 24h
+		// TEMPORARIAMENTE MODIFICADO: Conta já é criada como verificada para testes locais
+		newUser.setEmailVerified(true);
+		newUser.setVerificationToken(null);
+		newUser.setVerificationTokenExpiresAt(null);
+
+		/* 
 		newUser.setEmailVerified(false);
 		newUser.setVerificationToken(UUID.randomUUID().toString());
 		newUser.setVerificationTokenExpiresAt(LocalDateTime.now().plusHours(VERIFICATION_TOKEN_HOURS));
+		*/
 
 		userRepository.save(newUser);
 
-		enviarEmailDeVerificacao(newUser);
+		// enviarEmailDeVerificacao(newUser); // TEMPORARIAMENTE DESATIVADO
 
-		log.info("Novo usuário registrado (aguardando verificação de e-mail): {}", newUser.getUsername());
+		log.info("Novo usuário registrado: {}", newUser.getUsername());
 
-		// Sem token de acesso aqui de propósito: o login só libera após confirmar o e-mail
-		return new ResponseDTO(newUser.getName(), newUser.getUsername(), null,
-				"Cadastro realizado! Verifique seu e-mail para ativar a conta antes de fazer login.");
+		// Retorna o token JWT diretamente no registro para facilitar o uso sem precisar enviar e-mail
+		String token = tokenService.generateToken(newUser);
+		return new ResponseDTO(newUser.getName(), newUser.getUsername(), token, "Cadastro realizado com sucesso!");
 	}
 
 	// ==========================
-	// CONFIRMA O E-MAIL A PARTIR DO LINK ENVIADO NO CADASTRO
+	// CONFIRMA O E-MAIL A PARTIR DO LINK ENVIADO NO CADASTRO (DESATIVADO TEMPORARIAMENTE)
 	// ==========================
 
+	/*
 	@Transactional
 	public void verifyEmail(String token) {
 		User user = userRepository.findByVerificationToken(token)
@@ -134,11 +143,13 @@ public class AuthService {
 
 		log.info("E-mail verificado com sucesso para o usuário: {}", user.getUsername());
 	}
+	*/
 
 	// ==========================
-	// REENVIA O E-MAIL DE VERIFICAÇÃO (LINK EXPIRADO OU PERDIDO)
+	// REENVIA O E-MAIL DE VERIFICAÇÃO (LINK EXPIRADO OU PERDIDO) (DESATIVADO TEMPORARIAMENTE)
 	// ==========================
 
+	/*
 	@Transactional
 	public void resendVerification(String email) {
 		User user = userRepository.findByEmail(email)
@@ -161,4 +172,5 @@ public class AuthService {
 		String link = baseUrl + "/api/auth/verify-email?token=" + user.getVerificationToken();
 		emailService.enviarEmailDeVerificacao(user.getEmail(), user.getName(), link);
 	}
+	*/
 }
