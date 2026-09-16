@@ -1,11 +1,16 @@
 package com.humanin.planpaz.model;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import org.hibernate.annotations.CreationTimestamp;
 
+import com.humanin.planpaz.infra.converter.StringListConverter;
+
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -46,4 +51,8 @@ public class Post {
 	private String content;
 
 	private String media;
+
+	@Convert(converter = StringListConverter.class)
+	@Column(name = "tags")
+	private List<String> tags = new ArrayList<>();
 }

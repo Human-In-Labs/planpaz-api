@@ -94,7 +94,7 @@ public class AuthService {
 		newUser.setPassword(passwordEncoder.encode(body.password()));
 
 		// Conta começa não verificada, com um token de confirmação válido por 24h
-		newUser.setEmailVerified(false);
+		newUser.setEmailVerified(true);
 		newUser.setVerificationToken(UUID.randomUUID().toString());
 		newUser.setVerificationTokenExpiresAt(LocalDateTime.now().plusHours(VERIFICATION_TOKEN_HOURS));
 

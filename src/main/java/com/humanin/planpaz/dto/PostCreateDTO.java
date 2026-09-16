@@ -1,5 +1,6 @@
 package com.humanin.planpaz.dto;
 
+import java.util.List;
 import java.util.UUID;
 
 import jakarta.validation.constraints.NotBlank;
@@ -26,4 +27,7 @@ public class PostCreateDTO {
 	private String content;
 
 	private String media;
+
+	@Size(max = 3, message = "Você pode adicionar no máximo 3 hashtags")
+	private List<String> tags;
 }
