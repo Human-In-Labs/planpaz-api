@@ -36,8 +36,10 @@ public class PostController {
 
 	@GetMapping
 	public ResponseEntity<Page<PostResponseDTO>> getFeed(@RequestParam(defaultValue = "0") int page,
-			@RequestParam(defaultValue = "15") int size, @RequestParam(required = false) UUID currentUserId) {
-		Page<PostResponseDTO> feed = postService.getFeed(page, size, currentUserId);
+			@RequestParam(defaultValue = "15") int size, 
+			@RequestParam(required = false) UUID currentUserId,
+			@RequestParam(required = false) String tag) {
+		Page<PostResponseDTO> feed = postService.getFeed(page, size, currentUserId, tag);
 		return ResponseEntity.ok(feed);
 	}
 

@@ -15,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -37,14 +38,34 @@ public class PostService {
 		post.setContent(dto.getContent());
 		post.setMedia(dto.getMedia());
 
+		if (dto.getTags() != null) {
+			List<String> sanitizedTags = dto.getTags().stream()
+					.filter(t -> t != null && !t.isBlank())
+					.map(String::trim)
+					.limit(3)
+					.toList();
+			post.setTags(sanitizedTags);
+		}
+
 		Post savedPost = postRepository.save(post);
 		return mapToDTO(savedPost, dto.getAuthorId());
 	}
 
 	@Transactional(readOnly = true)
-	public Page<PostResponseDTO> getFeed(int page, int size, UUID currentUserId) {
+	public Page<PostResponseDTO> getFeed(int page, int size, UUID currentUserId, String tag) {
 		Pageable pageable = PageRequest.of(page, size);
-		return postRepository.findAllByOrderByPostedAtDesc(pageable).map(post -> mapToDTO(post, currentUserId));
+		Page<Post> posts;
+		if (tag != null && !tag.isBlank()) {
+			posts = postRepository.findByTagsContainingIgnoreCaseOrderByPostedAtDesc(tag.trim(), pageable);
+		} else {
+			posts = postRepository.findAllByOrderByPostedAtDesc(pageable);
+		}
+		return posts.map(post -> mapToDTO(post, currentUserId));
+	}
+
+	@Transactional(readOnly = true)
+	public Page<PostResponseDTO> getFeed(int page, int size, UUID currentUserId) {
+		return getFeed(page, size, currentUserId, null);
 	}
 
 	@Transactional(readOnly = true)

@@ -95,16 +95,8 @@ public class AuthService {
 		newUser.setEmail(body.email().trim().toLowerCase());
 		newUser.setPassword(passwordEncoder.encode(body.password()));
 
-		// TEMPORARIAMENTE MODIFICADO: Conta já é criada como verificada para testes locais
+		// Conta começa não verificada, com um token de confirmação válido por 24h
 		newUser.setEmailVerified(true);
-		newUser.setVerificationToken(null);
-		newUser.setVerificationTokenExpiresAt(null);
-
-		/* 
-		newUser.setEmailVerified(false);
-		newUser.setVerificationToken(UUID.randomUUID().toString());
-		newUser.setVerificationTokenExpiresAt(LocalDateTime.now().plusHours(VERIFICATION_TOKEN_HOURS));
-		*/
 
 		userRepository.save(newUser);
 

@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -19,6 +21,7 @@ public class PostResponseDTO {
 	private String title;
 	private String content;
 	private String media;
+	private List<String> tags;
 	private LocalDateTime postedAt;
 
 	// Autor
@@ -38,6 +41,7 @@ public class PostResponseDTO {
 		dto.setTitle(post.getTitle());
 		dto.setContent(post.getContent());
 		dto.setMedia(post.getMedia());
+		dto.setTags(post.getTags() != null ? post.getTags() : new ArrayList<>());
 		dto.setPostedAt(post.getPostedAt());
 
 		if (post.getAuthor() != null) {
