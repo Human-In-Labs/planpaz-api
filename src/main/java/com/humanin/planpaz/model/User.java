@@ -23,6 +23,7 @@ import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -74,13 +75,13 @@ public class User {
 	@Column(name = "main_goal")
 	private MainGoal mainGoal;
 
-	@ElementCollection(targetClass = RoomLuminosity.class)
+	@ElementCollection(targetClass = RoomLuminosity.class, fetch = FetchType.EAGER)
 	@CollectionTable(name = "user_room_luminosity", joinColumns = @JoinColumn(name = "user_id"))
 	@Enumerated(EnumType.STRING)
 	@Column(name = "luminosity")
 	private Set<RoomLuminosity> roomLuminosity = new HashSet<>();
 
-	@ElementCollection(targetClass = SpaceAvailability.class)
+	@ElementCollection(targetClass = SpaceAvailability.class, fetch = FetchType.EAGER)
 	@CollectionTable(name = "user_space_availability", joinColumns = @JoinColumn(name = "user_id"))
 	@Enumerated(EnumType.STRING)
 	@Column(name = "space")

@@ -2,7 +2,9 @@ package com.humanin.planpaz.controller;
 
 import java.util.List;
 import java.util.UUID;
+
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -10,8 +12,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.humanin.planpaz.dto.PlantResponseDTO;
 import com.humanin.planpaz.model.Plant;
+import com.humanin.planpaz.model.User;
 import com.humanin.planpaz.service.PlantService;
 import com.humanin.planpaz.service.PlantStageService;
 
@@ -25,12 +31,24 @@ public class PlantController {
 	private final PlantStageService plantStageService;
 
 	// ==========================
-	// LISTA TODAS AS ESPÉCIES DO BANCO
+	// LISTA TODAS AS ESPÉCIES DO BANCO COM FILTROS E RECOMENDAÇÃO INTELIGENTE
 	// ==========================
 
 	@GetMapping
-	public ResponseEntity<List<Plant>> listSpecies() {
-		return ResponseEntity.ok(plantService.listarPlantas());
+	public ResponseEntity<List<PlantResponseDTO>> listSpecies(@RequestParam(required = false) String search,
+			@RequestParam(required = false) String type, @RequestParam(required = false) String luminosity,
+			@RequestParam(required = false) String watering, @RequestParam(required = false) String size,
+			Authentication authentication) {
+
+		User user = null;
+		if (authentication != null && authentication.getPrincipal() instanceof User authenticatedUser) {
+			user = authenticatedUser;
+		}
+
+		List<PlantResponseDTO> resultado = plantService.listarECalcularRecomendacoes(user, search, type, luminosity,
+				watering, size);
+
+		return ResponseEntity.ok(resultado);
 	}
 
 	// ==========================
@@ -63,7 +81,7 @@ public class PlantController {
 		plantService.excluirPlanta(id);
 		return ResponseEntity.ok("Planta deletada com sucesso.");
 	}
-	
+
 	// ==========================
 	// RETORNA UMA ÚNICA ESPÉCIE DO BANCO
 	// ==========================
