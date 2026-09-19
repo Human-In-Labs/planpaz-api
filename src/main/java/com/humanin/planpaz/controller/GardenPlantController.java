@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.humanin.planpaz.dto.ApiResponseDTO;
 import com.humanin.planpaz.dto.WeatherResponseDTO;
 import com.humanin.planpaz.dto.WateringReminderDTO;
 import com.humanin.planpaz.dto.WateringStatusDTO;
@@ -28,7 +29,7 @@ import com.humanin.planpaz.service.WateringService;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/garden")
+@RequestMapping({"/api/garden", "/api/user-plants"})
 @RequiredArgsConstructor
 public class GardenPlantController {
 	private final GardenPlantService gardenPlantService;
@@ -45,11 +46,11 @@ public class GardenPlantController {
 	// =========================
 
 	@PostMapping("/add")
-	public ResponseEntity<String> addGardenPlant(@RequestBody GardenPlant gardenPlant, Authentication authentication) {
+	public ResponseEntity<ApiResponseDTO> addGardenPlant(@RequestBody GardenPlant gardenPlant, Authentication authentication) {
 		User user = getAuthenticatedUser(authentication);
 		gardenPlant.setOwner(user);
 		gardenPlantService.adicionarPlanta(gardenPlant);
-		return ResponseEntity.ok("Planta adicionada ao jardim.");
+		return ResponseEntity.ok(ApiResponseDTO.ok("Planta adicionada com sucesso ao seu jardim!"));
 	}
 
 	// =========================
@@ -79,11 +80,11 @@ public class GardenPlantController {
 	// =========================
 
 	@PutMapping("/{id}")
-	public ResponseEntity<String> editGardenPlant(@PathVariable UUID id, @RequestBody GardenPlant gardenPlant,
+	public ResponseEntity<ApiResponseDTO> editGardenPlant(@PathVariable UUID id, @RequestBody GardenPlant gardenPlant,
 			Authentication authentication) {
 		User user = getAuthenticatedUser(authentication);
 		gardenPlantService.editarPlanta(id, user.getId(), gardenPlant);
-		return ResponseEntity.ok("Planta atualizada com sucesso.");
+		return ResponseEntity.ok(ApiResponseDTO.ok("Planta atualizada com sucesso."));
 	}
 
 	// =========================
@@ -91,10 +92,10 @@ public class GardenPlantController {
 	// =========================
 
 	@DeleteMapping("/{id}")
-	public ResponseEntity<String> deleteGardenPlant(@PathVariable UUID id, Authentication authentication) {
+	public ResponseEntity<ApiResponseDTO> deleteGardenPlant(@PathVariable UUID id, Authentication authentication) {
 		User user = getAuthenticatedUser(authentication);
 		gardenPlantService.excluirPlanta(id, user.getId());
-		return ResponseEntity.ok("Planta excluída com sucesso.");
+		return ResponseEntity.ok(ApiResponseDTO.ok("Planta excluída do seu jardim com sucesso."));
 	}
 
 	// =========================
@@ -124,10 +125,10 @@ public class GardenPlantController {
 	// =========================
 
 	@PostMapping("/watering/{id}")
-	public ResponseEntity<String> waterGardenPlant(@PathVariable UUID id, Authentication authentication) {
+	public ResponseEntity<ApiResponseDTO> waterGardenPlant(@PathVariable UUID id, Authentication authentication) {
 		User user = getAuthenticatedUser(authentication);
 		wateringService.registrarRega(id, user.getId());
-		return ResponseEntity.ok("Planta regada com sucesso.");
+		return ResponseEntity.ok(ApiResponseDTO.ok("Planta regada com sucesso!"));
 	}
 
 	// =========================

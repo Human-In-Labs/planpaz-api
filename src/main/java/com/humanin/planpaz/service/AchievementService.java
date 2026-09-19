@@ -14,6 +14,13 @@ import com.humanin.planpaz.repositories.AchievementRepository;
 import com.humanin.planpaz.repositories.UserAchievementRepository;
 import com.humanin.planpaz.repositories.UserRepository;
 
+import java.util.ArrayList;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import com.humanin.planpaz.dto.AchievementProgressDTO;
+import com.humanin.planpaz.repositories.GardenPlantRepository;
+
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -23,6 +30,44 @@ public class AchievementService {
 	private final AchievementRepository achievementRepository;
 	private final UserAchievementRepository userAchievementRepository;
 	private final UserRepository userRepository;
+	private final GardenPlantRepository gardenPlantRepository;
+
+	@Transactional(readOnly = true)
+	public List<AchievementProgressDTO> obterConquistasProgressoDoUsuario(UUID userId) {
+		long totalPlants = gardenPlantRepository.countByOwnerId(userId);
+		List<UserAchievement> userAchievements = userAchievementRepository.findByUserId(userId);
+		Set<String> unlockedNames = userAchievements.stream().map(ua -> ua.getAchievement().getName())
+				.collect(Collectors.toSet());
+
+		List<AchievementProgressDTO> dtos = new ArrayList<>();
+
+		// 1. Aprendiz de Jardinagem (Cultivar 3 plantas)
+		boolean p3Unlocked = unlockedNames.contains("Aprendiz de Jardinagem") || totalPlants >= 3;
+		dtos.add(AchievementProgressDTO.builder().id(UUID.nameUUIDFromBytes("aprendiz-3".getBytes()))
+				.name("Aprendiz de Jardinagem").description("Cultivou 3 plantas no seu jardim!").icon("plant")
+				.unlocked(p3Unlocked).progress((int) Math.min(totalPlants, 3)).maxProgress(3).build());
+
+		// 2. Jardineiro Dedicado (Cultivar 5 plantas)
+		boolean p5Unlocked = unlockedNames.contains("Jardineiro Dedicado") || totalPlants >= 5;
+		dtos.add(AchievementProgressDTO.builder().id(UUID.nameUUIDFromBytes("jardineiro-5".getBytes()))
+				.name("Jardineiro Dedicado").description("Cultivou 5 plantas no seu jardim!").icon("leaf")
+				.unlocked(p5Unlocked).progress((int) Math.min(totalPlants, 5)).maxProgress(5).build());
+
+		// 3. Mestre Botânico (Cultivar 10 plantas)
+		boolean p10Unlocked = unlockedNames.contains("Mestre Botânico") || totalPlants >= 10;
+		dtos.add(AchievementProgressDTO.builder().id(UUID.nameUUIDFromBytes("mestre-10".getBytes()))
+				.name("Mestre Botânico").description("Cultivou 10 plantas no seu jardim!").icon("tree")
+				.unlocked(p10Unlocked).progress((int) Math.min(totalPlants, 10)).maxProgress(10).build());
+
+		// 4. Constância Inicial (Cuidar por 3 dias)
+		boolean c3Unlocked = unlockedNames.contains("Constância Inicial");
+		dtos.add(AchievementProgressDTO.builder().id(UUID.nameUUIDFromBytes("constancia-3".getBytes()))
+				.name("Constância Inicial").description("Cuidou de uma planta por 3 dias seguidos!")
+				.icon("calendarDots").unlocked(c3Unlocked).progress(c3Unlocked ? 3 : (totalPlants > 0 ? 1 : 0))
+				.maxProgress(3).build());
+
+		return dtos;
+	}
 
 	// Método genérico para conceder/salvar uma conquista
 	@Transactional
@@ -111,4 +156,3 @@ public class AchievementService {
 		return achievementRepository.findAll();
 	}
 }
-

@@ -69,8 +69,13 @@ public class CommentService {
 		Comment comment = commentRepository.findById(commentId)
 				.orElseThrow(() -> new RuntimeException("Comentário não encontrado"));
 
-		if (!comment.getAuthor().getId().equals(authorId)) {
-			throw new RuntimeException("Você não tem permissão para deletar este comentário.");
+		if (authorId != null) {
+			boolean isCommentAuthor = comment.getAuthor() != null && comment.getAuthor().getId().equals(authorId);
+			boolean isPostAuthor = comment.getPost() != null && comment.getPost().getAuthor() != null
+					&& comment.getPost().getAuthor().getId().equals(authorId);
+			if (!isCommentAuthor && !isPostAuthor) {
+				throw new RuntimeException("Você não tem permissão para deletar este comentário.");
+			}
 		}
 
 		commentRepository.delete(comment);

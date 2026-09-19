@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.humanin.planpaz.dto.ApiResponseDTO;
 import com.humanin.planpaz.dto.UserPreferencesDTO;
 import com.humanin.planpaz.dto.UserSettingsDTO;
 import com.humanin.planpaz.dto.UserSummaryDTO;
@@ -24,14 +25,14 @@ import com.humanin.planpaz.service.UserService;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/user")
+@RequestMapping({ "/api/user", "/api/users" })
 @RequiredArgsConstructor
 public class UserController {
 
 	private final UserService userService;
 
 	// ==========================
-	// 	TESTE: SE O USUÁRIO TIVER UM TOKEN  VÁLIDO ELE VAI PODE ACESSAR ESSE ENDPOINT
+	// TESTE: SE O USUÁRIO TIVER UM TOKEN VÁLIDO ELE VAI PODE ACESSAR ESSE ENDPOINT
 	// ==========================
 
 	@GetMapping
@@ -41,7 +42,7 @@ public class UserController {
 	}
 
 	// ==========================
-	// RETORNA TODOS OS ATRIBUTOS DO USER 
+	// RETORNA TODOS OS ATRIBUTOS DO USER
 	// ==========================
 
 	@GetMapping("/settings")
@@ -55,8 +56,7 @@ public class UserController {
 	// ==========================
 
 	@PutMapping("/preferences")
-	public ResponseEntity<UserSettingsDTO> updatePreferences(
-			@AuthenticationPrincipal User currentUser,
+	public ResponseEntity<UserSettingsDTO> updatePreferences(@AuthenticationPrincipal User currentUser,
 			@RequestBody UserPreferencesDTO preferences) {
 		UserSettingsDTO updated = userService.updatePreferences(currentUser.getId(), preferences);
 		return ResponseEntity.ok(updated);
@@ -67,14 +67,12 @@ public class UserController {
 	// ==========================
 
 	@PutMapping("/settings")
-	public ResponseEntity<UserSettingsDTO> updateSettings(
-			@AuthenticationPrincipal User currentUser,
+	public ResponseEntity<UserSettingsDTO> updateSettings(@AuthenticationPrincipal User currentUser,
 			@RequestBody UserSettingsDTO settings) {
 		UserSettingsDTO updated = userService.updateSettings(currentUser.getId(), settings);
 		return ResponseEntity.ok(updated);
 	}
 
-	
 	// ==========================
 	// PESQUISA USUÁRIOS PELO USERNAME
 	// ==========================
@@ -90,9 +88,9 @@ public class UserController {
 	// ==========================
 
 	@PostMapping("/{id}/follow")
-	public ResponseEntity<Void> followUser(@AuthenticationPrincipal User currentUser, @PathVariable UUID id) {
+	public ResponseEntity<ApiResponseDTO> followUser(@AuthenticationPrincipal User currentUser, @PathVariable UUID id) {
 		userService.followUser(currentUser, id);
-		return ResponseEntity.ok().build();
+		return ResponseEntity.ok(ApiResponseDTO.ok("Você começou a seguir este usuário."));
 	}
 
 	// ==========================
@@ -100,9 +98,10 @@ public class UserController {
 	// ==========================
 
 	@DeleteMapping("/{id}/unfollow")
-	public ResponseEntity<Void> unfollowUser(@AuthenticationPrincipal User currentUser, @PathVariable UUID id) {
+	public ResponseEntity<ApiResponseDTO> unfollowUser(@AuthenticationPrincipal User currentUser,
+			@PathVariable UUID id) {
 		userService.unfollowUser(currentUser, id);
-		return ResponseEntity.noContent().build();
+		return ResponseEntity.ok(ApiResponseDTO.ok("Você deixou de seguir este usuário."));
 	}
 
 	// ==========================
@@ -128,11 +127,11 @@ public class UserController {
 	// ==========================
 	// REMOVE UM SEGUIDOR DA SUA CONTA
 	// ==========================
-	
+
 	@DeleteMapping("/followers/{followerId}")
-	public ResponseEntity<Void> removeFollower(@AuthenticationPrincipal User currentUser,
+	public ResponseEntity<ApiResponseDTO> removeFollower(@AuthenticationPrincipal User currentUser,
 			@PathVariable UUID followerId) {
 		userService.removeFollower(currentUser, followerId);
-		return ResponseEntity.noContent().build();
+		return ResponseEntity.ok(ApiResponseDTO.ok("Seguidor removido com sucesso."));
 	}
 }

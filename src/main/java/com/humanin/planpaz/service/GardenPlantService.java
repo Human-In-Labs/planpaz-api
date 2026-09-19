@@ -12,8 +12,11 @@ import org.springframework.transaction.annotation.Transactional;
 import com.humanin.planpaz.infra.exception.BusinessException;
 import com.humanin.planpaz.infra.exception.ResourceNotFoundException;
 import com.humanin.planpaz.model.GardenPlant;
+import com.humanin.planpaz.model.Plant;
 import com.humanin.planpaz.model.PlantStage;
 import com.humanin.planpaz.repositories.GardenPlantRepository;
+import com.humanin.planpaz.repositories.PlantRepository;
+import com.humanin.planpaz.repositories.PlantStageRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -22,35 +25,34 @@ import lombok.RequiredArgsConstructor;
 public class GardenPlantService {
 
 	private final GardenPlantRepository gardenPlantRepository;
-	// private final EmailService emailService;
+	private final PlantRepository plantRepository;
+	private final PlantStageRepository plantStageRepository;
 	private final AchievementService achievementService; // Injeção do serviço de conquistas
-
-	// // EMAIL
-	// public String verificarEEnviarStatusRega(UUID gardenPlantId, String cidade) {
-	// 	GardenPlant gardenPlant = gardenPlantRepository.findById(gardenPlantId)
-	// 			.orElseThrow(() -> new ResourceNotFoundException("Planta não encontrada com ID: " + gardenPlantId));
-
-	// 	String statusRega = calcularStatusRega(gardenPlant, cidade);
-
-	// 	String emailUsuario = gardenPlant.getOwner().getEmail();
-	// 	String nomePlanta = gardenPlant.getNickname();
-
-	// 	emailService.enviarAlertaRega(emailUsuario, nomePlanta, statusRega);
-
-	// 	return statusRega;
-	// }
-
-	// private String calcularStatusRega(GardenPlant gardenPlant, String cidade) {
-	// 	return "Sua planta precisa ser regada hoje por conta do clima seco em " + cidade + "!";
-	// }
 
 	// ADICIONAR
 	@Transactional
 	public GardenPlant adicionarPlanta(GardenPlant gardenPlant) {
-		gardenPlant.setPlantedAt(LocalDateTime.now());
-		gardenPlant.setLastWatering(LocalDate.now());
+		if (gardenPlant.getPlantedAt() == null) {
+			gardenPlant.setPlantedAt(LocalDateTime.now());
+		}
+		if (gardenPlant.getLastWatering() == null) {
+			gardenPlant.setLastWatering(LocalDate.now());
+		}
 
 		UUID ownerId = gardenPlant.getOwner().getId();
+
+		if (gardenPlant.getPlant() != null && gardenPlant.getPlant().getId() != null) {
+			Plant realPlant = plantRepository.findById(gardenPlant.getPlant().getId()).orElseThrow(
+					() -> new ResourceNotFoundException("Espécie de planta não encontrada com o ID informado."));
+			gardenPlant.setPlant(realPlant);
+		}
+
+		if (gardenPlant.getStage() != null && gardenPlant.getStage().getId() != null) {
+			PlantStage realStage = plantStageRepository.findById(gardenPlant.getStage().getId()).orElse(null);
+			gardenPlant.setStage(realStage);
+		} else {
+			gardenPlant.setStage(null);
+		}
 
 		if (gardenPlantRepository.existsByOwnerIdAndNicknameIgnoreCase(ownerId, gardenPlant.getNickname())) {
 			throw new BusinessException("Já existe uma planta com esse apelido.");
@@ -58,8 +60,11 @@ public class GardenPlantService {
 
 		GardenPlant saved = gardenPlantRepository.save(gardenPlant);
 
-		// VERIFICAÇÃO AUTOMÁTICA DE CONQUISTAS (Quantidade de Plantas)
-		verificarConquistasDeCultivo(ownerId);
+		try {
+			verificarConquistasDeCultivo(ownerId);
+		} catch (Exception e) {
+			System.err.println("[ACHIEVEMENTS] Erro ao verificar conquistas após adicionar planta: " + e.getMessage());
+		}
 
 		return saved;
 	}
@@ -89,7 +94,8 @@ public class GardenPlantService {
 			throw new BusinessException("Esta planta não pertence ao usuário autenticado.");
 		}
 
-		if (gardenPlantRepository.existsByOwnerIdAndNicknameIgnoreCaseAndIdNot(ownerId, gardenPlant.getNickname(), id)) {
+		if (gardenPlantRepository.existsByOwnerIdAndNicknameIgnoreCaseAndIdNot(ownerId, gardenPlant.getNickname(),
+				id)) {
 			throw new BusinessException("Já existe uma planta com esse apelido.");
 		}
 
@@ -124,11 +130,11 @@ public class GardenPlantService {
 
 	private void verificarConquistasDeCultivo(UUID ownerId) {
 		long totalPlantas = gardenPlantRepository.countByOwnerId(ownerId);
-		
+
 		if (totalPlantas >= 3) {
 			achievementService.concederCultivar3Plantas(ownerId);
 		}
-		
+
 		if (totalPlantas >= 5) {
 			achievementService.concederCultivar5Plantas(ownerId);
 		}

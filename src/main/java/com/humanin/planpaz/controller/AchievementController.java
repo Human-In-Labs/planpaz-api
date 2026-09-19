@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.humanin.planpaz.dto.AchievementProgressDTO;
 import com.humanin.planpaz.model.Achievement;
 import com.humanin.planpaz.model.User;
 import com.humanin.planpaz.model.UserAchievement;
@@ -26,10 +27,17 @@ public class AchievementController {
 	private User getAuthenticatedUser(Authentication authentication) {
 		return (User) authentication.getPrincipal();
 	}
-	
+
 	// ==========================
-	// LISTAR CONQUISTAS DO USUÁRIO
+	// LISTAR CONQUISTAS E PROGRESSO DO USUÁRIO AUTENTICADO
 	// ==========================
+
+	@GetMapping("/me")
+	public ResponseEntity<List<AchievementProgressDTO>> getMyAchievementsProgress(Authentication authentication) {
+		User user = getAuthenticatedUser(authentication);
+		List<AchievementProgressDTO> conquistas = achievementService.obterConquistasProgressoDoUsuario(user.getId());
+		return ResponseEntity.ok(conquistas);
+	}
 
 	@GetMapping
 	public ResponseEntity<List<UserAchievement>> getUserAchievements(Authentication authentication) {
@@ -48,7 +56,8 @@ public class AchievementController {
 	}
 
 	// ==========================
-	// ENDPOINTS DE TESTE MANUAL (CONCEDE A CONQUISTA AO USUÁRIO AUTENTICADO AO CHAMAR O ENDPOINT)
+	// ENDPOINTS DE TESTE MANUAL (CONCEDE A CONQUISTA AO USUÁRIO AUTENTICADO AO
+	// CHAMAR O ENDPOINT)
 	// ==========================
 
 	@PostMapping("/cultivar-3")
