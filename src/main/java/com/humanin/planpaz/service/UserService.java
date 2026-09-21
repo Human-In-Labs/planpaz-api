@@ -1,11 +1,15 @@
 package com.humanin.planpaz.service;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.humanin.planpaz.dto.AchievementProgressDTO;
+import com.humanin.planpaz.dto.PublicUserProfileDTO;
 import com.humanin.planpaz.dto.UserPreferencesDTO;
 import com.humanin.planpaz.dto.UserSettingsDTO;
 import com.humanin.planpaz.dto.UserSummaryDTO;
@@ -14,6 +18,8 @@ import com.humanin.planpaz.infra.exception.ResourceNotFoundException;
 import com.humanin.planpaz.model.Follow;
 import com.humanin.planpaz.model.User;
 import com.humanin.planpaz.repositories.FollowRepository;
+import com.humanin.planpaz.repositories.GardenPlantRepository;
+import com.humanin.planpaz.repositories.PostRepository;
 import com.humanin.planpaz.repositories.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -24,6 +30,36 @@ public class UserService {
 
 	private final UserRepository userRepository;
 	private final FollowRepository followersRepository;
+	private final GardenPlantRepository gardenPlantRepository;
+	private final PostRepository postRepository;
+	private final AchievementService achievementService;
+
+	@Transactional(readOnly = true)
+	public PublicUserProfileDTO getPublicUserProfile(User currentUser, UUID targetUserId) {
+		User targetUser = findUserById(targetUserId);
+
+		long followersCount = followersRepository.countByFollowed(targetUser);
+		long followingCount = followersRepository.countByFollower(targetUser);
+		boolean isFollowing = currentUser != null
+				&& followersRepository.existsByFollowerAndFollowed(currentUser, targetUser);
+
+		long totalPlants = gardenPlantRepository.countByOwnerId(targetUserId);
+		long totalPosts = postRepository.countByAuthorId(targetUserId);
+
+		long daysOnApp = 0;
+		if (targetUser.getCreatedAt() != null) {
+			daysOnApp = Math.max(0, ChronoUnit.DAYS.between(targetUser.getCreatedAt(), LocalDateTime.now()));
+		}
+
+		long carbonPoints = targetUser.getEcoscore() != null ? targetUser.getEcoscore().longValue()
+				: (totalPlants * 10);
+
+		List<AchievementProgressDTO> achievements = achievementService.obterConquistasProgressoDoUsuario(targetUserId);
+
+		return new PublicUserProfileDTO(targetUser.getId(), targetUser.getName(), targetUser.getUsername(),
+				targetUser.getEmail(), targetUser.getBio(), targetUser.getAvatarUrl(), followersCount, followingCount,
+				isFollowing, totalPlants, totalPosts, daysOnApp, carbonPoints, achievements);
+	}
 
 	@Transactional(readOnly = true)
 	public UserSettingsDTO getUserSettings(UUID userId) {
@@ -35,19 +71,32 @@ public class UserService {
 	public UserSettingsDTO updatePreferences(UUID userId, UserPreferencesDTO preferences) {
 		User user = findUserById(userId);
 
-		if (preferences.bio() != null) user.setBio(preferences.bio());
-		if (preferences.birthdate() != null) user.setBirthdate(preferences.birthdate());
-		if (preferences.gender() != null) user.setGender(preferences.gender());
-		if (preferences.mainGoal() != null) user.setMainGoal(preferences.mainGoal());
-		if (preferences.roomLuminosity() != null) user.setRoomLuminosity(preferences.roomLuminosity());
-		if (preferences.spaceAvailability() != null) user.setSpaceAvailability(preferences.spaceAvailability());
-		if (preferences.experienceLevel() != null) user.setExperienceLevel(preferences.experienceLevel());
-		if (preferences.timeAvailability() != null) user.setTimeAvailability(preferences.timeAvailability());
-		if (preferences.wateringTime() != null) user.setWateringTime(preferences.wateringTime());
-		if (preferences.cityName() != null) user.setCityName(preferences.cityName());
-		if (preferences.latitude() != null) user.setLatitude(preferences.latitude());
-		if (preferences.longitude() != null) user.setLongitude(preferences.longitude());
-		if (preferences.fcmToken() != null) user.setFcmToken(preferences.fcmToken());
+		if (preferences.bio() != null)
+			user.setBio(preferences.bio());
+		if (preferences.birthdate() != null)
+			user.setBirthdate(preferences.birthdate());
+		if (preferences.gender() != null)
+			user.setGender(preferences.gender());
+		if (preferences.mainGoal() != null)
+			user.setMainGoal(preferences.mainGoal());
+		if (preferences.roomLuminosity() != null)
+			user.setRoomLuminosity(preferences.roomLuminosity());
+		if (preferences.spaceAvailability() != null)
+			user.setSpaceAvailability(preferences.spaceAvailability());
+		if (preferences.experienceLevel() != null)
+			user.setExperienceLevel(preferences.experienceLevel());
+		if (preferences.timeAvailability() != null)
+			user.setTimeAvailability(preferences.timeAvailability());
+		if (preferences.wateringTime() != null)
+			user.setWateringTime(preferences.wateringTime());
+		if (preferences.cityName() != null)
+			user.setCityName(preferences.cityName());
+		if (preferences.latitude() != null)
+			user.setLatitude(preferences.latitude());
+		if (preferences.longitude() != null)
+			user.setLongitude(preferences.longitude());
+		if (preferences.fcmToken() != null)
+			user.setFcmToken(preferences.fcmToken());
 
 		User saved = userRepository.save(user);
 		return UserSettingsDTO.fromEntity(saved);
@@ -75,22 +124,45 @@ public class UserService {
 			user.setName(settings.name().trim());
 		}
 
-		if (settings.bio() != null) user.setBio(settings.bio());
-		if (settings.birthdate() != null) user.setBirthdate(settings.birthdate());
-		if (settings.gender() != null) user.setGender(settings.gender());
-		if (settings.mainGoal() != null) user.setMainGoal(settings.mainGoal());
-		if (settings.roomLuminosity() != null) user.setRoomLuminosity(settings.roomLuminosity());
-		if (settings.spaceAvailability() != null) user.setSpaceAvailability(settings.spaceAvailability());
-		if (settings.experienceLevel() != null) user.setExperienceLevel(settings.experienceLevel());
-		if (settings.timeAvailability() != null) user.setTimeAvailability(settings.timeAvailability());
-		if (settings.wateringTime() != null) user.setWateringTime(settings.wateringTime());
-		if (settings.cityName() != null) user.setCityName(settings.cityName());
-		if (settings.latitude() != null) user.setLatitude(settings.latitude());
-		if (settings.longitude() != null) user.setLongitude(settings.longitude());
-		if (settings.fcmToken() != null) user.setFcmToken(settings.fcmToken());
+		if (settings.bio() != null)
+			user.setBio(settings.bio());
+		if (settings.birthdate() != null)
+			user.setBirthdate(settings.birthdate());
+		if (settings.gender() != null)
+			user.setGender(settings.gender());
+		if (settings.mainGoal() != null)
+			user.setMainGoal(settings.mainGoal());
+		if (settings.roomLuminosity() != null)
+			user.setRoomLuminosity(settings.roomLuminosity());
+		if (settings.spaceAvailability() != null)
+			user.setSpaceAvailability(settings.spaceAvailability());
+		if (settings.experienceLevel() != null)
+			user.setExperienceLevel(settings.experienceLevel());
+		if (settings.timeAvailability() != null)
+			user.setTimeAvailability(settings.timeAvailability());
+		if (settings.wateringTime() != null)
+			user.setWateringTime(settings.wateringTime());
+		if (settings.cityName() != null)
+			user.setCityName(settings.cityName());
+		if (settings.latitude() != null)
+			user.setLatitude(settings.latitude());
+		if (settings.longitude() != null)
+			user.setLongitude(settings.longitude());
+		if (settings.fcmToken() != null)
+			user.setFcmToken(settings.fcmToken());
+		if (settings.avatarUrl() != null)
+			user.setAvatarUrl(settings.avatarUrl());
 
 		User saved = userRepository.save(user);
 		return UserSettingsDTO.fromEntity(saved);
+	}
+
+	@Transactional(readOnly = true)
+	public boolean existsByUsername(String username) {
+		if (username == null || username.isBlank())
+			return false;
+		String clean = username.replace("@", "").trim();
+		return userRepository.existsByUsername(clean);
 	}
 
 	public List<UserSummaryDTO> searchByUsername(String query) {

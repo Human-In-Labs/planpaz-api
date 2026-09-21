@@ -15,12 +15,16 @@ public interface FollowRepository extends JpaRepository<Follow, UUID> { // Alter
 
 	boolean existsByFollowerAndFollowed(User follower, User followed);
 
+	long countByFollowed(User followed);
+
+	long countByFollower(User follower);
+
 	Optional<Follow> findByFollowerAndFollowed(User follower, User followed);
 
-	@EntityGraph(attributePaths = {"follower"})
+	@EntityGraph(attributePaths = { "follower" })
 	List<Follow> findByFollowed(User followed);
 
-	@EntityGraph(attributePaths = {"followed"})
+	@EntityGraph(attributePaths = { "followed" })
 	List<Follow> findByFollower(User follower);
 
 	@Modifying(clearAutomatically = true)

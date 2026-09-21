@@ -15,81 +15,68 @@ import lombok.extern.slf4j.Slf4j;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ErrorResponseDTO> handleResourceNotFound(ResourceNotFoundException ex, HttpServletRequest request) {
-        ErrorResponseDTO error = new ErrorResponseDTO(
-                HttpStatus.NOT_FOUND.value(),
-                HttpStatus.NOT_FOUND.getReasonPhrase(),
-                ex.getMessage(),
-                request.getRequestURI()
-        );
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
-    }
+	@ExceptionHandler(ResourceNotFoundException.class)
+	public ResponseEntity<ErrorResponseDTO> handleResourceNotFound(ResourceNotFoundException ex,
+			HttpServletRequest request) {
+		ErrorResponseDTO error = new ErrorResponseDTO(HttpStatus.NOT_FOUND.value(),
+				HttpStatus.NOT_FOUND.getReasonPhrase(), ex.getMessage(), request.getRequestURI());
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+	}
 
-    @ExceptionHandler(BusinessException.class)
-    public ResponseEntity<ErrorResponseDTO> handleBusinessException(BusinessException ex, HttpServletRequest request) {
-        ErrorResponseDTO error = new ErrorResponseDTO(
-                HttpStatus.BAD_REQUEST.value(),
-                HttpStatus.BAD_REQUEST.getReasonPhrase(),
-                ex.getMessage(),
-                request.getRequestURI()
-        );
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
-    }
+	@ExceptionHandler(BusinessException.class)
+	public ResponseEntity<ErrorResponseDTO> handleBusinessException(BusinessException ex, HttpServletRequest request) {
+		ErrorResponseDTO error = new ErrorResponseDTO(HttpStatus.BAD_REQUEST.value(),
+				HttpStatus.BAD_REQUEST.getReasonPhrase(), ex.getMessage(), request.getRequestURI());
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+	}
 
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ErrorResponseDTO> handleIllegalArgument(IllegalArgumentException ex, HttpServletRequest request) {
-        ErrorResponseDTO error = new ErrorResponseDTO(
-                HttpStatus.BAD_REQUEST.value(),
-                HttpStatus.BAD_REQUEST.getReasonPhrase(),
-                ex.getMessage(),
-                request.getRequestURI()
-        );
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
-    }
+	@ExceptionHandler(IllegalArgumentException.class)
+	public ResponseEntity<ErrorResponseDTO> handleIllegalArgument(IllegalArgumentException ex,
+			HttpServletRequest request) {
+		ErrorResponseDTO error = new ErrorResponseDTO(HttpStatus.BAD_REQUEST.value(),
+				HttpStatus.BAD_REQUEST.getReasonPhrase(), ex.getMessage(), request.getRequestURI());
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+	}
 
-    @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<ErrorResponseDTO> handleBadCredentials(BadCredentialsException ex, HttpServletRequest request) {
-        ErrorResponseDTO error = new ErrorResponseDTO(
-                HttpStatus.UNAUTHORIZED.value(),
-                HttpStatus.UNAUTHORIZED.getReasonPhrase(),
-                ex.getMessage(),
-                request.getRequestURI()
-        );
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
-    }
+	@ExceptionHandler(BadCredentialsException.class)
+	public ResponseEntity<ErrorResponseDTO> handleBadCredentials(BadCredentialsException ex,
+			HttpServletRequest request) {
+		ErrorResponseDTO error = new ErrorResponseDTO(HttpStatus.UNAUTHORIZED.value(),
+				HttpStatus.UNAUTHORIZED.getReasonPhrase(), ex.getMessage(), request.getRequestURI());
+		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
+	}
 
-    @ExceptionHandler(HttpClientErrorException.NotFound.class)
-    public ResponseEntity<ErrorResponseDTO> handleHttpClientNotFound(HttpClientErrorException.NotFound ex, HttpServletRequest request) {
-        ErrorResponseDTO error = new ErrorResponseDTO(
-                HttpStatus.NOT_FOUND.value(),
-                HttpStatus.NOT_FOUND.getReasonPhrase(),
-                "Recurso externo não encontrado.",
-                request.getRequestURI()
-        );
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
-    }
+	@ExceptionHandler(HttpClientErrorException.NotFound.class)
+	public ResponseEntity<ErrorResponseDTO> handleHttpClientNotFound(HttpClientErrorException.NotFound ex,
+			HttpServletRequest request) {
+		ErrorResponseDTO error = new ErrorResponseDTO(HttpStatus.NOT_FOUND.value(),
+				HttpStatus.NOT_FOUND.getReasonPhrase(), "Recurso externo não encontrado.", request.getRequestURI());
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+	}
 
-    @ExceptionHandler(ResponseStatusException.class)
-    public ResponseEntity<ErrorResponseDTO> handleResponseStatus(ResponseStatusException ex, HttpServletRequest request) {
-        ErrorResponseDTO error = new ErrorResponseDTO(
-                ex.getStatusCode().value(),
-                ex.getStatusCode().toString(),
-                ex.getReason() != null ? ex.getReason() : ex.getMessage(),
-                request.getRequestURI()
-        );
-        return ResponseEntity.status(ex.getStatusCode()).body(error);
-    }
+	@ExceptionHandler(org.springframework.dao.DataIntegrityViolationException.class)
+	public ResponseEntity<ErrorResponseDTO> handleDataIntegrity(
+			org.springframework.dao.DataIntegrityViolationException ex, HttpServletRequest request) {
+		ErrorResponseDTO error = new ErrorResponseDTO(HttpStatus.BAD_REQUEST.value(),
+				HttpStatus.BAD_REQUEST.getReasonPhrase(), "Já existe um registo com este nome de utilizador ou e-mail.",
+				request.getRequestURI());
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+	}
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponseDTO> handleGeneralException(Exception ex, HttpServletRequest request) {
-        log.error("Unhandled exception at " + request.getRequestURI(), ex);
-        ErrorResponseDTO error = new ErrorResponseDTO(
-                HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
-                "Ocorreu um erro interno no servidor.",
-                request.getRequestURI()
-        );
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
-    }
+	@ExceptionHandler(ResponseStatusException.class)
+	public ResponseEntity<ErrorResponseDTO> handleResponseStatus(ResponseStatusException ex,
+			HttpServletRequest request) {
+		ErrorResponseDTO error = new ErrorResponseDTO(ex.getStatusCode().value(), ex.getStatusCode().toString(),
+				ex.getReason() != null ? ex.getReason() : ex.getMessage(), request.getRequestURI());
+		return ResponseEntity.status(ex.getStatusCode()).body(error);
+	}
+
+	@ExceptionHandler(Exception.class)
+	public ResponseEntity<ErrorResponseDTO> handleGeneralException(Exception ex, HttpServletRequest request) {
+		log.error("Unhandled exception at " + request.getRequestURI(), ex);
+		ErrorResponseDTO error = new ErrorResponseDTO(HttpStatus.INTERNAL_SERVER_ERROR.value(),
+				HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(), "Ocorreu um erro interno no servidor.",
+				request.getRequestURI());
+		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+	}
 }

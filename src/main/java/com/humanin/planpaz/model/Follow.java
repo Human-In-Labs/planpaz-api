@@ -2,6 +2,8 @@ package com.humanin.planpaz.model;
 
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -17,12 +19,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(
-	name = "follow",
-	uniqueConstraints = {
-		@UniqueConstraint(name = "uk_follower_followed", columnNames = {"follower_id", "followed_id"})
-	}
-)
+@Table(name = "follow", uniqueConstraints = {
+		@UniqueConstraint(name = "uk_follower_followed", columnNames = { "follower_id", "followed_id" }) })
 @Getter
 @Setter
 @NoArgsConstructor
@@ -35,10 +33,12 @@ public class Follow {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "follower_id", nullable = false)
+	@JsonIgnore
 	private User follower;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "followed_id", nullable = false)
+	@JsonIgnore
 	private User followed;
 
 	public Follow(User follower, User followed) {

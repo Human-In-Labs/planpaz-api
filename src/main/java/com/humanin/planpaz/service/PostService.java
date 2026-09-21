@@ -1,5 +1,14 @@
 package com.humanin.planpaz.service;
 
+import java.util.List;
+import java.util.UUID;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.humanin.planpaz.dto.PostCreateDTO;
 import com.humanin.planpaz.dto.PostResponseDTO;
 import com.humanin.planpaz.model.Post;
@@ -8,15 +17,8 @@ import com.humanin.planpaz.repositories.CommentRepository;
 import com.humanin.planpaz.repositories.LikeRepository;
 import com.humanin.planpaz.repositories.PostRepository;
 import com.humanin.planpaz.repositories.UserRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -26,9 +28,13 @@ public class PostService {
 	private final UserRepository userRepository;
 	private final LikeRepository likeRepository;
 	private final CommentRepository commentRepository;
+	private final ContentModerationService contentModerationService;
 
 	@Transactional
 	public PostResponseDTO createPost(PostCreateDTO dto) {
+		contentModerationService.validateContent(dto.getTitle());
+		contentModerationService.validateContent(dto.getContent());
+
 		User author = userRepository.findById(dto.getAuthorId())
 				.orElseThrow(() -> new RuntimeException("Usuário não encontrado com o ID: " + dto.getAuthorId()));
 
@@ -39,11 +45,8 @@ public class PostService {
 		post.setMedia(dto.getMedia());
 
 		if (dto.getTags() != null) {
-			List<String> sanitizedTags = dto.getTags().stream()
-					.filter(t -> t != null && !t.isBlank())
-					.map(String::trim)
-					.limit(3)
-					.toList();
+			List<String> sanitizedTags = dto.getTags().stream().filter(t -> t != null && !t.isBlank()).map(String::trim)
+					.limit(3).toList();
 			post.setTags(sanitizedTags);
 		}
 
@@ -56,7 +59,7 @@ public class PostService {
 		Pageable pageable = PageRequest.of(page, size);
 		Page<Post> posts;
 		if (tag != null && !tag.isBlank()) {
-			posts = postRepository.findByTagsContainingIgnoreCaseOrderByPostedAtDesc(tag.trim(), pageable);
+			posts = postRepository.findByTag(tag.trim(), pageable);
 		} else {
 			posts = postRepository.findAllByOrderByPostedAtDesc(pageable);
 		}

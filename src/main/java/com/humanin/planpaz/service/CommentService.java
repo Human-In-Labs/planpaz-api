@@ -26,9 +26,12 @@ public class CommentService {
 	private final CommentRepository commentRepository;
 	private final PostRepository postRepository;
 	private final UserRepository userRepository;
+	private final ContentModerationService contentModerationService;
 
 	@Transactional
 	public CommentResponseDTO addComment(UUID postId, CommentCreateDTO dto) {
+		contentModerationService.validateContent(dto.getContent());
+
 		Post post = postRepository.findById(postId)
 				.orElseThrow(() -> new RuntimeException("Post não encontrado com ID: " + postId));
 

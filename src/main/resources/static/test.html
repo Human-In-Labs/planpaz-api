@@ -4,166 +4,160 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-	<title>Planpaz - API Test Dashboard</title>
-	<style>
-		@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+	<title>PlanPaz — Plataforma de Cultivo & Comunidade</title>
 
+	<!-- GOOGLE FONTS (Poppins & Inter) -->
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link
+		href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700;800&display=swap"
+		rel="stylesheet">
+
+	<style>
 		:root {
-			--primary: #10b981;
-			--primary-dark: #059669;
-			--primary-light: #34d399;
-			--primary-glow: rgba(16, 185, 129, 0.35);
-			--bg-color: #0a0f1c;
-			--bg-color-2: #0d1424;
-			--surface: #141b2d;
-			--surface-2: #1a2338;
-			--surface-hover: #212c47;
-			--text-main: #f8fafc;
-			--text-muted: #8b96ac;
-			--border: #263049;
-			--border-soft: rgba(148, 163, 184, 0.12);
-			--danger: #f43f5e;
-			--danger-hover: #e11d48;
-			--accent: #38bdf8;
-			--warning: #f59e0b;
-			--radius-sm: 8px;
-			--radius-md: 14px;
-			--radius-lg: 20px;
-			--shadow-card: 0 1px 2px rgba(0, 0, 0, 0.24), 0 8px 24px -8px rgba(0, 0, 0, 0.5);
-			--shadow-pop: 0 12px 32px -8px rgba(0, 0, 0, 0.55);
-			--safe-bottom: env(safe-area-inset-bottom, 0px);
-			--safe-top: env(safe-area-inset-top, 0px);
+			/* PALETA DE CORES HEXADECIMAL EXATA DO GUIA DE ESTILO */
+			--color-primary-dark: #002412;
+			/* Verde Escuro Principal */
+			--color-emerald: #115634;
+			/* Verde Médio / Esmeralda */
+			--color-soft-green: #D2E6DD;
+			/* Verde Claro Suave */
+			--color-bg-offwhite: #FAFFFA;
+			/* Off-White / Fundo */
+			--color-danger: #911000;
+			/* Vermelho de Ação Destrutiva */
+
+			--surface-card: #FFFFFF;
+			--text-main: #002412;
+			--text-muted: #3b5a4b;
+			--border-subtle: #cbe0d5;
+			--shadow-sm: 0 2px 10px rgba(0, 36, 18, 0.04);
+			--shadow-md: 0 6px 24px rgba(0, 36, 18, 0.08);
+			--shadow-lg: 0 16px 40px rgba(0, 36, 18, 0.14);
+			--radius-sm: 10px;
+			--radius-md: 16px;
+			--radius-lg: 24px;
 		}
 
 		* {
 			box-sizing: border-box;
 			margin: 0;
 			padding: 0;
-			font-family: 'Inter', sans-serif;
 			-webkit-tap-highlight-color: transparent;
 		}
 
-		html {
-			-webkit-text-size-adjust: 100%;
-		}
-
 		body {
-			background:
-				radial-gradient(circle at 12% 0%, rgba(16, 185, 129, 0.10), transparent 55%),
-				radial-gradient(circle at 90% 8%, rgba(56, 189, 248, 0.08), transparent 45%),
-				var(--bg-color);
-			background-attachment: fixed;
+			background-color: var(--color-bg-offwhite);
 			color: var(--text-main);
+			font-family: 'Inter', sans-serif;
+			font-size: 15px;
+			line-height: 1.5;
 			min-height: 100vh;
 			display: flex;
 			flex-direction: column;
-			font-size: 15px;
-			letter-spacing: -0.01em;
-			line-height: 1.5;
 			-webkit-font-smoothing: antialiased;
 		}
 
-		::-webkit-scrollbar {
-			width: 8px;
-			height: 8px;
+		/* TIPOGRAFIA POPPINS */
+		h1,
+		h2,
+		h3,
+		h4,
+		h5,
+		h6,
+		.brand-font {
+			font-family: 'Poppins', sans-serif;
+			color: var(--color-primary-dark);
 		}
 
-		::-webkit-scrollbar-track {
-			background: transparent;
-		}
-
-		::-webkit-scrollbar-thumb {
-			background: var(--surface-hover);
-			border-radius: 8px;
-		}
-
-		header {
-			background: linear-gradient(180deg, rgba(13, 20, 36, 0.97), rgba(10, 15, 28, 0.9));
-			backdrop-filter: blur(14px);
-			-webkit-backdrop-filter: blur(14px);
-			padding: calc(0.85rem + var(--safe-top)) 1rem 0.85rem;
-			border-bottom: 1px solid var(--border-soft);
+		/* LAYOUT SHELL (ESTRUTURA MODERNA COM BARRA LATERAL E CONTEÚDO) */
+		.app-header {
+			background-color: var(--color-primary-dark);
+			color: #ffffff;
+			padding: 0.9rem 1.75rem;
 			display: flex;
-			flex-direction: column;
-			gap: 0.7rem;
+			justify-content: space-between;
+			align-items: center;
+			box-shadow: var(--shadow-md);
 			position: sticky;
 			top: 0;
-			z-index: 100;
+			z-index: 200;
 		}
 
-		@media (min-width: 640px) {
-			header {
-				flex-direction: row;
-				justify-content: space-between;
-				align-items: center;
-				padding: 1rem 1.5rem;
-			}
-		}
-
-		header h1 {
-			font-size: 1.05rem;
-			background: linear-gradient(90deg, var(--primary-light), var(--accent));
-			-webkit-background-clip: text;
-			background-clip: text;
-			color: transparent;
-			font-weight: 800;
+		.app-header h1 {
+			font-size: 1.3rem;
+			font-weight: 700;
+			color: #ffffff;
 			display: flex;
 			align-items: center;
-			gap: 0.5rem;
-			letter-spacing: -0.02em;
-		}
-
-		.header-right {
-			display: flex;
-			align-items: center;
-			justify-content: space-between;
 			gap: 0.6rem;
-			width: 100%;
 		}
 
-		@media (min-width: 640px) {
-			.header-right {
-				width: auto;
-				justify-content: flex-end;
-			}
+		.app-header .header-actions {
+			display: flex;
+			align-items: center;
+			gap: 1rem;
 		}
 
 		#auth-status {
-			font-size: 0.8rem;
+			font-size: 0.85rem;
+			font-weight: 500;
+			color: var(--color-soft-green);
 		}
 
-		.container {
-			max-width: 1250px;
-			margin: 0.9rem auto;
-			padding: 0 0.8rem;
-			width: 100%;
+		/* ESTRUTURA PRINCIPAL DO PAINEL DE CONTROLO */
+		.app-shell {
+			display: flex;
+			flex-direction: column;
 			flex-grow: 1;
+			max-width: 1400px;
+			width: 100%;
+			margin: 0 auto;
 		}
 
-		body:has(#dashboard-section:not(.hidden)) .container {
-			padding-bottom: calc(1rem + var(--safe-bottom));
+		@media (min-width: 900px) {
+			.app-shell {
+				flex-direction: row;
+				align-items: flex-start;
+			}
+		}
+
+		/* SIDEBAR DE NAVEGAÇÃO LATERAL */
+		.app-sidebar {
+			width: 100%;
+			background: var(--surface-card);
+			border-bottom: 1px solid var(--border-subtle);
+			padding: 0.8rem 1rem;
+			position: sticky;
+			top: 3.8rem;
+			z-index: 100;
+		}
+
+		@media (min-width: 900px) {
+			.app-sidebar {
+				width: 260px;
+				min-width: 260px;
+				border-bottom: none;
+				border-right: 1px solid var(--border-subtle);
+				padding: 1.5rem 1rem;
+				min-height: calc(100vh - 3.8rem);
+				display: flex;
+				flex-direction: column;
+			}
 		}
 
 		.nav-tabs {
 			display: flex;
 			gap: 0.4rem;
-			margin-bottom: 1.1rem;
-			padding: 0.4rem;
 			overflow-x: auto;
-			-webkit-overflow-scrolling: touch;
 			scrollbar-width: none;
-			background: var(--surface);
-			border: 1px solid var(--border-soft);
-			border-radius: 14px;
-			box-shadow: var(--shadow-card);
-			position: sticky;
-			top: calc(3.6rem + var(--safe-top));
-			z-index: 90;
 		}
 
-		@media (min-width: 640px) {
+		@media (min-width: 900px) {
 			.nav-tabs {
-				top: calc(4.2rem + var(--safe-top));
+				flex-direction: column;
+				overflow-x: visible;
+				gap: 0.5rem;
 			}
 		}
 
@@ -175,137 +169,133 @@
 			background: transparent;
 			color: var(--text-muted);
 			border: 1px solid transparent;
-			padding: 0.6rem 0.85rem;
-			border-radius: 10px;
+			padding: 0.75rem 1.1rem;
+			border-radius: var(--radius-sm);
 			cursor: pointer;
+			font-family: 'Inter', sans-serif;
 			font-weight: 600;
-			transition: background-color 0.18s ease, color 0.18s ease, transform 0.1s ease;
+			font-size: 0.9rem;
 			white-space: nowrap;
-			font-size: 0.83rem;
-			flex-shrink: 0;
+			transition: all 0.2s ease;
+			display: flex;
+			align-items: center;
+			gap: 0.6rem;
+			width: 100%;
+			text-align: left;
 		}
 
 		.nav-tab:hover {
-			background-color: var(--surface-hover);
-			color: var(--text-main);
-		}
-
-		.nav-tab:active {
-			transform: scale(0.96);
+			background-color: var(--color-soft-green);
+			color: var(--color-primary-dark);
 		}
 
 		.nav-tab.active {
-			background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-			color: #042f2e;
-			box-shadow: 0 4px 14px -4px var(--primary-glow);
+			background-color: var(--color-emerald);
+			color: #ffffff;
+			box-shadow: 0 4px 14px rgba(17, 86, 52, 0.25);
 		}
 
-		.auth-grid,
-		.weather-grid {
-			display: grid;
-			grid-template-columns: 1fr;
-			gap: 1rem;
+		/* CANVAS DE CONTEÚDO PRINCIPAL */
+		.main-canvas {
+			flex-grow: 1;
+			padding: 1.25rem 1rem 2rem;
+			width: 100%;
 		}
 
-		@media (min-width: 768px) {
-			.auth-grid {
-				grid-template-columns: 1fr 1.6fr;
-				gap: 1.5rem;
-			}
-
-			.weather-grid {
-				grid-template-columns: 1fr 1fr;
-				gap: 1.5rem;
+		@media (min-width: 900px) {
+			.main-canvas {
+				padding: 1.75rem 2rem;
 			}
 		}
 
+		/* CARDS E SEÇÕES */
 		.card {
-			background: linear-gradient(180deg, var(--surface-2), var(--surface));
+			background: var(--surface-card);
 			border-radius: var(--radius-md);
-			padding: 1.1rem;
-			border: 1px solid var(--border-soft);
-			margin-bottom: 1rem;
-			box-shadow: var(--shadow-card);
-			animation: fadeIn 0.25s ease;
+			padding: 1.5rem;
+			border: 1px solid var(--border-subtle);
+			margin-bottom: 1.5rem;
+			box-shadow: var(--shadow-sm);
+			transition: box-shadow 0.25s ease, transform 0.2s ease;
 		}
 
-		@keyframes fadeIn {
-			from {
-				opacity: 0;
-				transform: translateY(6px);
-			}
-
-			to {
-				opacity: 1;
-				transform: translateY(0);
-			}
+		.card:hover {
+			box-shadow: var(--shadow-md);
 		}
 
-		@media (min-width: 640px) {
-			.card {
-				padding: 1.4rem;
-				margin-bottom: 1.25rem;
-			}
-		}
-
-		h2 {
-			font-size: 1.05rem;
-			margin-bottom: 1.1rem;
-			font-weight: 700;
-			border-bottom: 1px solid var(--border-soft);
-			padding-bottom: 0.75rem;
-			color: var(--text-main);
+		.card-header-bar {
 			display: flex;
 			align-items: center;
 			justify-content: space-between;
+			border-bottom: 2px solid var(--color-soft-green);
+			padding-bottom: 0.75rem;
+			margin-bottom: 1.25rem;
 			flex-wrap: wrap;
 			gap: 0.5rem;
-			letter-spacing: -0.01em;
+		}
+
+		.card-header-bar h2 {
+			font-size: 1.2rem;
+			font-weight: 700;
+			margin: 0;
+			border: none;
+			padding: 0;
 		}
 
 		h3 {
-			font-size: 0.92rem;
-			margin-bottom: 0.65rem;
-			color: var(--accent);
+			font-size: 1.02rem;
 			font-weight: 600;
+			color: var(--color-emerald);
+			margin-bottom: 0.9rem;
+		}
+
+		/* ESTRUTURA DE GRID DE DUAS COLUNAS INTERNAS */
+		.split-grid {
+			display: grid;
+			grid-template-columns: 1fr;
+			gap: 1.5rem;
+		}
+
+		@media (min-width: 960px) {
+			.split-grid {
+				grid-template-columns: 1.1fr 1fr;
+			}
 		}
 
 		.form-grid {
 			display: grid;
 			grid-template-columns: 1fr;
-			gap: 0.85rem;
+			gap: 1rem;
 			margin-bottom: 1rem;
 		}
 
-		@media (min-width: 640px) {
+		@media (min-width: 600px) {
 			.form-grid {
 				grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
 			}
 		}
 
 		.form-group {
-			margin-bottom: 0.85rem;
+			margin-bottom: 1.1rem;
 		}
 
 		.form-group label {
 			display: block;
-			margin-bottom: 0.4rem;
-			color: var(--text-muted);
-			font-size: 0.8rem;
+			margin-bottom: 0.45rem;
+			color: var(--color-primary-dark);
+			font-size: 0.82rem;
 			font-weight: 600;
 			text-transform: uppercase;
 			letter-spacing: 0.03em;
 		}
 
 		.form-group label span.required {
-			color: var(--danger);
-			text-transform: none;
+			color: var(--color-danger);
 		}
 
 		.form-group label span.optional {
-			color: #5b6884;
-			font-size: 0.72rem;
-			font-weight: 500;
+			color: var(--text-muted);
+			font-weight: 400;
 			text-transform: none;
 		}
 
@@ -313,592 +303,340 @@
 		select,
 		textarea {
 			width: 100%;
-			padding: 0.8rem 0.85rem;
-			border-radius: 10px;
-			border: 1.5px solid var(--border);
-			background-color: rgba(6, 10, 20, 0.55);
+			padding: 0.8rem 0.95rem;
+			border-radius: var(--radius-sm);
+			border: 1.5px solid var(--border-subtle);
+			background-color: #ffffff;
 			color: var(--text-main);
-			font-size: 16px;
-			transition: border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
-		}
-
-		input::placeholder,
-		textarea::placeholder {
-			color: #55617a;
+			font-family: 'Inter', sans-serif;
+			font-size: 0.92rem;
+			transition: border-color 0.2s ease, box-shadow 0.2s ease;
 		}
 
 		input:focus,
 		select:focus,
 		textarea:focus {
 			outline: none;
-			border-color: var(--primary);
-			background-color: rgba(6, 10, 20, 0.85);
-			box-shadow: 0 0 0 4px var(--primary-glow);
+			border-color: var(--color-emerald);
+			box-shadow: 0 0 0 3px var(--color-soft-green);
 		}
 
-		select {
-			appearance: none;
-			-webkit-appearance: none;
-			background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='9' viewBox='0 0 14 9'%3E%3Cpath fill='none' stroke='%238b96ac' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round' d='M1 1l6 6 6-6'/%3E%3C/svg%3E");
-			background-repeat: no-repeat;
-			background-position: right 0.9rem center;
-			padding-right: 2.2rem;
-		}
-
-		.checkbox-group {
-			display: flex;
-			flex-direction: column;
-			gap: 0.8rem;
-			background: rgba(6, 10, 20, 0.4);
-			padding: 0.85rem;
-			border-radius: 10px;
-			border: 1px solid var(--border-soft);
-		}
-
-		@media (min-width: 640px) {
-			.checkbox-group {
-				flex-direction: row;
-				flex-wrap: wrap;
-			}
-		}
-
-		.checkbox-label {
-			display: flex;
-			align-items: center;
-			gap: 0.6rem;
-			font-size: 0.88rem;
-			cursor: pointer;
-			color: var(--text-main);
-		}
-
-		.checkbox-label input[type="checkbox"] {
-			width: 1.2rem;
-			height: 1.2rem;
-			cursor: pointer;
-			accent-color: var(--primary);
-		}
-
-		button {
-			background: linear-gradient(135deg, var(--primary-light), var(--primary-dark));
-			color: #04211d;
+		/* BOTÕES E AÇÕES */
+		button,
+		.btn {
+			background-color: var(--color-emerald);
+			color: #ffffff;
 			border: none;
-			border-radius: 10px;
-			padding: 0.85rem 1.25rem;
-			font-weight: 700;
-			font-size: 0.93rem;
+			border-radius: var(--radius-sm);
+			padding: 0.8rem 1.4rem;
+			font-family: 'Inter', sans-serif;
+			font-weight: 600;
+			font-size: 0.92rem;
 			cursor: pointer;
-			transition: filter 0.18s ease, transform 0.08s ease, box-shadow 0.18s ease;
 			display: inline-flex;
 			align-items: center;
 			justify-content: center;
-			gap: 0.4rem;
-			min-height: 46px;
-			touch-action: manipulation;
-			box-shadow: 0 6px 16px -6px var(--primary-glow);
-			letter-spacing: -0.01em;
+			gap: 0.5rem;
+			transition: background-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+			text-decoration: none;
 		}
 
-		button:hover {
-			filter: brightness(1.08);
+		button:hover,
+		.btn:hover {
+			background-color: var(--color-primary-dark);
+			box-shadow: var(--shadow-sm);
 		}
 
-		button:active {
-			transform: scale(0.97);
+		button:active,
+		.btn:active {
+			transform: scale(0.98);
 		}
 
 		button.btn-sm {
-			padding: 0.55rem 0.85rem;
+			padding: 0.48rem 0.85rem;
 			font-size: 0.83rem;
-			min-height: 40px;
-			box-shadow: none;
+			border-radius: 8px;
 		}
 
 		button.btn-secondary {
-			background: var(--surface-hover);
-			color: var(--text-main);
-			box-shadow: none;
-			border: 1px solid var(--border-soft);
+			background-color: var(--color-soft-green);
+			color: var(--color-primary-dark);
 		}
 
 		button.btn-secondary:hover {
-			background-color: #2a3654;
-			filter: none;
+			background-color: var(--border-subtle);
 		}
 
 		button.danger {
-			background: linear-gradient(135deg, #fb7185, var(--danger-hover));
-			color: #2d0a12;
-			box-shadow: 0 6px 16px -6px rgba(244, 63, 94, 0.35);
+			background-color: var(--color-danger);
+			color: #ffffff;
 		}
 
 		button.danger:hover {
-			filter: brightness(1.08);
+			background-color: #6a0900;
 		}
 
-		.item-list {
+		/* CARDS DE ITENS E GRID DE CONTEÚDO */
+		.item-grid {
 			display: grid;
 			grid-template-columns: 1fr;
-			gap: 0.85rem;
+			gap: 1.2rem;
 		}
 
 		@media (min-width: 640px) {
-			.item-list {
+			.item-grid {
 				grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-				gap: 1rem;
 			}
 		}
 
 		.item-card {
-			background: rgba(6, 10, 20, 0.5);
-			border: 1px solid var(--border-soft);
-			border-radius: 12px;
-			padding: 1rem;
+			background: var(--surface-card);
+			border: 1px solid var(--border-subtle);
+			border-radius: var(--radius-md);
+			padding: 1.25rem;
 			display: flex;
 			flex-direction: column;
 			justify-content: space-between;
-			transition: border-color 0.18s ease, transform 0.12s ease;
+			box-shadow: var(--shadow-sm);
+			transition: border-color 0.2s ease, transform 0.2s ease;
 		}
 
 		.item-card:hover {
-			border-color: var(--border);
+			border-color: var(--color-emerald);
+			transform: translateY(-2px);
 		}
 
 		.item-card h3 {
-			color: var(--text-main);
+			font-family: 'Poppins', sans-serif;
+			font-size: 1.1rem;
+			color: var(--color-primary-dark);
+			margin-bottom: 0.4rem;
 		}
 
 		.item-card p {
 			color: var(--text-muted);
-			font-size: 0.85rem;
-			margin-bottom: 0.35rem;
-			word-break: break-word;
+			font-size: 0.88rem;
+			margin-bottom: 0.4rem;
 		}
 
 		.item-card p strong {
-			color: var(--text-main);
+			color: var(--color-primary-dark);
 		}
 
 		.item-actions {
-			display: grid;
-			grid-template-columns: repeat(2, 1fr);
+			display: flex;
 			gap: 0.5rem;
-			margin-top: 0.85rem;
+			margin-top: 1rem;
+			flex-wrap: wrap;
 		}
 
-		@media (min-width: 480px) {
-			.item-actions {
-				display: flex;
-				flex-wrap: wrap;
-			}
-
-			.item-actions button {
-				flex: 1 1 auto;
-			}
+		.item-actions button {
+			flex: 1 1 auto;
 		}
 
+		/* BADGES E TAGS */
 		.badge {
 			display: inline-block;
-			padding: 0.28rem 0.55rem;
-			border-radius: 6px;
-			font-size: 0.72rem;
-			font-weight: 700;
-			background: var(--surface-hover);
-			color: var(--accent);
-			margin-right: 0.3rem;
-			margin-bottom: 0.3rem;
-			letter-spacing: 0.01em;
+			padding: 0.28rem 0.65rem;
+			border-radius: 20px;
+			font-size: 0.76rem;
+			font-weight: 600;
+			background-color: var(--color-soft-green);
+			color: var(--color-primary-dark);
 		}
 
 		.badge.success {
-			background: rgba(16, 185, 129, 0.18);
-			color: var(--primary-light);
+			background-color: #d1fae5;
+			color: #065f46;
 		}
 
-		.badge.warning {
-			background: rgba(245, 158, 11, 0.18);
-			color: var(--warning);
+		.badge.danger {
+			background-color: #fee2e2;
+			color: var(--color-danger);
 		}
 
-		.care-box {
-			background: rgba(16, 185, 129, 0.08);
-			border: 1px solid rgba(16, 185, 129, 0.25);
-			border-radius: 8px;
-			padding: 0.7rem;
-			margin-top: 0.6rem;
-			font-size: 0.8rem;
-			color: #d1fae5;
-			white-space: pre-line;
+		/* POST CARD DO FEED */
+		.post-card {
+			background: var(--surface-card);
+			border: 1px solid var(--border-subtle);
+			border-radius: var(--radius-md);
+			padding: 1.4rem;
+			margin-bottom: 1.2rem;
+			box-shadow: var(--shadow-sm);
 		}
 
-		/* ESTILOS REFINADOS DA BIBLIOTECA DE ESPÉCIES (PLANT CARD VISUAL) */
-		.plant-card-view {
-			background: linear-gradient(180deg, var(--surface-2), rgba(10, 15, 28, 0.8));
-			border: 1px solid var(--border-soft);
-			border-radius: 16px;
-			overflow: hidden;
-			display: flex;
-			flex-direction: column;
-			justify-content: space-between;
-			box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-			transition: transform 0.2s ease, border-color 0.2s ease;
-		}
-
-		.plant-card-view:hover {
-			transform: translateY(-3px);
-			border-color: rgba(16, 185, 129, 0.4);
-		}
-
-		.plant-card-header {
-			background: linear-gradient(135deg, rgba(16, 185, 129, 0.25), rgba(56, 189, 248, 0.15));
-			padding: 1rem 1.1rem;
-			border-bottom: 1px solid var(--border-soft);
-		}
-
-		.plant-card-header-top {
+		.post-header {
 			display: flex;
 			justify-content: space-between;
 			align-items: center;
-			margin-bottom: 0.5rem;
+			margin-bottom: 0.8rem;
 		}
 
-		.plant-card-title {
-			font-size: 1.2rem;
-			font-weight: 800;
-			color: #ffffff;
-			line-height: 1.2;
-		}
-
-		.plant-card-scientific {
-			font-style: italic;
-			font-size: 0.82rem;
-			color: var(--primary-light);
-			margin-top: 0.15rem;
-		}
-
-		.plant-quick-stats {
-			display: grid;
-			grid-template-columns: repeat(3, 1fr);
-			gap: 0.5rem;
-			padding: 0.75rem 1rem;
-			background: rgba(6, 10, 20, 0.4);
-			border-bottom: 1px solid var(--border-soft);
-		}
-
-		.quick-stat-item {
-			display: flex;
-			flex-direction: column;
-			align-items: center;
-			text-align: center;
-		}
-
-		.quick-stat-label {
-			font-size: 0.65rem;
-			text-transform: uppercase;
-			color: var(--text-muted);
-			font-weight: 700;
-			letter-spacing: 0.05em;
-		}
-
-		.quick-stat-value {
-			font-size: 0.8rem;
-			font-weight: 700;
-			color: var(--text-main);
-			margin-top: 0.1rem;
-		}
-
-		.plant-card-body {
-			padding: 1rem;
-			display: flex;
-			flex-direction: column;
-			gap: 0.85rem;
-			flex-grow: 1;
-		}
-
-		.plant-card-body p {
-			font-size: 0.85rem;
-			color: var(--text-muted);
-			line-height: 1.45;
-		}
-
-		.plant-care-panel {
-			background: rgba(16, 185, 129, 0.06);
-			border: 1px solid rgba(16, 185, 129, 0.2);
-			border-radius: 10px;
-			padding: 0.8rem;
-		}
-
-		.plant-care-title {
-			font-size: 0.8rem;
-			font-weight: 700;
-			color: var(--primary-light);
-			margin-bottom: 0.4rem;
-			display: flex;
-			align-items: center;
-			gap: 0.3rem;
-		}
-
-		.plant-care-text {
-			font-size: 0.8rem;
-			color: #e2e8f0;
-			white-space: pre-line;
-			line-height: 1.5;
-		}
-
-		.hidden {
-			display: none !important;
-		}
-
-		.alert {
-			position: fixed;
-			top: 20px;
-			right: 20px;
-			left: 20px;
-			max-width: 480px;
-			margin: 0 auto;
-			z-index: 10000;
-			padding: 1rem 1.25rem;
-			border-radius: 14px;
-			display: none;
+		.post-author {
+			font-family: 'Poppins', sans-serif;
 			font-weight: 600;
-			font-size: 0.92rem;
-			word-break: break-word;
-			box-shadow: 0 12px 32px -8px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.08);
-			backdrop-filter: blur(12px);
-			-webkit-backdrop-filter: blur(12px);
-			animation: slideInDown 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+			color: var(--color-primary-dark);
 		}
 
-		@keyframes slideInDown {
-			from {
-				opacity: 0;
-				transform: translateY(-30px) scale(0.95);
-			}
-
-			to {
-				opacity: 1;
-				transform: translateY(0) scale(1);
-			}
-		}
-
-		.alert.success {
-			background-color: rgba(16, 185, 129, 0.92);
-			border: 1px solid rgba(52, 211, 153, 0.5);
-			color: #022c22;
-		}
-
-		.alert.error {
-			background-color: rgba(244, 63, 94, 0.92);
-			border: 1px solid rgba(251, 113, 133, 0.5);
-			color: #4c0519;
-		}
-
-		.text-muted {
+		.post-date {
+			font-size: 0.8rem;
 			color: var(--text-muted);
 		}
 
+		.post-title {
+			font-family: 'Poppins', sans-serif;
+			font-size: 1.15rem;
+			font-weight: 700;
+			color: var(--color-primary-dark);
+			margin-bottom: 0.45rem;
+		}
+
+		.post-content {
+			font-size: 0.94rem;
+			color: var(--text-main);
+			margin-bottom: 1rem;
+			white-space: pre-line;
+		}
+
+		.post-media {
+			width: 100%;
+			max-height: 320px;
+			object-fit: cover;
+			border-radius: var(--radius-sm);
+			margin-bottom: 1rem;
+		}
+
+		.post-actions {
+			display: flex;
+			gap: 0.6rem;
+			border-top: 1px solid var(--color-soft-green);
+			padding-top: 0.85rem;
+			flex-wrap: wrap;
+		}
+
+		.comments-section {
+			margin-top: 1rem;
+			padding-top: 1rem;
+			border-top: 1px dashed var(--border-subtle);
+		}
+
+		.comment-box {
+			background: var(--color-bg-offwhite);
+			border: 1px solid var(--border-subtle);
+			border-radius: var(--radius-sm);
+			padding: 0.8rem;
+			margin-bottom: 0.6rem;
+			font-size: 0.88rem;
+		}
+
+		/* MODAIS */
 		.modal-overlay {
 			position: fixed;
 			top: 0;
 			left: 0;
 			right: 0;
 			bottom: 0;
-			background: rgba(4, 7, 15, 0.75);
-			backdrop-filter: blur(6px);
-			-webkit-backdrop-filter: blur(6px);
+			background: rgba(0, 36, 18, 0.65);
+			backdrop-filter: blur(5px);
 			display: flex;
-			align-items: flex-end;
+			align-items: center;
 			justify-content: center;
 			z-index: 1000;
-			padding: 0;
-			animation: fadeIn 0.18s ease;
-		}
-
-		@media (min-width: 640px) {
-			.modal-overlay {
-				align-items: center;
-				padding: 1rem;
-			}
+			padding: 1rem;
 		}
 
 		.modal-content {
-			background: linear-gradient(180deg, var(--surface-2), var(--surface));
-			border: 1px solid var(--border-soft);
-			border-top: 1px solid var(--border);
-			border-radius: 20px 20px 0 0;
-			padding: 1.5rem 1.25rem calc(1.25rem + var(--safe-bottom));
+			background: #ffffff;
+			border-radius: var(--radius-lg);
+			padding: 1.75rem;
 			width: 100%;
-			max-height: 85vh;
+			max-width: 540px;
+			max-height: 90vh;
 			overflow-y: auto;
-			box-shadow: var(--shadow-pop);
-			position: relative;
+			box-shadow: var(--shadow-lg);
 		}
 
-		.modal-content::before {
-			content: '';
-			position: absolute;
-			top: 0.55rem;
+		.hidden {
+			display: none !important;
+		}
+
+		/* ALERT TOAST */
+		.alert {
+			position: fixed;
+			top: 20px;
 			left: 50%;
 			transform: translateX(-50%);
-			width: 40px;
-			height: 4px;
-			border-radius: 4px;
-			background: var(--border);
+			max-width: 520px;
+			width: calc(100% - 40px);
+			z-index: 10000;
+			padding: 1.1rem 1.4rem;
+			border-radius: var(--radius-md);
+			font-weight: 600;
+			font-size: 0.95rem;
+			display: none;
+			box-shadow: var(--shadow-lg);
 		}
 
-		@media (min-width: 640px) {
-			.modal-content {
-				border-radius: 16px;
-				max-width: 550px;
-				padding: 1.5rem;
-			}
-
-			.modal-content::before {
-				display: none;
-			}
+		.alert.success {
+			background-color: var(--color-emerald);
+			color: #ffffff;
 		}
 
-		.forecast-grid {
-			display: grid;
-			grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
-			gap: 0.5rem;
-			margin-top: 1rem;
+		.alert.error {
+			background-color: var(--color-danger);
+			color: #ffffff;
 		}
 
-		.forecast-box {
-			background: rgba(6, 10, 20, 0.55);
-			border: 1px solid var(--border-soft);
-			border-radius: 10px;
-			padding: 0.6rem;
-			text-align: center;
-		}
-
-		.post-card {
-			background: rgba(6, 10, 20, 0.55);
-			border: 1px solid var(--border-soft);
-			border-radius: 14px;
-			padding: 1rem;
-			margin-bottom: 0.9rem;
-		}
-
-		.post-header {
-			display: flex;
-			justify-content: space-between;
-			align-items: flex-start;
-			margin-bottom: 0.75rem;
-			gap: 0.5rem;
-		}
-
-		.post-author {
-			font-weight: 700;
-			color: var(--accent);
-		}
-
-		.post-date {
-			font-size: 0.75rem;
-			color: var(--text-muted);
-		}
-
-		.post-title {
-			font-size: 1rem;
-			font-weight: 700;
-			color: var(--text-main);
-			margin-bottom: 0.5rem;
-			word-break: break-word;
-		}
-
-		.post-content {
-			font-size: 0.9rem;
-			color: var(--text-muted);
-			margin-bottom: 1rem;
-			white-space: pre-line;
-			word-break: break-word;
-		}
-
-		.post-media {
-			max-width: 100%;
+		.preview-img {
 			width: 100%;
-			border-radius: 10px;
-			margin-bottom: 1rem;
-			max-height: 250px;
+			max-height: 180px;
 			object-fit: cover;
-		}
-
-		.post-actions {
-			display: flex;
-			gap: 0.5rem;
-			border-top: 1px solid var(--border-soft);
-			padding-top: 0.75rem;
-			flex-wrap: wrap;
-		}
-
-		.post-actions button {
-			flex: 1 1 auto;
-		}
-
-		.comments-section {
-			margin-top: 1rem;
-			padding-top: 1rem;
-			border-top: 1px dashed var(--border-soft);
-		}
-
-		.comment-box {
-			background: rgba(20, 27, 45, 0.6);
-			border: 1px solid var(--border-soft);
-			border-radius: 8px;
-			padding: 0.65rem;
-			margin-bottom: 0.5rem;
-			font-size: 0.85rem;
-			word-break: break-word;
-		}
-
-		.reply-box {
-			margin-left: 0.5rem;
-			border-left: 2px solid var(--accent);
-			padding-left: 0.5rem;
+			border-radius: var(--radius-sm);
+			margin-top: 0.6rem;
 		}
 	</style>
 </head>
 
 <body>
 
-	<header>
-		<h1>🌱 Planpaz - API Test Dashboard</h1>
-		<div class="header-right">
-			<button id="btn-quick-weather" class="btn-sm btn-secondary" onclick="openPublicWeatherModal()">🌤️ Clima
-				(Sem Login)</button>
+	<!-- CABEÇALHO DA APLICAÇÃO -->
+	<header class="app-header">
+		<h1>🌱 PlanPaz</h1>
+		<div class="header-actions">
+			<button class="btn-sm btn-secondary" onclick="openPublicWeatherModal()">🌤️ Clima Rápido</button>
 			<div id="auth-status">
-				<span class="text-muted" style="font-size: 0.8rem;">Não autenticado</span>
+				<span>Não autenticado</span>
 			</div>
 		</div>
 	</header>
 
-	<div class="container">
+	<div class="app-shell">
 
+		<!-- BANNER ALERTA FEEDBACK -->
 		<div id="alert-box" class="alert"></div>
 
-		<!-- AUTHENTICATION SECTION -->
-		<section id="auth-section">
-			<div class="auth-grid">
-
-				<!-- LOGIN CARD -->
+		<!-- ESTRUTURA AUTENTICAÇÃO (LOGIN / REGISTRO) -->
+		<div id="auth-section" class="main-canvas" style="max-width: 1100px; margin: 0 auto;">
+			<div class="split-grid">
+				<!-- LOGIN -->
 				<div class="card">
-					<h2>Login (/api/auth/login)</h2>
+					<h2>Entrar na Conta</h2>
 					<form id="login-form">
 						<div class="form-group">
-							<label>Email <span class="required">*</span></label>
+							<label>E-mail <span class="required">*</span></label>
 							<input type="email" id="login-email" required placeholder="seu@email.com">
 						</div>
 						<div class="form-group">
 							<label>Senha <span class="required">*</span></label>
 							<input type="password" id="login-password" required placeholder="Sua senha">
 						</div>
-						<button type="submit" style="width: 100%;">Entrar (Log In)</button>
+						<button type="submit" style="width: 100%;">Entrar no PlanPaz</button>
 					</form>
 				</div>
 
-				<!-- REGISTER CARD WITH PREFERENCES EXTENSION -->
+				<!-- CADASTRO -->
 				<div class="card">
-					<h2>Cadastro (/api/auth/register)</h2>
+					<h2>Criar Nova Conta</h2>
 					<form id="register-form">
 						<div class="form-grid">
 							<div class="form-group">
@@ -907,10 +645,10 @@
 							</div>
 							<div class="form-group">
 								<label>Username <span class="required">*</span></label>
-								<input type="text" id="reg-username" placeholder="mariasilva" required>
+								<input type="text" id="reg-username" required placeholder="mariasilva">
 							</div>
 							<div class="form-group">
-								<label>Email <span class="required">*</span></label>
+								<label>E-mail <span class="required">*</span></label>
 								<input type="email" id="reg-email" required placeholder="maria@exemplo.com">
 							</div>
 							<div class="form-group">
@@ -918,589 +656,405 @@
 								<input type="password" id="reg-password" required placeholder="Mínimo 6 caracteres">
 							</div>
 						</div>
-
-						<h3
-							style="font-size: 0.95rem; color: #94a3b8; margin: 0.8rem 0 0.5rem 0; border-top: 1px dashed var(--border); padding-top: 0.5rem;">
-							Preferências & Onboarding Inicial
-						</h3>
-
-						<div class="form-grid">
-							<div class="form-group">
-								<label>Cidade <span class="optional">(opcional)</span></label>
-								<input type="text" id="reg-city" placeholder="Ex: São Paulo">
-							</div>
-							<div class="form-group">
-								<label>Data de Nascimento <span class="optional">(opcional)</span></label>
-								<input type="date" id="reg-birthdate">
-							</div>
-							<div class="form-group">
-								<label>Gênero <span class="optional">(opcional)</span></label>
-								<select id="reg-gender">
-									<option value="">Selecione...</option>
-									<option value="MALE">Masculino (MALE)</option>
-									<option value="FEMALE">Feminino (FEMALE)</option>
-									<option value="PREFER_NOT_TO_SAY">Prefiro não dizer</option>
-									<option value="OTHER">Outro</option>
-								</select>
-							</div>
-							<div class="form-group">
-								<label>Horário de Rega Habitual <span class="optional">(opcional)</span></label>
-								<input type="time" id="reg-watering-time">
-							</div>
-						</div>
-
-						<div class="form-group">
-							<label>Biografia / Apresentação <span class="optional">(opcional)</span></label>
-							<textarea id="reg-bio" rows="2"
-								placeholder="Amante de suculentas, ervas e hortas..."></textarea>
-						</div>
-
-						<div class="form-grid">
-							<div class="form-group">
-								<label>Objetivo Principal <span class="optional">(opcional)</span></label>
-								<select id="reg-main-goal">
-									<option value="">Selecione...</option>
-									<option value="DECORATION">Decoração (DECORATION)</option>
-									<option value="ALIMENTATION">Alimentação (ALIMENTATION)</option>
-									<option value="WELL_BEING">Bem-Estar (WELL_BEING)</option>
-									<option value="SUSTAINABILITY">Sustentabilidade (SUSTAINABILITY)</option>
-								</select>
-							</div>
-							<div class="form-group">
-								<label>Nível de Experiência <span class="optional">(opcional)</span></label>
-								<select id="reg-experience">
-									<option value="">Selecione...</option>
-									<option value="BEGINNER">Iniciante (BEGINNER)</option>
-									<option value="INTERMEDIATE">Intermediário (INTERMEDIATE)</option>
-									<option value="ADVANCED">Avançado (ADVANCED)</option>
-								</select>
-							</div>
-							<div class="form-group">
-								<label>Disponibilidade <span class="optional">(opcional)</span></label>
-								<select id="reg-time-availability">
-									<option value="">Selecione...</option>
-									<option value="DAILY">Diária (DAILY)</option>
-									<option value="FREQUENT">Frequente (FREQUENT)</option>
-									<option value="WEEKLY">Semanal (WEEKLY)</option>
-									<option value="SPORADIC">Esporádica (SPORADIC)</option>
-								</select>
-							</div>
-						</div>
-
-						<button type="submit" style="width: 100%; margin-top: 0.5rem;">Cadastrar e Configurar</button>
+						<button type="submit" style="width: 100%;">Cadastrar-se</button>
 					</form>
 				</div>
 			</div>
-		</section>
+		</div>
 
-		<!-- DASHBOARD SECTION -->
-		<section id="dashboard-section" class="hidden">
+		<!-- ESTRUTURA DASHBOARD COM SIDEBAR LATERAL E CANVAS PRINCIPAL -->
+		<div id="dashboard-section" class="hidden" style="display: flex; width: 100%;">
 
-			<!-- TAB CONTROLS -->
-			<div class="nav-tabs">
-				<button class="nav-tab active" onclick="switchTab('garden')">🪴 Jardim</button>
-				<button class="nav-tab" onclick="switchTab('feed')">📰 Feed</button>
-				<button class="nav-tab" onclick="switchTab('species')">🌿 Biblioteca de Espécies</button>
-				<button class="nav-tab" onclick="switchTab('weather')">🌤️ Clima</button>
-				<button class="nav-tab" onclick="switchTab('profile')">⚙️ Perfil</button>
-				<button class="nav-tab" onclick="switchTab('social')">👥 Social</button>
-				<button class="nav-tab" onclick="switchTab('achievements')">🏆 Conquistas</button>
-				<button onclick="logout()" class="danger btn-sm" style="margin-left: auto; flex-shrink: 0;">🚪
-					Sair</button>
-			</div>
-
-			<!-- TAB 1: MEU JARDIM -->
-			<div id="tab-garden" class="tab-content">
-				<div class="card">
-					<h2>
-						<span>Meu Jardim</span>
-						<button class="btn-sm btn-secondary" onclick="loadGarden()">🔄 Atualizar</button>
-					</h2>
-
-					<form id="garden-form" style="margin-bottom: 1.5rem;">
-						<div class="form-grid">
-							<div class="form-group">
-								<label>Apelido da Planta <span class="required">*</span></label>
-								<input type="text" id="garden-nickname" required placeholder="Ex: Minha Samambaia">
-							</div>
-							<div class="form-group">
-								<label>Espécie <span class="required">*</span></label>
-								<select id="garden-species" required onchange="onSpeciesSelected(this.value)">
-									<option value="">Selecione uma espécie...</option>
-								</select>
-							</div>
-							<div class="form-group">
-								<label>Estágio Atual <span class="optional">(opcional)</span></label>
-								<select id="garden-stage">
-									<option value="">Selecione a espécie primeiro...</option>
-								</select>
-							</div>
-							<div class="form-group">
-								<label>Cômodo / Local <span class="optional">(opcional)</span></label>
-								<select id="garden-room">
-									<option value="">Selecione...</option>
-									<option value="LIVING_ROOM">Sala de Estar</option>
-									<option value="BEDROOM">Quarto</option>
-									<option value="YARD">Quintal / Jardim</option>
-									<option value="KITCHEN">Cozinha</option>
-									<option value="DINING_ROOM">Sala de Jantar</option>
-									<option value="BATHROOM">Banheiro</option>
-									<option value="OTHER">Outro</option>
-								</select>
-							</div>
-						</div>
-						<div class="checkbox-group" style="margin-bottom: 1rem;">
-							<label class="checkbox-label">
-								<input type="checkbox" id="garden-rain"> Pega chuva direta
-							</label>
-							<label class="checkbox-label">
-								<input type="checkbox" id="garden-notify" checked> Notificações de rega
-							</label>
-						</div>
-						<button type="submit" style="width: 100%;">➕ Adicionar ao Jardim</button>
-					</form>
-
-					<div id="garden-list" class="item-list"></div>
+			<!-- SIDEBAR DE NAVEGAÇÃO -->
+			<aside class="app-sidebar">
+				<nav class="nav-tabs">
+					<button class="nav-tab active" onclick="switchTab('garden')">🪴 Meu Jardim</button>
+					<button class="nav-tab" onclick="switchTab('feed')">📰 Feed Comunidade</button>
+					<button class="nav-tab" onclick="switchTab('species')">🌿 Espécies</button>
+					<button class="nav-tab" onclick="switchTab('weather')">🌤️ Clima</button>
+					<button class="nav-tab" onclick="switchTab('profile')">⚙️ Perfil</button>
+					<button class="nav-tab" onclick="switchTab('social')">👥 Social</button>
+					<button class="nav-tab" onclick="switchTab('achievements')">🏆 Conquistas</button>
+				</nav>
+				<div style="margin-top: auto; padding-top: 1rem;">
+					<button onclick="logout()" class="danger" style="width: 100%;">🚪 Sair</button>
 				</div>
-			</div>
+			</aside>
 
-			<!-- TAB 2: FEED & POSTS -->
-			<div id="tab-feed" class="tab-content hidden">
-				<div class="card">
-					<h2>
-						<span>Feed da Comunidade</span>
-						<button class="btn-sm btn-secondary" onclick="loadFeed()">🔄 Recarregar</button>
-					</h2>
+			<!-- CANVAS PRINCIPAL DE CONTEÚDO -->
+			<main class="main-canvas">
 
-					<!-- NOVO POST FORM -->
-					<form id="post-form"
-						style="margin-bottom: 1.5rem; background: rgba(15, 23, 42, 0.4); padding: 0.9rem; border-radius: 8px; border: 1px solid var(--border);">
-						<h3>✍️ Nova Publicação</h3>
-						<div class="form-group">
-							<label>Título <span class="required">*</span></label>
-							<input type="text" id="post-title" required
-								placeholder="Ex: Minhas suculentas floresceram!">
-						</div>
-						<div class="form-group">
-							<label>Conteúdo <span class="required">*</span></label>
-							<textarea id="post-content" rows="3" required
-								placeholder="Escreva sobre suas plantas..."></textarea>
-						</div>
-						<div class="form-group">
-							<label>URL da Imagem <span class="optional">(opcional)</span></label>
-							<input type="text" id="post-media" placeholder="https://exemplo.com/imagem.jpg">
-						</div>
-						<button type="submit" style="width: 100%;">📢 Publicar</button>
-					</form>
-
-					<!-- LISTA DO FEED -->
-					<div id="feed-list"></div>
-				</div>
-			</div>
-
-			<!-- TAB 3: CATÁLOGO / BIBLIOTECA DE ESPÉCIES -->
-			<div id="tab-species" class="tab-content hidden">
-				<div class="card">
-					<h2>
-						<span>Biblioteca de Espécies</span>
-						<button class="btn-sm btn-secondary" onclick="loadSpecies()">🔄 Atualizar</button>
-					</h2>
-					<p class="text-muted" style="margin-bottom: 1rem;">Consulte abaixo os guias de cuidados e
-						informações detalhadas de cada espécie cadastrada no sistema.</p>
-
-					<div id="plants-list" class="item-list"></div>
-				</div>
-			</div>
-
-			<!-- TAB 4: CLIMA & PREVISÃO -->
-			<div id="tab-weather" class="tab-content hidden">
-				<div class="card">
-					<h2>Previsão Climática 🌤️</h2>
-
-					<div class="weather-grid">
-						<!-- BUSCA POR CIDADE -->
-						<div
-							style="background: rgba(15,23,42,0.4); padding: 0.9rem; border-radius: 8px; border: 1px solid var(--border);">
-							<h3>Buscar por Cidade</h3>
-							<div class="form-group">
-								<label>Nome da Cidade</label>
-								<input type="text" id="weather-city-input" placeholder="Ex: São Paulo">
+				<!-- TAB 1: MEU JARDIM -->
+				<div id="tab-garden" class="tab-content">
+					<div class="split-grid">
+						<!-- COLUNA ESQUERDA: FORMULARIO ADICIONAR PLANTA -->
+						<div class="card">
+							<div class="card-header-bar">
+								<h2>➕ Adicionar Planta</h2>
 							</div>
-							<div style="display: flex; gap: 0.5rem;">
-								<button type="button" class="btn-sm" style="flex: 1;"
-									onclick="consultWeatherByCity(false)">Clima Atual</button>
-								<button type="button" class="btn-sm btn-secondary" style="flex: 1;"
-									onclick="consultWeatherByCity(true)">Previsão 24h</button>
-							</div>
-						</div>
-
-						<!-- BUSCA POR COORDENADAS -->
-						<div
-							style="background: rgba(15,23,42,0.4); padding: 0.9rem; border-radius: 8px; border: 1px solid var(--border);">
-							<h3>Buscar por GPS</h3>
-							<div style="display: flex; gap: 0.5rem;">
-								<div class="form-group" style="flex: 1;">
-									<label>Lat</label>
-									<input type="number" step="0.00001" id="weather-lat-input" placeholder="-23.5505">
+							<form id="garden-form">
+								<div class="form-group">
+									<label>Apelido da Planta <span class="required">*</span></label>
+									<input type="text" id="garden-nickname" required placeholder="Ex: Minha Orquídea">
 								</div>
-								<div class="form-group" style="flex: 1;">
-									<label>Lon</label>
-									<input type="number" step="0.00001" id="weather-lon-input" placeholder="-46.6333">
+								<div class="form-group">
+									<label>Espécie <span class="required">*</span></label>
+									<select id="garden-species" required onchange="onSpeciesSelected(this.value)">
+										<option value="">Selecione uma espécie...</option>
+									</select>
 								</div>
-							</div>
-							<div style="display: flex; gap: 0.5rem;">
-								<button type="button" class="btn-sm" style="flex: 1;"
-									onclick="consultWeatherByCoords(false)">Clima Atual</button>
-								<button type="button" class="btn-sm btn-secondary" style="flex: 1;"
-									onclick="consultWeatherByCoords(true)">Previsão 24h</button>
-							</div>
+								<div class="form-group">
+									<label>Estágio Atual <span class="optional">(opcional)</span></label>
+									<select id="garden-stage">
+										<option value="">Selecione a espécie primeiro...</option>
+									</select>
+								</div>
+								<div class="form-group">
+									<label>Cômodo <span class="optional">(opcional)</span></label>
+									<select id="garden-room">
+										<option value="">Selecione...</option>
+										<option value="LIVING_ROOM">Sala de Estar</option>
+										<option value="BEDROOM">Quarto</option>
+										<option value="YARD">Quintal / Varanda</option>
+										<option value="KITCHEN">Cozinha</option>
+										<option value="DINING_ROOM">Sala de Jantar</option>
+										<option value="BATHROOM">Banheiro</option>
+										<option value="OTHER">Outro</option>
+									</select>
+								</div>
+								<div class="form-group">
+									<label>Foto da Planta (Cloudinary)</label>
+									<input type="file" id="garden-photo-file" accept="image/*"
+										onchange="previewUploadImage(this, 'garden-photo-preview')">
+									<img id="garden-photo-preview" class="preview-img hidden" alt="Preview da imagem">
+								</div>
+								<div style="display: flex; gap: 1rem; margin-bottom: 1.2rem;">
+									<label><input type="checkbox" id="garden-rain"> Chuva direta</label>
+									<label><input type="checkbox" id="garden-notify" checked> Lembretes rega</label>
+								</div>
+								<button type="submit" style="width: 100%;">Adicionar ao Jardim</button>
+							</form>
 						</div>
-					</div>
 
-					<!-- RESULTADO DO CLIMA -->
-					<div id="weather-display-result" style="display: none; margin-top: 1rem;">
-						<h3 id="weather-result-title">Condições Climáticas</h3>
-						<div id="weather-current-card" class="card" style="background: rgba(15, 23, 42, 0.8);"></div>
-						<div id="weather-forecast-container" style="display: none;">
-							<h3 style="margin-top: 1rem;">Previsão por Horário</h3>
-							<div id="forecast-grid" class="forecast-grid"></div>
+						<!-- COLUNA DIREITA: LISTA DO JARDIM -->
+						<div class="card">
+							<div class="card-header-bar">
+								<h2>🪴 Plantas no Meu Jardim</h2>
+								<button class="btn-sm btn-secondary" onclick="loadGarden()">🔄 Atualizar</button>
+							</div>
+							<div id="garden-list" class="item-grid"></div>
 						</div>
 					</div>
 				</div>
-			</div>
 
-			<!-- TAB 5: PERFIL & PREFERÊNCIAS -->
-			<div id="tab-profile" class="tab-content hidden">
-				<div class="card">
-					<h2>
-						<span>Perfil & Configurações ⚙️</span>
-						<button class="btn-sm btn-secondary" onclick="loadUserProfile()">🔄 Recarregar</button>
-					</h2>
+				<!-- TAB 2: FEED DA COMUNIDADE -->
+				<div id="tab-feed" class="tab-content hidden">
+					<div class="split-grid">
+						<!-- PUBLICAR -->
+						<div class="card">
+							<div class="card-header-bar">
+								<h2>📢 Criar Publicação</h2>
+							</div>
+							<form id="post-form">
+								<div class="form-group">
+									<label>Título <span class="required">*</span></label>
+									<input type="text" id="post-title" required
+										placeholder="Título sobre suas plantas...">
+								</div>
+								<div class="form-group">
+									<label>Conteúdo / Mensagem <span class="required">*</span></label>
+									<textarea id="post-content" rows="4" required
+										placeholder="Escreva o texto da publicação..."></textarea>
+								</div>
+								<div class="form-group">
+									<label>Mídia / Imagem (Cloudinary)</label>
+									<input type="file" id="post-photo-file" accept="image/*"
+										onchange="previewUploadImage(this, 'post-photo-preview')">
+									<img id="post-photo-preview" class="preview-img hidden" alt="Preview foto">
+								</div>
+								<button type="submit" style="width: 100%;">Publicar na Comunidade</button>
+							</form>
+						</div>
 
-					<!-- RESUMO ATUAL DO PERFIL -->
-					<div id="profile-summary"
-						style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 0.6rem; margin-bottom: 1.5rem; background: rgba(15, 23, 42, 0.5); padding: 0.8rem; border-radius: 8px; border: 1px solid var(--border); font-size: 0.85rem;">
-						<div><strong>Nome:</strong> <span id="prof-disp-name">-</span></div>
-						<div><strong>User:</strong> <span id="prof-disp-username">-</span></div>
-						<div><strong>Email:</strong> <span id="prof-disp-email" style="word-break: break-all;">-</span>
+						<!-- LISTA DO FEED -->
+						<div class="card">
+							<div class="card-header-bar">
+								<h2>📰 Feed de Notícias</h2>
+								<button class="btn-sm btn-secondary" onclick="loadFeed()">🔄 Recarregar</button>
+							</div>
+							<div id="feed-list"></div>
 						</div>
-						<div><strong>Score:</strong> <span id="prof-disp-ecoscore" class="badge success">0 pts</span>
-						</div>
-						<div><strong>Cidade:</strong> <span id="prof-disp-city">-</span></div>
-						<div><strong>Rega:</strong> <span id="prof-disp-watering">-</span></div>
 					</div>
+				</div>
 
-					<form id="preferences-form">
-						<h3>Editar Preferências</h3>
+				<!-- TAB 3: BIBLIOTECA DE ESPÉCIES -->
+				<div id="tab-species" class="tab-content hidden">
+					<div class="card">
+						<div class="card-header-bar">
+							<h2>🌿 Catálogo de Espécies</h2>
+							<button class="btn-sm btn-secondary" onclick="loadSpecies()">🔄 Atualizar</button>
+						</div>
+						<div id="plants-list" class="item-grid"></div>
+					</div>
+				</div>
+
+				<!-- TAB 4: CLIMA -->
+				<div id="tab-weather" class="tab-content hidden">
+					<div class="card">
+						<div class="card-header-bar">
+							<h2>🌤️ Previsão Climática</h2>
+						</div>
 						<div class="form-grid">
 							<div class="form-group">
 								<label>Cidade</label>
-								<input type="text" id="pref-city" placeholder="Ex: São Paulo">
-							</div>
-							<div class="form-group">
-								<label>Horário de Rega Habitual</label>
-								<input type="time" id="pref-watering-time">
-							</div>
-							<div class="form-group">
-								<label>Latitude</label>
-								<input type="number" step="0.00001" id="pref-latitude" placeholder="-23.5505">
-							</div>
-							<div class="form-group">
-								<label>Longitude</label>
-								<input type="number" step="0.00001" id="pref-longitude" placeholder="-46.6333">
+								<input type="text" id="weather-city-input" placeholder="Ex: São Paulo">
 							</div>
 						</div>
-
-						<div class="form-group">
-							<label>Biografia</label>
-							<textarea id="pref-bio" rows="2" placeholder="Sua biografia..."></textarea>
+						<div style="display: flex; gap: 0.6rem; margin-bottom: 1.2rem;">
+							<button type="button" onclick="consultWeatherByCity(false)">Clima Atual</button>
+							<button type="button" class="btn-secondary" onclick="consultWeatherByCity(true)">Previsão
+								24h</button>
 						</div>
 
-						<div class="form-grid">
-							<div class="form-group">
-								<label>Objetivo Principal</label>
-								<select id="pref-main-goal">
-									<option value="">Selecione...</option>
-									<option value="DECORATION">Decoração</option>
-									<option value="ALIMENTATION">Alimentação</option>
-									<option value="WELL_BEING">Bem-Estar</option>
-									<option value="SUSTAINABILITY">Sustentabilidade</option>
-								</select>
+						<div id="weather-display-result" style="display: none; margin-top: 1rem;">
+							<div id="weather-current-card" class="card" style="background: var(--color-soft-green);">
 							</div>
-							<div class="form-group">
-								<label>Experiência</label>
-								<select id="pref-experience">
-									<option value="">Selecione...</option>
-									<option value="BEGINNER">Iniciante</option>
-									<option value="INTERMEDIATE">Intermediário</option>
-									<option value="ADVANCED">Avançado</option>
-								</select>
-							</div>
-							<div class="form-group">
-								<label>Disponibilidade</label>
-								<select id="pref-time-availability">
-									<option value="">Selecione...</option>
-									<option value="DAILY">Diária</option>
-									<option value="FREQUENT">Frequente</option>
-									<option value="WEEKLY">Semanal</option>
-									<option value="SPORADIC">Esporádica</option>
-								</select>
-							</div>
-							<div class="form-group">
-								<label>Gênero</label>
-								<select id="pref-gender">
-									<option value="">Selecione...</option>
-									<option value="MALE">Masculino</option>
-									<option value="FEMALE">Feminino</option>
-									<option value="PREFER_NOT_TO_SAY">Prefiro não dizer</option>
-									<option value="OTHER">Outro</option>
-								</select>
+							<div id="weather-forecast-container" style="display: none;">
+								<h3>Previsão por Horário</h3>
+								<div id="forecast-grid" class="item-grid"></div>
 							</div>
 						</div>
-
-						<button type="submit" style="width: 100%;">Salvar Preferências</button>
-					</form>
-				</div>
-			</div>
-
-			<!-- TAB 6: COMUNIDADE & SOCIAL -->
-			<div id="tab-social" class="tab-content hidden">
-				<div class="card">
-					<h2>Comunidade 👥</h2>
-					<form id="search-user-form"
-						style="display: flex; gap: 0.5rem; margin-bottom: 1.5rem; flex-direction: column;">
-						<div class="form-group" style="margin: 0;">
-							<label>Buscar usuário por @username</label>
-							<input type="text" id="search-username-input" placeholder="Digite o username" required>
-						</div>
-						<button type="submit">🔍 Buscar</button>
-					</form>
-
-					<h3>Resultados</h3>
-					<div id="search-results-list" class="item-list" style="margin-bottom: 1.5rem;">
-						<p class="text-muted">Faça uma busca para encontrar outros cultivadores.</p>
 					</div>
-
-					<div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
-						<button onclick="loadMyFollowers()" class="btn-sm btn-secondary" style="flex: 1;">👥
-							Seguidores</button>
-						<button onclick="loadMyFollowing()" class="btn-sm btn-secondary" style="flex: 1;">➡️ Quem
-							Sigo</button>
-					</div>
-
-					<div id="social-relations-list" class="item-list"></div>
 				</div>
-			</div>
 
-			<!-- TAB 7: CONQUISTAS & GAMIFICAÇÃO -->
-			<div id="tab-achievements" class="tab-content hidden">
-				<div class="card">
-					<h2>
-						<span>Conquistas 🏆</span>
-						<button class="btn-sm btn-secondary" onclick="loadAchievementsCatalog()">📖 Catálogo</button>
-					</h2>
-
-					<form id="achievement-form"
-						style="display: flex; gap: 0.5rem; margin-bottom: 1.5rem; flex-direction: column;">
-						<div class="form-group" style="margin: 0;">
-							<label>Gatilho de Conquista (Teste)</label>
-							<select id="achievement-type" required>
-								<option value="">Selecione...</option>
-								<option value="cultivar3">🌿 Cultivar 3 plantas</option>
-								<option value="cultivar5">🌿 Cultivar 5 plantas</option>
-								<option value="cultivar10">🌳 Cultivar 10 plantas</option>
-								<option value="cuidar3">🌱 Cuidar por 3 dias</option>
-								<option value="cuidar5">🪴 Cuidar por 5 dias</option>
-								<option value="cuidar10">⭐ Cuidar por 10 dias</option>
-								<option value="crescimento">🍃 Estágio de Crescimento</option>
-								<option value="colheita">🌸 Estágio de Colheita</option>
-							</select>
+				<!-- TAB 5: PERFIL -->
+				<div id="tab-profile" class="tab-content hidden">
+					<div class="card">
+						<div class="card-header-bar">
+							<h2>⚙️ Perfil & Configurações</h2>
+							<button class="btn-sm btn-secondary" onclick="loadUserProfile()">🔄 Recarregar</button>
 						</div>
-						<button type="submit">Conceder Conquista</button>
-					</form>
 
-					<div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
-						<button class="btn-sm" style="flex: 1;" onclick="loadAchievements()">🏆 Minhas
-							Conquistas</button>
-						<button class="btn-sm btn-secondary" style="flex: 1;" onclick="loadAchievementsCatalog()">📚
-							Catálogo Geral</button>
+						<div id="profile-summary"
+							style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; background: var(--color-soft-green); padding: 1.2rem; border-radius: var(--radius-md);">
+							<div><strong>Nome:</strong> <span id="prof-disp-name">-</span></div>
+							<div><strong>Username:</strong> <span id="prof-disp-username">-</span></div>
+							<div><strong>E-mail:</strong> <span id="prof-disp-email">-</span></div>
+							<div><strong>Ecoscore:</strong> <span id="prof-disp-ecoscore" class="badge success">0
+									pts</span></div>
+						</div>
+
+						<form id="preferences-form">
+							<h3>Editar Perfil & Avatar</h3>
+							<div class="form-group">
+								<label>Foto de Perfil (Cloudinary)</label>
+								<input type="file" id="profile-photo-file" accept="image/*"
+									onchange="previewUploadImage(this, 'profile-photo-preview')">
+								<img id="profile-photo-preview" class="preview-img hidden" alt="Preview foto perfil">
+							</div>
+
+							<div class="form-grid">
+								<div class="form-group">
+									<label>Nome Completo</label>
+									<input type="text" id="pref-name" placeholder="Seu nome">
+								</div>
+								<div class="form-group">
+									<label>Username</label>
+									<input type="text" id="pref-username" placeholder="seuusername">
+								</div>
+								<div class="form-group">
+									<label>Cidade</label>
+									<input type="text" id="pref-city" placeholder="Ex: Rio de Janeiro">
+								</div>
+								<div class="form-group">
+									<label>Horário de Rega</label>
+									<input type="time" id="pref-watering-time">
+								</div>
+							</div>
+
+							<div class="form-group">
+								<label>Biografia</label>
+								<textarea id="pref-bio" rows="2" placeholder="Sua biografia..."></textarea>
+							</div>
+
+							<button type="submit" style="width: 100%;">Salvar Alterações do Perfil</button>
+						</form>
 					</div>
-
-					<div id="achievements-list" class="item-list"></div>
 				</div>
-			</div>
 
-		</section>
+				<!-- TAB 6: COMUNIDADE & SOCIAL -->
+				<div id="tab-social" class="tab-content hidden">
+					<div class="card">
+						<div class="card-header-bar">
+							<h2>👥 Comunidade & Seguidores</h2>
+						</div>
+						<form id="search-user-form" style="margin-bottom: 1.5rem;">
+							<div class="form-group">
+								<label>Buscar Usuário por @username</label>
+								<input type="text" id="search-username-input" placeholder="Digite o username..."
+									required>
+							</div>
+							<button type="submit" style="width: 100%;">🔍 Buscar Utilizador</button>
+						</form>
+
+						<div id="search-results-list" class="item-grid" style="margin-bottom: 1.5rem;"></div>
+
+						<div style="display: flex; gap: 0.6rem; margin-bottom: 1.2rem;">
+							<button onclick="loadMyFollowers()" class="btn-secondary" style="flex: 1;">👥
+								Seguidores</button>
+							<button onclick="loadMyFollowing()" class="btn-secondary" style="flex: 1;">➡️
+								Seguindo</button>
+						</div>
+
+						<div id="social-relations-list" class="item-grid"></div>
+					</div>
+				</div>
+
+				<!-- TAB 7: CONQUISTAS -->
+				<div id="tab-achievements" class="tab-content hidden">
+					<div class="card">
+						<div class="card-header-bar">
+							<h2>🏆 Conquistas & Gamificação</h2>
+						</div>
+						<div style="display: flex; gap: 0.6rem; margin-bottom: 1.2rem;">
+							<button class="btn" style="flex: 1;" onclick="loadAchievements()">🏆 Minhas
+								Conquistas</button>
+							<button class="btn-secondary" style="flex: 1;" onclick="loadAchievementsCatalog()">📚
+								Catálogo Geral</button>
+						</div>
+						<div id="achievements-list" class="item-grid"></div>
+					</div>
+				</div>
+
+			</main>
+		</div>
+
 	</div>
 
-	<!-- MODAL DE PRÓXIMAS REGAS -->
-	<div id="waterings-modal" class="modal-overlay hidden" onclick="closeWateringsModal(event)">
-		<div class="modal-content" onclick="event.stopPropagation()">
-			<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-				<h3 id="modal-plant-title" style="margin: 0; color: var(--accent);">📅 Próximas Regas</h3>
-				<button class="btn-sm btn-secondary"
-					onclick="document.getElementById('waterings-modal').classList.add('hidden')">✕ Fechar</button>
-			</div>
-			<div id="modal-waterings-list"></div>
+	<!-- MODAIS -->
+	<div id="waterings-modal" class="modal-overlay hidden">
+		<div class="modal-content">
+			<h3 id="modal-plant-title">📅 Próximas Regas</h3>
+			<div id="modal-waterings-list" style="margin: 1.2rem 0;"></div>
+			<button class="btn-secondary" style="width: 100%;" onclick="closeWateringsModal()">Fechar</button>
 		</div>
 	</div>
 
-	<!-- MODAL PÚBLICO DE CLIMA -->
-	<div id="public-weather-modal" class="modal-overlay hidden" onclick="closePublicWeatherModal(event)">
-		<div class="modal-content" onclick="event.stopPropagation()">
-			<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-				<h3 style="margin: 0; color: var(--accent);">🌤️ Consulta Rápida</h3>
-				<button class="btn-sm btn-secondary"
-					onclick="document.getElementById('public-weather-modal').classList.add('hidden')">✕ Fechar</button>
-			</div>
-			<div class="form-group">
-				<label>Nome da Cidade</label>
-				<input type="text" id="quick-weather-city" placeholder="Ex: Rio de Janeiro" value="São Paulo">
-			</div>
-			<div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
-				<button type="button" class="btn-sm" style="flex: 1;" onclick="quickFetchWeather(false)">Clima
-					Atual</button>
-				<button type="button" class="btn-sm btn-secondary" style="flex: 1;"
-					onclick="quickFetchWeather(true)">Previsão 24h</button>
-			</div>
-			<div id="quick-weather-output" style="margin-top: 1rem;"></div>
+	<!-- MODAL DENÚNCIA (RF14) -->
+	<div id="report-modal" class="modal-overlay hidden">
+		<div class="modal-content">
+			<h2 style="color: var(--color-danger); border-bottom-color: #fee2e2;">🚨 Denunciar Conteúdo</h2>
+			<form id="report-form">
+				<input type="hidden" id="report-content-type">
+				<input type="hidden" id="report-content-id">
+
+				<div class="form-group">
+					<label>Motivo da Denúncia <span class="required">*</span></label>
+					<select id="report-reason" required>
+						<option value="">Selecione o motivo...</option>
+						<option value="HATE_SPEECH">Discurso de ódio</option>
+						<option value="UNAUTHORIZED_DISCLOSURE">Divulgação indevida</option>
+						<option value="SPAM">Spam ou Golpes</option>
+						<option value="INAPPROPRIATE_CONTENT">Conteúdo inapropriado</option>
+					</select>
+				</div>
+
+				<div class="form-group">
+					<label>Justificativa / Detalhes <span class="optional">(opcional)</span></label>
+					<textarea id="report-message" rows="3" placeholder="Forneça mais detalhes se desejar..."></textarea>
+				</div>
+
+				<div style="display: flex; gap: 0.6rem; margin-top: 1.2rem;">
+					<button type="button" class="btn-secondary" style="flex: 1;"
+						onclick="closeReportModal()">Cancelar</button>
+					<button type="submit" class="danger" style="flex: 1;">Enviar Denúncia</button>
+				</div>
+			</form>
 		</div>
 	</div>
 
+	<!-- MODAL CLIMA RÁPIDO -->
+	<div id="public-weather-modal" class="modal-overlay hidden">
+		<div class="modal-content">
+			<h3>🌤️ Consulta Climática</h3>
+			<div class="form-group" style="margin-top: 1rem;">
+				<label>Cidade</label>
+				<input type="text" id="quick-weather-city" value="São Paulo">
+			</div>
+			<div style="display: flex; gap: 0.6rem; margin-bottom: 1.2rem;">
+				<button type="button" style="flex: 1;" onclick="quickFetchWeather(false)">Clima Atual</button>
+				<button type="button" class="btn-secondary" style="flex: 1;" onclick="quickFetchWeather(true)">Previsão
+					24h</button>
+			</div>
+			<div id="quick-weather-output"></div>
+			<button class="btn-secondary" style="width: 100%; margin-top: 1.2rem;"
+				onclick="closePublicWeatherModal()">Fechar</button>
+		</div>
+	</div>
+
+	<!-- SCRIPT DE INTEGRAÇÃO REAL COM O BACKEND -->
 	<script>
-		const API_URL = 'http://localhost:8080';
+		const API_URL = window.location.origin;
 		let token = localStorage.getItem('planpaz_token');
 		let username = localStorage.getItem('planpaz_username') || '';
 		let currentUserId = localStorage.getItem('planpaz_userid') || '';
-		let speciesCache = [];
-		let userAchievementsCount = 0;
+		let alertTimer = null;
 
 		const authSection = document.getElementById('auth-section');
 		const dashboardSection = document.getElementById('dashboard-section');
 		const authStatus = document.getElementById('auth-status');
 		const alertBox = document.getElementById('alert-box');
 
-		function formatEnumLabel(value) {
-			if (!value) return 'Não informado';
-			const map = {
-				'DAILY': 'Diária',
-				'WEEKLY': 'Semanal',
-				'SPORADIC': 'Esporádica',
-				'FREQUENT': 'Frequente',
-				'HIGH': 'Alta',
-				'MEDIUM': 'Média',
-				'LOW': 'Baixa',
-				'SMALL': 'Pequeno',
-				'MEDIUM_SIZE': 'Médio',
-				'LARGE': 'Grande',
-				'INDOOR': 'Interno',
-				'OUTDOOR': 'Externo',
-				'DECORATION': 'Decoração',
-				'ALIMENTATION': 'Alimentação',
-				'WELL_BEING': 'Bem-Estar',
-				'SUSTAINABILITY': 'Sustentabilidade',
-				'BEGINNER': 'Iniciante',
-				'INTERMEDIATE': 'Intermediário',
-				'ADVANCED': 'Avançado'
-			};
-			return map[value] || value;
-		}
-
-		function init() {
-			checkEmailVerificationToken();
-			if (token) {
-				showDashboard();
-				loadData();
-			} else {
-				showAuth();
-			}
-		}
-
-		async function checkEmailVerificationToken() {
-			const urlParams = new URLSearchParams(window.location.search);
-			const verifyToken = urlParams.get('token');
-
-			if (verifyToken) {
-				try {
-					const res = await fetch(`${API_URL}/api/auth/verify-email?token=${verifyToken}`, {
-						headers: {'ngrok-skip-browser-warning': 'true'}
-					});
-					const isJson = res.headers.get('content-type')?.includes('application/json');
-					const data = isJson ? await res.json() : await res.text();
-
-					if (res.ok) {
-						showMessage('E-mail verificado com sucesso! Você já pode fazer login.');
-					} else {
-						const errorMsg = (typeof data === 'object' && data.message) ? data.message : (typeof data === 'string' && data ? data : 'Link inválido ou expirado.');
-						showMessage(`Falha na verificação: ${errorMsg}`, true);
-					}
-				} catch (err) {
-					showMessage('Erro de conexão ao verificar o e-mail.', true);
-				}
-			}
-		}
-
-		let alertTimer = null;
-
 		function showMessage(msg, isError = false) {
-			if (alertTimer) {
-				clearTimeout(alertTimer);
-			}
-
+			if (alertTimer) clearTimeout(alertTimer);
 			alertBox.textContent = msg;
 			alertBox.className = `alert ${isError ? 'error' : 'success'}`;
 			alertBox.style.display = 'block';
-
-			alertTimer = setTimeout(() => {
-				alertBox.style.display = 'none';
-			}, 10000);
+			alertTimer = setTimeout(() => {alertBox.style.display = 'none';}, 8000);
 		}
 
-		function switchTab(tabId) {
-			document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-			document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
-
-			const targetContent = document.getElementById(`tab-${tabId}`);
-			if (targetContent) targetContent.classList.remove('hidden');
-
-			const matchingBtn = Array.from(document.querySelectorAll('.nav-tab')).find(btn =>
-				btn.getAttribute('onclick')?.includes(tabId)
-			);
-			if (matchingBtn) matchingBtn.classList.add('active');
-
-			if (tabId === 'profile') loadUserProfile();
-			if (tabId === 'feed') loadFeed();
-			if (tabId === 'weather' && !document.getElementById('weather-city-input').value) {
-				const savedCity = document.getElementById('prof-disp-city')?.textContent;
-				if (savedCity && savedCity !== '-') {
-					document.getElementById('weather-city-input').value = savedCity;
-				}
+		function previewUploadImage(input, previewId) {
+			const preview = document.getElementById(previewId);
+			if (input.files && input.files[0]) {
+				const reader = new FileReader();
+				reader.onload = (e) => {
+					preview.src = e.target.result;
+					preview.classList.remove('hidden');
+				};
+				reader.readAsDataURL(input.files[0]);
+			} else {
+				preview.classList.add('hidden');
 			}
 		}
 
-		function showAuth() {
-			authSection.classList.remove('hidden');
-			dashboardSection.classList.add('hidden');
-			authStatus.innerHTML = '<span class="text-muted" style="font-size: 0.8rem;">Não autenticado</span>';
-		}
+		async function uploadFileToCloudinary(fileInputId) {
+			const fileInput = document.getElementById(fileInputId);
+			if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
+				return null;
+			}
+			const formData = new FormData();
+			formData.append('file', fileInput.files[0]);
 
-		function showDashboard() {
-			authSection.classList.add('hidden');
-			dashboardSection.classList.remove('hidden');
-			const userDisplay = username ? `@${username}` : 'Autenticado';
-			authStatus.innerHTML = `<span style="color: var(--primary); font-size: 0.85rem;">Conectado como <strong>${userDisplay}</strong> ✓</span>`;
-		}
+			try {
+				const headers = {'ngrok-skip-browser-warning': 'true'};
+				if (token) headers['Authorization'] = `Bearer ${token}`;
 
-		function logout() {
-			token = null;
-			username = '';
-			currentUserId = '';
-			localStorage.removeItem('planpaz_token');
-			localStorage.removeItem('planpaz_username');
-			localStorage.removeItem('planpaz_userid');
-			userAchievementsCount = 0;
-			showAuth();
-			showMessage('Sessão encerrada com sucesso.');
+				const res = await fetch(`${API_URL}/api/uploads`, {
+					method: 'POST',
+					headers: headers,
+					body: formData
+				});
+
+				if (!res.ok) {
+					const data = await res.json();
+					throw new Error(data.message || 'Falha ao fazer upload da imagem.');
+				}
+				const data = await res.json();
+				return data.url;
+			} catch (err) {
+				showMessage(`Erro no upload: ${err.message}`, true);
+				throw err;
+			}
 		}
 
 		async function fetchAPI(endpoint, method = 'GET', body = null) {
@@ -1538,6 +1092,61 @@
 			}
 		}
 
+		function init() {
+			if (token) {
+				showDashboard();
+				loadData();
+			} else {
+				showAuth();
+			}
+		}
+
+		function showAuth() {
+			authSection.classList.remove('hidden');
+			dashboardSection.classList.add('hidden');
+			dashboardSection.style.display = 'none';
+			authStatus.innerHTML = '<span>Não autenticado</span>';
+		}
+
+		function showDashboard() {
+			authSection.classList.add('hidden');
+			dashboardSection.classList.remove('hidden');
+			dashboardSection.style.display = 'flex';
+			authStatus.innerHTML = `<span>Conectado como <strong>@${username}</strong></span>`;
+		}
+
+		function logout() {
+			token = null; username = ''; currentUserId = '';
+			localStorage.removeItem('planpaz_token');
+			localStorage.removeItem('planpaz_username');
+			localStorage.removeItem('planpaz_userid');
+			showAuth();
+			showMessage('Sessão encerrada com sucesso.');
+		}
+
+		function switchTab(tabId) {
+			document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+			document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
+
+			const target = document.getElementById(`tab-${tabId}`);
+			if (target) target.classList.remove('hidden');
+
+			const btn = Array.from(document.querySelectorAll('.nav-tab')).find(b => b.getAttribute('onclick')?.includes(tabId));
+			if (btn) btn.classList.add('active');
+
+			if (tabId === 'profile') loadUserProfile();
+			if (tabId === 'feed') loadFeed();
+			if (tabId === 'garden') loadGarden();
+			if (tabId === 'species') loadSpecies();
+		}
+
+		async function loadData() {
+			await loadUserProfile();
+			await loadSpecies();
+			await loadGarden();
+		}
+
+		// AUTH
 		document.getElementById('login-form').addEventListener('submit', async (e) => {
 			e.preventDefault();
 			const email = document.getElementById('login-email').value;
@@ -1551,75 +1160,35 @@
 					if (username) localStorage.setItem('planpaz_username', username);
 					showDashboard();
 					loadData();
-					showMessage('Login realizado com sucesso!');
+					showMessage('Login realizado com sucesso! 🌱');
 				}
 			} catch (e) { }
 		});
 
 		document.getElementById('register-form').addEventListener('submit', async (e) => {
 			e.preventDefault();
-
 			const name = document.getElementById('reg-name').value;
 			const usernameInput = document.getElementById('reg-username').value;
 			const email = document.getElementById('reg-email').value;
 			const password = document.getElementById('reg-password').value;
 
-			const city = document.getElementById('reg-city').value || null;
-			const birthdate = document.getElementById('reg-birthdate').value || null;
-			const gender = document.getElementById('reg-gender').value || null;
-			const wateringTime = document.getElementById('reg-watering-time').value ? document.getElementById('reg-watering-time').value + ":00" : null;
-			const bio = document.getElementById('reg-bio').value || null;
-			const mainGoal = document.getElementById('reg-main-goal').value || null;
-			const experienceLevel = document.getElementById('reg-experience').value || null;
-			const timeAvailability = document.getElementById('reg-time-availability').value || null;
-
 			try {
-				const data = await fetchAPI('/api/auth/register', 'POST', {
-					name,
-					username: usernameInput,
-					email,
-					password
-				});
-
+				const data = await fetchAPI('/api/auth/register', 'POST', {name, username: usernameInput, email, password});
 				if (data.token) {
 					token = data.token;
 					username = data.username || usernameInput;
 					localStorage.setItem('planpaz_token', token);
 					localStorage.setItem('planpaz_username', username);
-
-					if (city || birthdate || gender || wateringTime || bio || mainGoal || experienceLevel || timeAvailability) {
-						try {
-							await fetchAPI('/api/user/preferences', 'PUT', {
-								cityName: city,
-								birthdate,
-								gender,
-								wateringTime,
-								bio,
-								mainGoal,
-								experienceLevel,
-								timeAvailability
-							});
-						} catch (prefErr) {
-							console.warn('Erro ao salvar preferências iniciais:', prefErr);
-						}
-					}
-
 					showDashboard();
 					loadData();
-					showMessage(`Cadastro realizado! Um e-mail de verificação foi enviado para ${email}.`);
+					showMessage('Cadastro realizado com sucesso! 🌱');
 				} else {
-					showMessage(`Cadastro realizado! Por favor, verifique a caixa de entrada de ${email} para confirmar a conta.`);
+					showMessage('Cadastro realizado! Por favor, verifique seu e-mail.');
 				}
 			} catch (e) { }
 		});
 
-		async function loadData() {
-			await loadUserProfile();
-			await loadSpecies();
-			await loadGarden();
-			await loadAchievements();
-		}
-
+		// PERFIL
 		async function loadUserProfile() {
 			try {
 				const settings = await fetchAPI('/api/user/settings');
@@ -1631,43 +1200,143 @@
 					document.getElementById('prof-disp-username').textContent = `@${settings.username || '-'}`;
 					document.getElementById('prof-disp-email').textContent = settings.email || '-';
 					document.getElementById('prof-disp-ecoscore').textContent = `${settings.ecoscore || 0} pts`;
-					document.getElementById('prof-disp-city').textContent = settings.cityName || 'Não informada';
-					document.getElementById('prof-disp-watering').textContent = settings.wateringTime || 'Não informado';
 
+					document.getElementById('pref-name').value = settings.name || '';
+					document.getElementById('pref-username').value = settings.username || '';
 					document.getElementById('pref-city').value = settings.cityName || '';
 					document.getElementById('pref-watering-time').value = settings.wateringTime ? settings.wateringTime.substring(0, 5) : '';
-					document.getElementById('pref-latitude').value = settings.latitude || '';
-					document.getElementById('pref-longitude').value = settings.longitude || '';
 					document.getElementById('pref-bio').value = settings.bio || '';
-					document.getElementById('pref-main-goal').value = settings.mainGoal || '';
-					document.getElementById('pref-experience').value = settings.experienceLevel || '';
-					document.getElementById('pref-time-availability').value = settings.timeAvailability || '';
-					document.getElementById('pref-gender').value = settings.gender || '';
 				}
 			} catch (e) { }
 		}
 
 		document.getElementById('preferences-form').addEventListener('submit', async (e) => {
 			e.preventDefault();
-			const payload = {
-				cityName: document.getElementById('pref-city').value || null,
-				wateringTime: document.getElementById('pref-watering-time').value ? document.getElementById('pref-watering-time').value + ":00" : null,
-				latitude: document.getElementById('pref-latitude').value ? parseFloat(document.getElementById('pref-latitude').value) : null,
-				longitude: document.getElementById('pref-longitude').value ? parseFloat(document.getElementById('pref-longitude').value) : null,
-				bio: document.getElementById('pref-bio').value || null,
-				mainGoal: document.getElementById('pref-main-goal').value || null,
-				experienceLevel: document.getElementById('pref-experience').value || null,
-				timeAvailability: document.getElementById('pref-time-availability').value || null,
-				gender: document.getElementById('pref-gender').value || null
-			};
-
 			try {
-				await fetchAPI('/api/user/preferences', 'PUT', payload);
-				showMessage('Preferências atualizadas com sucesso! ✅');
+				let avatarUrl = null;
+				if (document.getElementById('profile-photo-file').files.length > 0) {
+					avatarUrl = await uploadFileToCloudinary('profile-photo-file');
+				}
+
+				const payload = {
+					name: document.getElementById('pref-name').value,
+					username: document.getElementById('pref-username').value,
+					cityName: document.getElementById('pref-city').value || null,
+					wateringTime: document.getElementById('pref-watering-time').value ? document.getElementById('pref-watering-time').value + ":00" : null,
+					bio: document.getElementById('pref-bio').value || null,
+					avatarUrl: avatarUrl
+				};
+
+				await fetchAPI('/api/user/settings', 'PUT', payload);
+				showMessage('Perfil atualizado com sucesso! ✅');
 				loadUserProfile();
 			} catch (e) { }
 		});
 
+		// JARDIM
+		async function loadGarden() {
+			try {
+				const garden = await fetchAPI('/api/garden');
+				const list = document.getElementById('garden-list');
+				list.innerHTML = '';
+
+				if (!garden || garden.length === 0) {
+					list.innerHTML = '<p style="color: var(--text-muted);">Seu jardim ainda não possui plantas adicionadas.</p>';
+					return;
+				}
+
+				garden.forEach(g => {
+					const div = document.createElement('div');
+					div.className = 'item-card';
+					div.innerHTML = `
+						<div>
+							<h3>${g.nickname}</h3>
+							<p><strong>Espécie:</strong> ${g.plant?.name || 'Desconhecida'}</p>
+							<p><strong>Estágio:</strong> ${g.stage?.name ? `${g.stage.order}º - ${g.stage.name}` : 'Muda'}</p>
+							<p><strong>Cômodo:</strong> ${g.room || 'Varanda'}</p>
+							${g.imagePath ? `<img src="${g.imagePath}" class="preview-img" style="max-height: 140px;" alt="Foto da planta">` : ''}
+						</div>
+						<div class="item-actions">
+							<button class="btn-sm" onclick="waterPlant('${g.id}')">💧 Regar</button>
+							<button class="btn-sm btn-secondary" onclick="viewUpcomingWaterings('${g.id}', '${g.nickname}')">📅 Regas</button>
+							<button class="btn-sm danger" onclick="deleteGardenPlant('${g.id}')">Excluir</button>
+						</div>
+					`;
+					list.appendChild(div);
+				});
+			} catch (e) { }
+		}
+
+		document.getElementById('garden-form').addEventListener('submit', async (e) => {
+			e.preventDefault();
+			try {
+				let imagePath = null;
+				if (document.getElementById('garden-photo-file').files.length > 0) {
+					imagePath = await uploadFileToCloudinary('garden-photo-file');
+				}
+
+				const payload = {
+					nickname: document.getElementById('garden-nickname').value,
+					plant: {id: document.getElementById('garden-species').value},
+					stage: document.getElementById('garden-stage').value ? {id: document.getElementById('garden-stage').value} : null,
+					room: document.getElementById('garden-room').value || null,
+					directRain: document.getElementById('garden-rain').checked,
+					wateringNotification: document.getElementById('garden-notify').checked,
+					imagePath: imagePath
+				};
+
+				await fetchAPI('/api/garden/add', 'POST', payload);
+				showMessage('Planta adicionada ao seu jardim! 🪴');
+				document.getElementById('garden-form').reset();
+				document.getElementById('garden-photo-preview').classList.add('hidden');
+				loadGarden();
+			} catch (e) { }
+		});
+
+		async function waterPlant(id) {
+			try {
+				await fetchAPI(`/api/garden/watering/${id}`, 'POST');
+				showMessage('Planta regada com sucesso! 💧');
+				loadGarden();
+			} catch (e) { }
+		}
+
+		async function deleteGardenPlant(id) {
+			if (!confirm('Deseja remover esta planta do jardim?')) return;
+			try {
+				await fetchAPI(`/api/garden/${id}`, 'DELETE');
+				showMessage('Planta removida do jardim.');
+				loadGarden();
+			} catch (e) { }
+		}
+
+		async function viewUpcomingWaterings(id, nickname) {
+			try {
+				const reminders = await fetchAPI(`/api/garden/next-waterings/${id}`);
+				document.getElementById('modal-plant-title').textContent = `📅 Próximas Regas: ${nickname}`;
+				const list = document.getElementById('modal-waterings-list');
+				list.innerHTML = '';
+				if (!reminders || reminders.length === 0) {
+					list.innerHTML = '<p style="color: var(--text-muted);">Nenhuma rega pendente.</p>';
+				} else {
+					reminders.forEach(r => {
+						list.innerHTML += `
+							<div class="comment-box" style="display:flex; justify-content:space-between; align-items:center;">
+								<div><strong>${r.order}ª Rega:</strong> ${r.date} às ${r.time}</div>
+								<span class="badge success">${r.status || 'Agendada'}</span>
+							</div>
+						`;
+					});
+				}
+				document.getElementById('waterings-modal').classList.remove('hidden');
+			} catch (e) { }
+		}
+
+		function closeWateringsModal() {
+			document.getElementById('waterings-modal').classList.add('hidden');
+		}
+
+		// FEED & MODERAÇÃO (RF14)
 		async function loadFeed() {
 			try {
 				const query = currentUserId ? `?currentUserId=${currentUserId}` : '';
@@ -1677,49 +1346,47 @@
 				feedList.innerHTML = '';
 
 				if (!posts || posts.length === 0) {
-					feedList.innerHTML = '<p class="text-muted">Nenhum post publicado ainda. Seja o primeiro!</p>';
+					feedList.innerHTML = '<p style="color: var(--text-muted);">Nenhuma publicação na comunidade.</p>';
 					return;
 				}
 
 				posts.forEach(post => {
-					const isLiked = post.likedByCurrentUser;
 					const formattedDate = post.postedAt ? new Date(post.postedAt).toLocaleString('pt-BR') : '';
-
 					const card = document.createElement('div');
 					card.className = 'post-card';
 					card.innerHTML = `
 						<div class="post-header">
 							<div>
 								<span class="post-author">${post.authorName || 'Jardineiro'}</span>
-								<span class="text-muted" style="font-size: 0.8rem;">(@${post.authorUsername || 'usuario'})</span>
+								<span style="font-size: 0.8rem; color: var(--text-muted);">(@${post.authorUsername || 'usuario'})</span>
 							</div>
 							<span class="post-date">${formattedDate}</span>
 						</div>
-						<div class="post-title">${post.title}</div>
+						<div class="post-title">${post.title || ''}</div>
 						<div class="post-content">${post.content}</div>
-						${post.media ? `<img src="${post.media}" class="post-media" alt="Mídia da publicação" onerror="this.style.display='none'">` : ''}
+						${post.media ? `<img src="${post.media}" class="post-media" alt="Foto da publicação">` : ''}
 
 						<div class="post-actions">
-							<button class="btn-sm ${isLiked ? 'danger' : 'btn-secondary'}" onclick="toggleLike('${post.id}', ${isLiked})">
-								${isLiked ? '❤️' : '🤍'} ${post.likesCount || 0}
+							<button class="btn-sm ${post.likedByCurrentUser ? 'danger' : 'btn-secondary'}" onclick="toggleLike('${post.id}')">
+								${post.likedByCurrentUser ? '❤️' : '🤍'} ${post.likesCount || 0}
 							</button>
 							<button class="btn-sm btn-secondary" onclick="toggleCommentsSection('${post.id}')">
-								💬 ${post.commentsCount || 0}
+								💬 ${post.commentsCount || 0} Comentários
+							</button>
+							<button class="btn-sm danger" style="margin-left: auto;" onclick="openReportModal('POST', '${post.id}')">
+								🚨 Denunciar
 							</button>
 							${currentUserId && currentUserId === post.authorId ? `
-								<button class="btn-sm danger" style="margin-left: auto;" onclick="deletePost('${post.id}')">🗑️</button>
+								<button class="btn-sm danger" onclick="deletePost('${post.id}')">🗑️</button>
 							` : ''}
 						</div>
 
 						<div id="comments-container-${post.id}" class="comments-section hidden">
-							<div class="form-group" style="margin-bottom: 0.5rem;">
-								<input type="text" id="comment-input-${post.id}" placeholder="Escreva um comentário..." style="font-size: 0.85rem;">
+							<div class="form-group">
+								<input type="text" id="comment-input-${post.id}" placeholder="Escreva um comentário...">
 							</div>
-							<button class="btn-sm" style="width: 100%;" onclick="submitComment('${post.id}')">Enviar Comentário</button>
-							
-							<div id="comments-list-${post.id}" style="margin-top: 1rem;">
-								<p class="text-muted" style="font-size: 0.8rem;">Carregando comentários...</p>
-							</div>
+							<button class="btn-sm" style="width: 100%; margin-bottom: 1rem;" onclick="submitComment('${post.id}')">Enviar Comentário</button>
+							<div id="comments-list-${post.id}"></div>
 						</div>
 					`;
 					feedList.appendChild(card);
@@ -1729,56 +1396,47 @@
 
 		document.getElementById('post-form').addEventListener('submit', async (e) => {
 			e.preventDefault();
-			if (!currentUserId) {
-				showMessage('Faça login primeiro para criar um post.', true);
-				return;
-			}
-
-			const payload = {
-				authorId: currentUserId,
-				title: document.getElementById('post-title').value,
-				content: document.getElementById('post-content').value,
-				media: document.getElementById('post-media').value || null
-			};
-
 			try {
+				let media = null;
+				if (document.getElementById('post-photo-file').files.length > 0) {
+					media = await uploadFileToCloudinary('post-photo-file');
+				}
+
+				const payload = {
+					authorId: currentUserId,
+					title: document.getElementById('post-title').value,
+					content: document.getElementById('post-content').value,
+					media: media
+				};
+
 				await fetchAPI('/api/posts', 'POST', payload);
 				showMessage('Publicação criada com sucesso! 📢');
 				document.getElementById('post-form').reset();
+				document.getElementById('post-photo-preview').classList.add('hidden');
 				loadFeed();
 			} catch (e) { }
 		});
 
-		async function deletePost(postId) {
-			if (!confirm('Deseja excluir esta publicação?')) return;
+		async function submitComment(postId) {
+			const input = document.getElementById(`comment-input-${postId}`);
+			const content = input.value.trim();
+			if (!content) return;
 			try {
-				await fetchAPI(`/api/posts/${postId}?authorId=${currentUserId}`, 'DELETE');
-				showMessage('Post deletado com sucesso.');
-				loadFeed();
-			} catch (e) { }
-		}
-
-		async function toggleLike(postId) {
-			if (!currentUserId) {
-				alert('Faça login para curtir!');
-				return;
-			}
-
-			try {
-				await fetchAPI(`/api/posts/${postId}/likes`, 'POST', {
-					authorId: currentUserId
+				await fetchAPI(`/api/posts/${postId}/comments`, 'POST', {
+					authorId: currentUserId,
+					content: content
 				});
-				loadFeed();
-			} catch (error) {
-				alert('Erro ao processar curtida: ' + error.message);
-			}
+				input.value = '';
+				loadComments(postId);
+				showMessage('Comentário enviado! 💬');
+			} catch (e) { }
 		}
 
 		async function toggleCommentsSection(postId) {
 			const container = document.getElementById(`comments-container-${postId}`);
 			if (container.classList.contains('hidden')) {
 				container.classList.remove('hidden');
-				await loadComments(postId);
+				loadComments(postId);
 			} else {
 				container.classList.add('hidden');
 			}
@@ -1790,224 +1448,127 @@
 				const data = await fetchAPI(`/api/posts/${postId}/comments`);
 				const comments = data.content || data || [];
 				list.innerHTML = '';
-
 				if (!comments || comments.length === 0) {
-					list.innerHTML = '<p class="text-muted" style="font-size: 0.8rem;">Nenhum comentário ainda.</p>';
+					list.innerHTML = '<p style="font-size: 0.82rem; color: var(--text-muted);">Sem comentários ainda.</p>';
 					return;
 				}
 
-				for (const comment of comments) {
+				comments.forEach(c => {
 					const div = document.createElement('div');
 					div.className = 'comment-box';
-					const date = comment.commentedAt ? new Date(comment.commentedAt).toLocaleString('pt-BR') : '';
-
 					div.innerHTML = `
-						<div style="display: flex; justify-content: space-between; margin-bottom: 0.2rem; flex-wrap: wrap;">
-							<strong style="color: var(--accent);">@${comment.authorUsername || 'usuario'}</strong>
-							<span class="text-muted" style="font-size: 0.75rem;">${date}</span>
+						<div style="display:flex; justify-content:space-between; margin-bottom:0.3rem;">
+							<strong style="color: var(--color-emerald);">@${c.authorUsername || 'usuario'}</strong>
+							<span style="font-size: 0.75rem; color: var(--text-muted);">${c.commentedAt ? new Date(c.commentedAt).toLocaleString('pt-BR') : ''}</span>
 						</div>
-						<div>${comment.content}</div>
-						<div style="margin-top: 0.4rem; display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
-							<button class="btn-sm btn-secondary" style="font-size: 0.75rem; padding: 0.25rem 0.5rem;" onclick="showReplyBox('${comment.id}')">Responder</button>
-							${currentUserId && currentUserId === comment.authorId ? `
-								<button class="btn-sm danger" style="font-size: 0.75rem; padding: 0.25rem 0.5rem;" onclick="deleteComment('${postId}', '${comment.id}')">Excluir</button>
+						<div>${c.content}</div>
+						<div style="margin-top: 0.4rem; display: flex; gap: 0.5rem;">
+							<button class="btn-sm btn-secondary" style="font-size:0.75rem; padding: 0.2rem 0.5rem;" onclick="openReportModal('COMMENT', '${c.id}')">🚨 Denunciar</button>
+							${currentUserId && currentUserId === c.authorId ? `
+								<button class="btn-sm danger" style="font-size:0.75rem; padding: 0.2rem 0.5rem;" onclick="deleteComment('${postId}', '${c.id}')">🗑️ Excluir</button>
 							` : ''}
 						</div>
-						<div id="reply-input-box-${comment.id}" class="hidden" style="margin-top: 0.5rem;">
-							<input type="text" id="reply-text-${comment.id}" placeholder="Escreva sua resposta..." style="font-size: 0.8rem; margin-bottom: 0.3rem;">
-							<button class="btn-sm" style="font-size: 0.75rem; width: 100%;" onclick="submitReply('${postId}', '${comment.id}')">Enviar Resposta</button>
-						</div>
-						<div id="replies-list-${comment.id}" class="reply-box" style="margin-top: 0.5rem;"></div>
 					`;
 					list.appendChild(div);
-					loadReplies(postId, comment.id);
-				}
-			} catch (e) {
-				list.innerHTML = '<p class="danger" style="font-size: 0.8rem;">Erro ao carregar comentários.</p>';
-			}
-		}
-
-		async function loadReplies(postId, commentId) {
-			const list = document.getElementById(`replies-list-${commentId}`);
-			try {
-				const data = await fetchAPI(`/api/posts/${postId}/comments/${commentId}/replies`);
-				const replies = data.content || data || [];
-
-				if (replies && replies.length > 0) {
-					list.innerHTML = '';
-					replies.forEach(r => {
-						const div = document.createElement('div');
-						div.className = 'comment-box';
-						div.style.background = 'rgba(15, 23, 42, 0.4)';
-						div.innerHTML = `
-							<div style="display: flex; justify-content: space-between; flex-wrap: wrap;">
-								<strong style="color: var(--primary);">@${r.authorUsername || 'usuario'}</strong>
-								<span class="text-muted" style="font-size: 0.7rem;">${r.commentedAt ? new Date(r.commentedAt).toLocaleString('pt-BR') : ''}</span>
-							</div>
-							<div>${r.content}</div>
-						`;
-						list.appendChild(div);
-					});
-				}
+				});
 			} catch (e) { }
 		}
 
-		async function submitComment(postId) {
-			const input = document.getElementById(`comment-input-${postId}`);
-			const content = input.value.trim();
-			if (!content) return;
-			if (!currentUserId) {
-				showMessage('Faça login primeiro.', true);
-				return;
-			}
-
+		async function deletePost(postId) {
+			if (!confirm('Deseja excluir esta publicação?')) return;
 			try {
-				await fetchAPI(`/api/posts/${postId}/comments`, 'POST', {
-					authorId: currentUserId,
-					content: content
-				});
-				input.value = '';
-				await loadComments(postId);
-				showMessage('Comentário enviado!');
-			} catch (e) { }
-		}
-
-		function showReplyBox(commentId) {
-			const box = document.getElementById(`reply-input-box-${commentId}`);
-			box.classList.toggle('hidden');
-		}
-
-		async function submitReply(postId, parentCommentId) {
-			const input = document.getElementById(`reply-text-${parentCommentId}`);
-			const content = input.value.trim();
-			if (!content) return;
-			if (!currentUserId) {
-				showMessage('Faça login primeiro.', true);
-				return;
-			}
-
-			try {
-				await fetchAPI(`/api/posts/${postId}/comments`, 'POST', {
-					authorId: currentUserId,
-					content: content,
-					parentCommentId: parentCommentId
-				});
-				input.value = '';
-				showReplyBox(parentCommentId);
-				await loadReplies(postId, parentCommentId);
-				showMessage('Resposta enviada!');
+				await fetchAPI(`/api/posts/${postId}?authorId=${currentUserId}`, 'DELETE');
+				showMessage('Post excluído com sucesso.');
+				loadFeed();
 			} catch (e) { }
 		}
 
 		async function deleteComment(postId, commentId) {
 			if (!confirm('Deseja excluir este comentário?')) return;
 			try {
-				await fetchAPI(`/api/posts/${postId}/comments/${commentId}?authorId=${currentUserId}`, 'DELETE');
+				await fetchAPI(`/api/comments/${commentId}?authorId=${currentUserId}`, 'DELETE');
 				showMessage('Comentário excluído.');
-				await loadComments(postId);
+				loadComments(postId);
 			} catch (e) { }
 		}
 
+		async function toggleLike(postId) {
+			try {
+				await fetchAPI(`/api/posts/${postId}/likes`, 'POST', {authorId: currentUserId});
+				loadFeed();
+			} catch (e) { }
+		}
+
+		// MODAL DE DENÚNCIA (RF14)
+		function openReportModal(contentType, contentId) {
+			document.getElementById('report-content-type').value = contentType;
+			document.getElementById('report-content-id').value = contentId;
+			document.getElementById('report-reason').value = '';
+			document.getElementById('report-message').value = '';
+			document.getElementById('report-modal').classList.remove('hidden');
+		}
+
+		function closeReportModal() {
+			document.getElementById('report-modal').classList.add('hidden');
+		}
+
+		document.getElementById('report-form').addEventListener('submit', async (e) => {
+			e.preventDefault();
+			const contentType = document.getElementById('report-content-type').value;
+			const contentId = document.getElementById('report-content-id').value;
+			const reason = document.getElementById('report-reason').value;
+			const message = document.getElementById('report-message').value;
+
+			try {
+				await fetchAPI('/api/reports', 'POST', {
+					contentType,
+					contentId,
+					reason,
+					message: message || null,
+					reporterId: currentUserId
+				});
+				closeReportModal();
+				showMessage('Denúncia enviada com sucesso! Nossa equipe de moderação irá analisar o conteúdo. 🚨');
+			} catch (e) { }
+		});
+
+		// ESPÉCIES
 		async function loadSpecies() {
 			try {
 				const plants = await fetchAPI('/api/species');
-				speciesCache = plants;
-
 				const list = document.getElementById('plants-list');
 				list.innerHTML = '';
-
 				const select = document.getElementById('garden-species');
 				select.innerHTML = '<option value="">Selecione uma espécie...</option>';
 
 				plants.forEach(p => {
 					const div = document.createElement('div');
-					div.className = 'plant-card-view';
-
-					const careGuideText = p.careGuide || p.care_guide || p.careInstruction || '';
-
+					div.className = 'item-card';
 					div.innerHTML = `
 						<div>
-							<div class="plant-card-header">
-								<div class="plant-card-header-top">
-									${p.type ? `<span class="badge success">${formatEnumLabel(p.type)}</span>` : '<span></span>'}
-									${p.size ? `<span class="badge warning">Porte: ${formatEnumLabel(p.size)}</span>` : ''}
-								</div>
-								<div class="plant-card-title">${p.name}</div>
-								<div class="plant-card-scientific">${p.scientificName || 'Espécie não classificada'}</div>
-							</div>
-
-							${p.imagePath ? `<img src="${p.imagePath}" style="width:100%; max-height:180px; object-fit:cover;" onerror="this.style.display='none'">` : ''}
-
-							<div class="plant-quick-stats">
-								<div class="quick-stat-item">
-									<span class="quick-stat-label">💧 Rega</span>
-									<span class="quick-stat-value">${formatEnumLabel(p.wateringLevel)}</span>
-								</div>
-								<div class="quick-stat-item">
-									<span class="quick-stat-label">☀️ Luz</span>
-									<span class="quick-stat-value">${formatEnumLabel(p.luminosityLevel)}</span>
-								</div>
-								<div class="quick-stat-item">
-									<span class="quick-stat-label">🌡️ Temp</span>
-									<span class="quick-stat-value">${formatEnumLabel(p.temperatureLevel)}</span>
-								</div>
-							</div>
-
-							<div class="plant-card-body">
-								${p.description ? `<p>${p.description}</p>` : ''}
-								
-								${careGuideText ? `
-									<div class="plant-care-panel">
-										<div class="plant-care-title">📖 Guia de Manejo e Cuidados</div>
-										<div class="plant-care-text">${careGuideText}</div>
-									</div>
-								` : ''}
-							</div>
-						</div>
-						<div style="padding: 1rem; border-top: 1px solid var(--border-soft);">
-							<button class="btn-sm btn-secondary" style="width: 100%;" onclick="viewSpeciesStages('${p.id}', '${p.name}')">🌱 Ver Estágios de Cultivo</button>
+							<h3>${p.name}</h3>
+							<p style="font-style: italic; color: var(--color-emerald);">${p.scientificName || ''}</p>
+							${p.imagePath ? `<img src="${p.imagePath}" class="preview-img" style="max-height:140px;" alt="Espécie">` : ''}
+							<p style="margin-top:0.5rem;">${p.description || ''}</p>
 						</div>
 					`;
 					list.appendChild(div);
 
 					const opt = document.createElement('option');
 					opt.value = p.id;
-					opt.textContent = p.name + (p.scientificName ? ` (${p.scientificName})` : '');
+					opt.textContent = p.name;
 					select.appendChild(opt);
 				});
-			} catch (e) { }
-		}
-
-		async function viewSpeciesStages(speciesId, speciesName) {
-			try {
-				const stages = await fetchAPI(`/api/species/${speciesId}/stages`);
-				if (!stages || stages.length === 0) {
-					alert(`A espécie "${speciesName}" ainda não possui estágios cadastrados.`);
-					return;
-				}
-				const stageDetails = stages.map(s => `• ${s.order}º estágio: ${s.name} (~${s.days} dias)`).join('\n');
-				alert(`Estágios de ${speciesName}:\n\n${stageDetails}`);
 			} catch (e) { }
 		}
 
 		async function onSpeciesSelected(plantId) {
 			const stageSelect = document.getElementById('garden-stage');
 			stageSelect.innerHTML = '<option value="">Carregando estágios...</option>';
-
-			if (!plantId) {
-				stageSelect.innerHTML = '<option value="">Selecione a espécie primeiro...</option>';
-				return;
-			}
-
+			if (!plantId) return;
 			try {
 				const stages = await fetchAPI(`/api/species/${plantId}/stages`);
-				stageSelect.innerHTML = '<option value="">Nenhum estágio definido (opcional)</option>';
-
-				if (!stages || stages.length === 0) {
-					stageSelect.innerHTML = '<option value="">Sem estágios cadastrados</option>';
-					return;
-				}
-
+				stageSelect.innerHTML = '<option value="">Nenhum estágio selecionado</option>';
 				stages.forEach(st => {
 					const opt = document.createElement('option');
 					opt.value = st.id;
@@ -2015,265 +1576,11 @@
 					stageSelect.appendChild(opt);
 				});
 			} catch (e) {
-				stageSelect.innerHTML = '<option value="">Erro ao carregar estágios</option>';
+				stageSelect.innerHTML = '<option value="">Sem estágios cadastrados</option>';
 			}
 		}
 
-		async function loadGarden() {
-			try {
-				const garden = await fetchAPI('/api/garden');
-				const list = document.getElementById('garden-list');
-				list.innerHTML = '';
-
-				if (!garden || garden.length === 0) {
-					list.innerHTML = '<p class="text-muted">Seu jardim ainda não possui plantas.</p>';
-					return;
-				}
-
-				garden.forEach(g => {
-					const speciesName = g.plant?.name || 'Espécie desconhecida';
-					const stageName = g.stage?.name ? `${g.stage.order}º - ${g.stage.name}` : 'Não informado';
-					const roomName = g.room || 'Não informado';
-					const careGuideText = g.plant?.careGuide || g.plant?.care_guide || g.plant?.careInstruction || '';
-
-					const div = document.createElement('div');
-					div.className = 'item-card';
-					div.innerHTML = `
-						<div>
-							<h3>${g.nickname}</h3>
-							<p><strong>Espécie:</strong> ${speciesName}</p>
-							<p><strong>Estágio:</strong> ${stageName}</p>
-							<p><strong>Cômodo:</strong> ${roomName}</p>
-							<p><strong>Última rega:</strong> ${g.lastWatering ? new Date(g.lastWatering).toLocaleDateString('pt-BR') : 'Não registrada'}</p>
-							<p><strong>Chuva direta:</strong> ${g.directRain ? 'Sim 🌧️' : 'Não 🏠'}</p>
-
-							${careGuideText ? `
-								<div class="care-box">
-									<strong>📖 Care Guide (${speciesName}):</strong><br>${careGuideText}
-								</div>
-							` : ''}
-						</div>
-						<div class="item-actions">
-							<button class="btn-sm" onclick="waterPlant('${g.id}')">💧 Regar</button>
-							<button class="btn-sm btn-secondary" onclick="viewUpcomingWaterings('${g.id}', '${g.nickname}')">📅 Regas</button>
-							<button class="btn-sm btn-secondary" onclick="checkStatus('${g.id}')">🌤️ Clima</button>
-							<button class="btn-sm danger" onclick="deleteGardenPlant('${g.id}')">Excluir</button>
-						</div>
-					`;
-					list.appendChild(div);
-				});
-			} catch (e) { }
-		}
-
-		document.getElementById('garden-form').addEventListener('submit', async (e) => {
-			e.preventDefault();
-			const nickname = document.getElementById('garden-nickname').value;
-			const plantId = document.getElementById('garden-species').value;
-			const stageId = document.getElementById('garden-stage').value || null;
-			const room = document.getElementById('garden-room').value || null;
-			const directRain = document.getElementById('garden-rain').checked;
-			const wateringNotification = document.getElementById('garden-notify').checked;
-
-			const payload = {
-				nickname,
-				plant: {id: plantId},
-				stage: stageId ? {id: stageId} : null,
-				room,
-				directRain,
-				wateringNotification
-			};
-
-			try {
-				await fetchAPI('/api/garden/add', 'POST', payload);
-				showMessage('Planta adicionada com sucesso!');
-				document.getElementById('garden-form').reset();
-				await loadGarden();
-				await loadAchievements();
-			} catch (e) { }
-		});
-
-		async function waterPlant(id) {
-			try {
-				await fetchAPI(`/api/garden/watering/${id}`, 'POST');
-				showMessage('Planta regada com sucesso! 💧');
-				await loadGarden();
-				await loadAchievements();
-			} catch (e) { }
-		}
-
-		async function checkStatus(id) {
-			const city = prompt("Digite o nome da cidade para verificar o clima:", "São Paulo");
-			if (!city) return;
-
-			try {
-				const data = await fetchAPI(`/api/garden/watering-status/${id}?cidade=${encodeURIComponent(city)}`);
-				showMessage(`📍 ${data.cidade}: ${data.temperatura}°C, Umidade ${data.umidade}%. Recomendação: ${data.recomendacao}`);
-			} catch (e) { }
-		}
-
-		async function viewUpcomingWaterings(id, nickname) {
-			try {
-				const reminders = await fetchAPI(`/api/garden/next-waterings/${id}`);
-				const modal = document.getElementById('waterings-modal');
-				const modalTitle = document.getElementById('modal-plant-title');
-				const modalList = document.getElementById('modal-waterings-list');
-
-				modalTitle.textContent = `📅 Próximas Regas: ${nickname}`;
-				modalList.innerHTML = '';
-
-				if (!reminders || reminders.length === 0) {
-					modalList.innerHTML = '<p class="text-muted">Nenhum agendamento projetado.</p>';
-				} else {
-					reminders.forEach(r => {
-						const div = document.createElement('div');
-						div.style.cssText = 'background: rgba(15,23,42,0.6); padding: 0.8rem; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center; gap: 0.5rem;';
-						div.innerHTML = `
-							<div>
-								<strong>${r.order}ª Rega:</strong> ${r.date} às ${r.time}
-							</div>
-							<span class="badge success">${r.status || 'Agendada'}</span>
-						`;
-						modalList.appendChild(div);
-					});
-				}
-
-				modal.classList.remove('hidden');
-			} catch (e) { }
-		}
-
-		function closeWateringsModal(e) {
-			document.getElementById('waterings-modal').classList.add('hidden');
-		}
-
-		async function deleteGardenPlant(id) {
-			if (!confirm('Deseja remover esta planta do jardim?')) return;
-			try {
-				await fetchAPI(`/api/garden/${id}`, 'DELETE');
-				showMessage('Planta removida.');
-				loadGarden();
-			} catch (e) { }
-		}
-
-		async function consultWeatherByCity(isForecast = false) {
-			const city = document.getElementById('weather-city-input').value.trim();
-			if (!city) {
-				showMessage('Informe o nome de uma cidade.', true);
-				return;
-			}
-			const endpoint = isForecast ? `/api/clima/forecast?cidade=${encodeURIComponent(city)}` : `/api/clima/current?cidade=${encodeURIComponent(city)}`;
-			await displayWeatherOutput(endpoint, isForecast, city);
-		}
-
-		async function consultWeatherByCoords(isForecast = false) {
-			const lat = document.getElementById('weather-lat-input').value;
-			const lon = document.getElementById('weather-lon-input').value;
-			if (!lat || !lon) {
-				showMessage('Informe latitude e longitude.', true);
-				return;
-			}
-			const endpoint = isForecast
-				? `/api/clima/forecast?latitude=${lat}&longitude=${lon}`
-				: `/api/clima/current?latitude=${lat}&longitude=${lon}`;
-			await displayWeatherOutput(endpoint, isForecast, `Lat: ${lat}, Lon: ${lon}`);
-		}
-
-		async function displayWeatherOutput(endpoint, isForecast, locationTitle) {
-			try {
-				const data = await fetchAPI(endpoint);
-				const container = document.getElementById('weather-display-result');
-				const currentCard = document.getElementById('weather-current-card');
-				const forecastContainer = document.getElementById('weather-forecast-container');
-				const forecastGrid = document.getElementById('forecast-grid');
-
-				container.style.display = 'block';
-
-				if (isForecast) {
-					forecastContainer.style.display = 'block';
-					currentCard.innerHTML = `<h3>Previsão para ${locationTitle}</h3><p class="text-muted">Próximos períodos:</p>`;
-					forecastGrid.innerHTML = '';
-
-					if (Array.isArray(data)) {
-						data.forEach(item => {
-							const box = document.createElement('div');
-							box.className = 'forecast-box';
-							box.innerHTML = `
-								<div style="font-size: 0.75rem; color: var(--accent); font-weight: 600;">${item.horario || item.dataHora?.split(' ')[1] || ''}</div>
-								<div style="font-size: 1rem; font-weight: bold; margin: 0.2rem 0;">${item.temperatura}°C</div>
-								<div style="font-size: 0.7rem; color: var(--text-muted);">${item.descricao || ''}</div>
-								<div style="font-size: 0.65rem; margin-top: 0.2rem;">💧 ${item.umidade}%</div>
-							`;
-							forecastGrid.appendChild(box);
-						});
-					}
-				} else {
-					forecastContainer.style.display = 'none';
-					currentCard.innerHTML = `
-						<h3>${data.cidade || locationTitle}</h3>
-						<div style="display: flex; gap: 1rem; align-items: center; margin-top: 0.5rem; flex-wrap: wrap;">
-							<div style="font-size: 1.8rem; font-weight: bold; color: var(--primary);">${data.temperatura}°C</div>
-							<div style="font-size: 0.85rem;">
-								<p><strong>Condição:</strong> ${data.descricao || 'Tempo aberto'}</p>
-								<p><strong>Sensação:</strong> ${data.sensacaoTermica}°C</p>
-								<p><strong>Umidade:</strong> ${data.umidade}%</p>
-								<p><strong>Chuva:</strong> ${data.chovendo ? 'Sim 🌧️' : 'Não ☀️'}</p>
-							</div>
-						</div>
-					`;
-				}
-			} catch (e) { }
-		}
-
-		function openPublicWeatherModal() {
-			document.getElementById('public-weather-modal').classList.remove('hidden');
-		}
-
-		function closePublicWeatherModal(e) {
-			document.getElementById('public-weather-modal').classList.add('hidden');
-		}
-
-		async function quickFetchWeather(isForecast) {
-			const city = document.getElementById('quick-weather-city').value.trim();
-			if (!city) return;
-			const endpoint = isForecast ? `/api/clima/forecast?cidade=${encodeURIComponent(city)}` : `/api/clima/current?cidade=${encodeURIComponent(city)}`;
-			const output = document.getElementById('quick-weather-output');
-			output.innerHTML = '<p class="text-muted">Consultando clima...</p>';
-
-			try {
-				const res = await fetch(`${API_URL}${endpoint}`, {
-					headers: {'ngrok-skip-browser-warning': 'true'}
-				});
-				const data = await res.json();
-
-				if (isForecast && Array.isArray(data)) {
-					output.innerHTML = `<h4>Previsão para ${city}:</h4>`;
-					const grid = document.createElement('div');
-					grid.className = 'forecast-grid';
-					data.slice(0, 6).forEach(item => {
-						grid.innerHTML += `
-							<div class="forecast-box">
-								<div style="font-size: 0.75rem; color: var(--accent);">${item.horario || ''}</div>
-								<strong>${item.temperatura}°C</strong>
-								<div style="font-size: 0.7rem;">${item.descricao || ''}</div>
-							</div>
-						`;
-					});
-					output.appendChild(grid);
-				} else {
-					output.innerHTML = `
-						<div style="background: rgba(15,23,42,0.7); padding: 0.8rem; border-radius: 8px;">
-							<h4>${data.cidade || city}</h4>
-							<p style="font-size: 1.5rem; font-weight: bold; color: var(--primary);">${data.temperatura}°C</p>
-							<p style="font-size: 0.85rem;"><strong>Condição:</strong> ${data.descricao}</p>
-							<p style="font-size: 0.85rem;"><strong>Umidade:</strong> ${data.umidade}% | <strong>Sensação:</strong> ${data.sensacaoTermica}°C</p>
-							<p style="font-size: 0.85rem;"><strong>Chuva:</strong> ${data.chovendo ? '🌧️ Sim' : '☀️ Não'}</p>
-						</div>
-					`;
-				}
-			} catch (e) {
-				output.innerHTML = `<p class="danger" style="color: var(--danger);">Erro ao consultar: ${e.message}</p>`;
-			}
-		}
-
+		// SOCIAL
 		document.getElementById('search-user-form').addEventListener('submit', async (e) => {
 			e.preventDefault();
 			const query = document.getElementById('search-username-input').value;
@@ -2281,12 +1588,10 @@
 				const users = await fetchAPI(`/api/user/search?username=${encodeURIComponent(query)}`);
 				const list = document.getElementById('search-results-list');
 				list.innerHTML = '';
-
 				if (!users || users.length === 0) {
-					list.innerHTML = '<p class="text-muted">Nenhum usuário encontrado.</p>';
+					list.innerHTML = '<p style="color: var(--text-muted);">Nenhum usuário encontrado.</p>';
 					return;
 				}
-
 				users.forEach(u => {
 					const div = document.createElement('div');
 					div.className = 'item-card';
@@ -2294,11 +1599,10 @@
 						<div>
 							<h3>${u.name}</h3>
 							<p>@${u.username}</p>
-							<p style="word-break: break-all;">${u.email}</p>
 						</div>
 						<div class="item-actions">
 							<button class="btn-sm" onclick="followUser('${u.id}')">➕ Seguir</button>
-							<button class="btn-sm danger" onclick="unfollowUser('${u.id}')">➖ Deixar de seguir</button>
+							<button class="btn-sm danger" onclick="unfollowUser('${u.id}')">➖ Deixar de Seguir</button>
 						</div>
 					`;
 					list.appendChild(div);
@@ -2316,124 +1620,127 @@
 		async function unfollowUser(userId) {
 			try {
 				await fetchAPI(`/api/user/${userId}/unfollow`, 'DELETE');
-				showMessage('Você deixou de seguir este usuário!');
+				showMessage('Você deixou de seguir este usuário.');
 			} catch (e) { }
 		}
 
 		async function loadMyFollowers() {
 			try {
-				const list = document.getElementById('social-relations-list');
-				list.innerHTML = '<p class="text-muted">Carregando...</p>';
-
-				if (!currentUserId) {
-					await loadUserProfile();
-				}
-
 				const followers = await fetchAPI(`/api/user/${currentUserId}/followers`);
+				const list = document.getElementById('social-relations-list');
 				list.innerHTML = '';
-
 				if (!followers || followers.length === 0) {
-					list.innerHTML = '<p class="text-muted">Você não possui seguidores.</p>';
+					list.innerHTML = '<p style="color: var(--text-muted);">Sem seguidores.</p>';
 					return;
 				}
-
 				followers.forEach(u => {
-					const div = document.createElement('div');
-					div.className = 'item-card';
-					div.innerHTML = `
-						<div>
-							<h3>${u.name}</h3>
-							<p>@${u.username}</p>
-						</div>
-						<div class="item-actions">
-							<button class="btn-sm danger" onclick="removeFollower('${u.id}')">❌ Remover</button>
-						</div>
-					`;
-					list.appendChild(div);
+					list.innerHTML += `<div class="item-card"><h3>${u.name}</h3><p>@${u.username}</p></div>`;
 				});
 			} catch (e) { }
 		}
 
 		async function loadMyFollowing() {
 			try {
-				const list = document.getElementById('social-relations-list');
-				list.innerHTML = '<p class="text-muted">Carregando...</p>';
-
-				if (!currentUserId) {
-					await loadUserProfile();
-				}
-
 				const following = await fetchAPI(`/api/user/${currentUserId}/following`);
+				const list = document.getElementById('social-relations-list');
 				list.innerHTML = '';
-
 				if (!following || following.length === 0) {
-					list.innerHTML = '<p class="text-muted">Você não segue ninguém.</p>';
+					list.innerHTML = '<p style="color: var(--text-muted);">Você não segue ninguém.</p>';
 					return;
 				}
-
 				following.forEach(u => {
-					const div = document.createElement('div');
-					div.className = 'item-card';
-					div.innerHTML = `
-						<div>
-							<h3>${u.name}</h3>
-							<p>@${u.username}</p>
-						</div>
-						<div class="item-actions">
-							<button class="btn-sm danger" onclick="unfollowUser('${u.id}')">➖ Deixar de seguir</button>
-						</div>
-					`;
-					list.appendChild(div);
+					list.innerHTML += `<div class="item-card"><h3>${u.name}</h3><p>@${u.username}</p></div>`;
 				});
 			} catch (e) { }
 		}
 
-		async function removeFollower(followerId) {
-			if (!confirm('Remover este seguidor?')) return;
+		// CLIMA
+		async function consultWeatherByCity(isForecast = false) {
+			const city = document.getElementById('weather-city-input').value.trim();
+			if (!city) {showMessage('Informe o nome de uma cidade.', true); return;}
+			const endpoint = isForecast ? `/api/clima/forecast?cidade=${encodeURIComponent(city)}` : `/api/clima/current?cidade=${encodeURIComponent(city)}`;
 			try {
-				await fetchAPI(`/api/user/followers/${followerId}`, 'DELETE');
-				showMessage('Seguidor removido!');
-				loadMyFollowers();
+				const data = await fetchAPI(endpoint);
+				const container = document.getElementById('weather-display-result');
+				const currentCard = document.getElementById('weather-current-card');
+				container.style.display = 'block';
+
+				if (isForecast) {
+					document.getElementById('weather-forecast-container').style.display = 'block';
+					currentCard.innerHTML = `<h3>Previsão para ${city}</h3>`;
+					const grid = document.getElementById('forecast-grid');
+					grid.innerHTML = '';
+					data.slice(0, 8).forEach(item => {
+						grid.innerHTML += `
+							<div class="item-card">
+								<strong>${item.horario || ''}</strong>
+								<div style="font-size: 1.2rem; font-weight: bold; color: var(--color-emerald);">${item.temperatura}°C</div>
+								<p>${item.descricao || ''}</p>
+							</div>
+						`;
+					});
+				} else {
+					document.getElementById('weather-forecast-container').style.display = 'none';
+					currentCard.innerHTML = `
+						<h3>${data.cidade || city}</h3>
+						<p style="font-size: 1.5rem; font-weight: bold; color: var(--color-emerald);">${data.temperatura}°C</p>
+						<p><strong>Condição:</strong> ${data.descricao}</p>
+						<p><strong>Umidade:</strong> ${data.umidade}% | <strong>Sensação:</strong> ${data.sensacaoTermica}°C</p>
+						<p><strong>Chuva:</strong> ${data.chovendo ? '🌧️ Sim' : '☀️ Não'}</p>
+					`;
+				}
 			} catch (e) { }
 		}
 
+		function openPublicWeatherModal() {document.getElementById('public-weather-modal').classList.remove('hidden');}
+		function closePublicWeatherModal() {document.getElementById('public-weather-modal').classList.add('hidden');}
+
+		async function quickFetchWeather(isForecast) {
+			const city = document.getElementById('quick-weather-city').value.trim();
+			if (!city) return;
+			const endpoint = isForecast ? `/api/clima/forecast?cidade=${encodeURIComponent(city)}` : `/api/clima/current?cidade=${encodeURIComponent(city)}`;
+			const output = document.getElementById('quick-weather-output');
+			output.innerHTML = '<p>Consultando...</p>';
+			try {
+				const res = await fetch(`${API_URL}${endpoint}`, {headers: {'ngrok-skip-browser-warning': 'true'}});
+				const data = await res.json();
+				if (isForecast && Array.isArray(data)) {
+					output.innerHTML = `<h4>Previsão ${city}:</h4>`;
+					data.slice(0, 4).forEach(i => {
+						output.innerHTML += `<div class="badge">${i.horario || ''}: ${i.temperatura}°C (${i.descricao || ''})</div> `;
+					});
+				} else {
+					output.innerHTML = `
+						<div style="background: var(--color-soft-green); padding: 0.8rem; border-radius: 8px;">
+							<h4>${data.cidade || city}</h4>
+							<p style="font-size: 1.3rem; font-weight: bold;">${data.temperatura}°C</p>
+							<p>${data.descricao} | Umidade: ${data.umidade}%</p>
+						</div>
+					`;
+				}
+			} catch (e) {output.innerHTML = `<p class="danger">Erro: ${e.message}</p>`;}
+		}
+
+		// CONQUISTAS
 		async function loadAchievements() {
 			try {
 				const achievements = await fetchAPI('/api/achievements');
 				const list = document.getElementById('achievements-list');
 				list.innerHTML = '';
-
 				if (!achievements || achievements.length === 0) {
-					list.innerHTML = '<p class="text-muted">Nenhuma conquista desbloqueada.</p>';
-					userAchievementsCount = 0;
+					list.innerHTML = '<p style="color: var(--text-muted);">Nenhuma conquista desbloqueada ainda.</p>';
 					return;
 				}
-
-				if (userAchievementsCount > 0 && achievements.length > userAchievementsCount) {
-					const ultimaConquista = achievements[achievements.length - 1];
-					const desc = ultimaConquista.description || ultimaConquista.achievement?.name;
-					showMessage(`🎉 Nova Conquista: ${desc}`);
-				}
-				userAchievementsCount = achievements.length;
-
 				achievements.forEach(ach => {
-					const div = document.createElement('div');
-					div.className = 'item-card';
-
-					const title = ach.achievement ? `${ach.achievement.name}` : (ach.description || 'Conquista');
+					const title = ach.achievement ? ach.achievement.name : (ach.description || 'Conquista');
 					const desc = ach.achievement ? ach.achievement.description : '';
-					const date = ach.unlockedAt || ach.createdAt
-						? new Date(ach.unlockedAt || ach.createdAt).toLocaleDateString('pt-BR')
-						: 'Data N/I';
-
-					div.innerHTML = `
-						<div>
+					list.innerHTML += `
+						<div class="item-card">
 							<h3>🏆 ${title}</h3>
 							${desc ? `<p>${desc}</p>` : ''}
-							<p style="font-size: 0.75rem; color: var(--accent); margin-top: 0.3rem;">Desbloqueado em: ${date}</p>
+							<span class="badge success">Desbloqueado</span>
 						</div>
 					`;
-					list.appendChild(div);
 				});
 			} catch (e) { }
 		}
@@ -2443,53 +1750,18 @@
 				const catalog = await fetchAPI('/api/achievements/catalog');
 				const list = document.getElementById('achievements-list');
 				list.innerHTML = '';
-
-				if (!catalog || catalog.length === 0) {
-					list.innerHTML = '<p class="text-muted">Catálogo vazio.</p>';
-					return;
-				}
-
 				catalog.forEach(item => {
-					const div = document.createElement('div');
-					div.className = 'item-card';
-					div.innerHTML = `
-						<div>
+					list.innerHTML += `
+						<div class="item-card">
 							<h3>🏅 ${item.name}</h3>
 							<p>${item.description || 'Sem descrição.'}</p>
-							<span class="badge">${item.code || 'CONQUISTA'}</span>
 						</div>
 					`;
-					list.appendChild(div);
 				});
-				showMessage('Catálogo carregado.');
 			} catch (e) { }
 		}
 
-		document.getElementById('achievement-form').addEventListener('submit', async (e) => {
-			e.preventDefault();
-			const type = document.getElementById('achievement-type').value;
-
-			const endpoints = {
-				'cultivar3': '/api/achievements/cultivar-3',
-				'cultivar5': '/api/achievements/cultivar-5',
-				'cultivar10': '/api/achievements/cultivar-10',
-				'cuidar3': '/api/achievements/cuidar-3-dias',
-				'cuidar5': '/api/achievements/cuidar-5-dias',
-				'cuidar10': '/api/achievements/cuidar-10-dias',
-				'crescimento': '/api/achievements/estagio-crescimento',
-				'colheita': '/api/achievements/estagio-colheita'
-			};
-
-			const targetEndpoint = endpoints[type];
-			if (!targetEndpoint) return;
-
-			try {
-				await fetchAPI(targetEndpoint, 'POST');
-				showMessage('Conquista registrada!');
-				loadAchievements();
-			} catch (e) { }
-		});
-
+		// INICIALIZAÇÃO
 		init();
 	</script>
 </body>

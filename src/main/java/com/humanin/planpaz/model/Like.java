@@ -5,6 +5,8 @@ import java.util.UUID;
 
 import org.hibernate.annotations.CreationTimestamp;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -21,12 +23,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(
-	name = "likes",
-	uniqueConstraints = {
-		@UniqueConstraint(name = "uk_like_author_post", columnNames = {"author_id", "post_id"})
-	}
-)
+@Table(name = "likes", uniqueConstraints = {
+		@UniqueConstraint(name = "uk_like_author_post", columnNames = { "author_id", "post_id" }) })
 @Getter
 @Setter
 @AllArgsConstructor
@@ -39,10 +37,12 @@ public class Like {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "author_id", nullable = false)
+	@JsonIgnore
 	private User author;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "post_id", nullable = false)
+	@JsonIgnore
 	private Post post;
 
 	@CreationTimestamp

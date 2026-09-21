@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.humanin.planpaz.model.enums.Room;
 
 import jakarta.persistence.Column;
@@ -36,6 +37,7 @@ public class GardenPlant {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "owner_id", nullable = false)
+	@JsonIgnore
 	private User owner;
 
 	@ManyToOne(fetch = FetchType.EAGER)
@@ -64,5 +66,6 @@ public class GardenPlant {
 	@Enumerated(EnumType.STRING)
 	private Room room;
 
+	@Column(name = "image_path", columnDefinition = "TEXT")
 	private String imagePath;
 }

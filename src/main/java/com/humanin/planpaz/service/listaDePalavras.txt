@@ -1,0 +1,143 @@
+
+
+# Configuração do Filtro de Moderação - Lista Expandida de Termos Inadequados e Spam
+
+
+
+# ==================== SPAM E GOLPES ====================
+compreagora,ganhedinheiro,clickaqui,promocaoimperdivel,descontoexclusivo,\
+lucrofacil,rendaextra,linknabio,chamaingbox,pixfacil,ofertalimitada,\
+ganheja,dinheirofacil,investimentoalto,rendagarantida,lucrogarantido,\
+cliqueaqui,acesseaqui,linkbio,chamepv,chameinbox,ofertaunicas,\
+
+# ==================== PALAVRÕES CLÁSSICOS ====================
+caralho,caralhos,caralhao,caralhão,caralhinho,krl,krlo,krlh,crl,\
+porra,porras,porraaa,prr,prra,\
+merda,merdas,merdinha,mrd,mrs,\
+bosta,bostas,bostinha,\
+foda,fodas,foder,fodendo,fodido,fodida,fodidos,fodidas,\
+fudido,fudida,fudidos,fudidas,fuder,fudendo,\
+puta,putas,puto,putos,putinha,putinho,putonas,putão,putao,\
+filho da puta,filha da puta,filhos da puta,filhas da puta,\
+filhadaputa,filhadaputa,fdp,fdps,fdup,fdpq,\
+arrombado,arrombada,arrombados,arrombadas,arrombadao,arrombadão,\
+desgraça,desgraçado,desgraçada,desgraçados,desgraçadas,desgracado,\
+vagabundo,vagabunda,vagabundos,vagabundas,vagabundao,\
+escroto,escrota,escrotos,escrotas,escrotinho,\
+lixo,lixos,lixoso,lixosa,lixosos,lixosas,\
+nojento,nojenta,nojentos,nojentas,\
+asqueroso,asquerosa,asquerosos,asquerosas,\
+
+# ==================== ÓRGÃOS E TERMOS SEXUAIS ====================
+cu,cus,cuzinho,cuzão,cuzona,cuzões,cuzonas,cuzao,cuzona,\
+buceta,bucetinha,bucetão,bucetao,bucetuda,bucetudo,\
+xoxota,xota,xotinha,ppk,ppks,\
+pau,pauzudo,pauzuda,pauzudos,pauzudas,pauzao,pauzão,\
+pinto,pintinho,pintão,pintao,\
+cacete,cacetao,cacetão,caceta,\
+rola,rolas,rolinha,rolão,rolao,\
+piroca,pirocas,pirocão,pirocudo,pirocuda,\
+pica,picas,picão,picao,\
+rola grossa,pau duro,pau mole,\
+xereca,xerequinha,xana,xaninha,\
+pepeca,pepeka,pepekinha,\
+grelo,grelinho,clitóris (em contexto ofensivo),\
+saco,sacão,saco de merda,\
+bolas,bolão,testículos (em contexto ofensivo),\
+
+# ==================== EXPRESSÕES COMPOSTAS MUITO USADAS ====================
+vai se foder,vai se fuder,vai se foder,vsf,vail se foder,\
+vai tomar no cu,vtnc,vai tomar no seu cu,vai pro cu,\
+vai pro caralho,vpc,vai pro inferno,vai pra puta que pariu,\
+puta que pariu,puta que o pariu,pqp,pqpariu,pq o pariu,\
+filho de uma puta,filha de uma puta,fdup,\
+pau no cu,pnc,pau no seu cu,pau no cu dele,pau no cu dela,\
+toma no cu,toma no seu cu,tnc,\
+chupa,chupar,chupador,chupadora,chupando,chupeta,\
+mama,mamar,mamando,mamador,mamadora,\
+foder o cu,foder a buceta,foder a xota,\
+enfia no cu,enfia no seu cu,enfia essa,\
+come merda,come bosta,come porra,\
+vai cagar,vai mijar,vai se lascar,\
+
+# ==================== OFENSAS PESSOAIS E INSULTOS ====================
+idiota,idiotas,idiotaço,\
+imbecil,imbecis,imbeciloide,\
+otario,otário,otarios,otários,otaria,otarias,\
+babaca,babacas,babacão,babacão,\
+burro,burra,burros,burras,burrão,burrona,\
+retardado,retardada,retardados,retardadas,retarda,\
+mongol,mongoloide,mongolóide,mongolóides,\
+débil,debiloide,débil mental,\
+estupido,estúpido,estupida,estúpida,\
+inútil,inuteis,inúteis,\
+fracassado,fracassada,fracassados,fracassadas,\
+perdedor,perdedora,loser,\
+corno,corna,cornos,cornas,chifrudo,chifruda,chifrudos,\
+corno manso,corna mansa,\
+safado,safada,safados,safadas,safadão,safadona,\
+piranha,piranhas,piranhão,\
+vadia,vadias,vadio,vadios,\
+prostituta,puto,putinha,putão,\
+galinha,galinhas,galinhagem,\
+
+# ==================== TERMOS HOMÓFOBOS / TRANSFÓBICOS (ofensivos) ====================
+viado,viados,viadinho,viadão,viadao,\
+bicha,bichas,bichinha,bichona,bichonas,\
+veado,veados,veadinho,veadão,\
+bichona,bichonas,bichonaço,\
+sapatão,sapatona,sapatão,sapatonas,\
+traveco,travecos,travecão,traveca,\
+travesti (quando usado de forma pejorativa),\
+viado de merda,bicha nojenta,\
+
+# ==================== TERMOS RACISTAS / XENOFOBOS (ofensivos) ====================
+preto,preta,pretos,pretas (em contexto racista),\
+negrão,negrona,neguinho,neguinha (pejorativo),\
+macaco,macaca,macacos,macacas (racista),\
+crioulo,crioula,crioulos (racista),\
+japa,japinha,japs,japones (xenófobo),\
+china,chinês,chinesa,chinks (xenófobo),\
+judeu,judia,judeus (antissemita),\
+turco,turca (em contexto ofensivo),\
+baiano,baiana (quando usado como ofensa),\
+nordestino,nordestina (quando usado pejorativamente),\
+
+# ==================== OUTRAS OFENSAS FORTES ====================
+filho da puta,filha da puta,\
+filho de uma égua,filha de uma égua,\
+filho de uma cadela,filha de uma cadela,\
+desgraçado do caralho,desgraçada do caralho,\
+seu merda,sua merda,seu bosta,sua bosta,\
+seu cu,sua buceta,seu pau,sua xota,\
+vai se ferrar,vai se lascar,vai se danar,\
+se foder,se fuder,se foda,\
+que se foda,que se foder,qsf,\
+foda-se,fodase,foda se,fs,\
+caralho de merda,porra de merda,merda de porra,\
+
+# ==================== ABREVIAÇÕES E GÍRIAS DE CHAT ====================
+krl,krlo,krlh,crl,crlh,\
+prr,prra,pra,\
+mrd,mrs,mrdinha,\
+fdp,fdps,fdup,fdpq,\
+vsf,vtnc,vpc,pqp,pqpariu,pnc,tnc,\
+arromb,arrombada,arrombado,\
+cuzão,cuzona,cuzao,cuzona,\
+bct,xota,ppk,rola,piroca,pica,\
+viado,bicha,sapatão,traveco,\
+corno,chifrudo,safado,piranha,\
+babaca,otario,idiota,imbecil,burro,\
+retardado,mongol,escroto,nojento,\
+
+# ==================== VARIAÇÕES REGIONAIS E MENOS COMUNS ====================
+porra louca,caralho velho,merda seca,\
+cu de burro,cu de mula,cu de cavalo,\
+pau de arara,pau de sebo,\
+rola de macaco,pau de anão,\
+buceta fedida,xota fedorenta,cu fedido,\
+saco de porra,saco de merda,\
+filho da mãe,filha da mãe,\
+desgraça da porra,desgraça do caralho,\
+vai pra puta que te pariu,vai pra puta que o pariu,\
+toma essa porra,enfia essa porra,engole essa porra

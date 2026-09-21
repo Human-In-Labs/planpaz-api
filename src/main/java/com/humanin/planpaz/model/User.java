@@ -113,6 +113,9 @@ public class User {
 	@Column(name = "fcm_token")
 	private String fcmToken;
 
+	@Column(name = "avatar_url", columnDefinition = "TEXT")
+	private String avatarUrl;
+
 	// ===== VERIFICAÇÃO DE E-MAIL =====
 
 	@Column(name = "email_verified", nullable = false)

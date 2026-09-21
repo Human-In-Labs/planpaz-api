@@ -6,7 +6,9 @@ import java.util.UUID;
 import org.hibernate.annotations.CreationTimestamp;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.humanin.planpaz.model.enums.ActivityType;
+import com.humanin.planpaz.model.enums.ReportContentType;
+import com.humanin.planpaz.model.enums.ReportReason;
+import com.humanin.planpaz.model.enums.ReportStatus;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -25,31 +27,39 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "activity")
+@Table(name = "reports")
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Activity {
+public class Report {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.UUID)
 	private UUID id;
 
+	@Enumerated(EnumType.STRING)
+	@Column(name = "content_type", nullable = false)
+	private ReportContentType contentType;
+
+	@Column(name = "content_id", nullable = false)
+	private UUID contentId;
+
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "user_id", nullable = false)
+	@JoinColumn(name = "reporter_id", nullable = false)
 	@JsonIgnore
-	private User user;
+	private User reporter;
 
 	@Enumerated(EnumType.STRING)
-	@Column(name = "activity_type", nullable = false)
-	private ActivityType activityType;
+	@Column(name = "reason", nullable = false)
+	private ReportReason reason;
 
-	@Column(name = "target_id")
-	private UUID targetId;
+	@Column(columnDefinition = "TEXT")
+	private String message;
 
-	@Column(length = 50)
-	private String description;
+	@Enumerated(EnumType.STRING)
+	@Column(name = "status", nullable = false)
+	private ReportStatus status = ReportStatus.PENDING;
 
 	@CreationTimestamp
 	@Column(name = "created_at", nullable = false, updatable = false)

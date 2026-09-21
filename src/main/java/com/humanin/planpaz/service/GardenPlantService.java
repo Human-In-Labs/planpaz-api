@@ -12,12 +12,12 @@ import org.springframework.transaction.annotation.Transactional;
 import com.humanin.planpaz.infra.exception.BusinessException;
 import com.humanin.planpaz.infra.exception.ResourceNotFoundException;
 import com.humanin.planpaz.model.GardenPlant;
+import com.humanin.planpaz.model.PlantStage;
 import com.humanin.planpaz.model.Plant;
 import com.humanin.planpaz.model.PlantStage;
 import com.humanin.planpaz.repositories.GardenPlantRepository;
 import com.humanin.planpaz.repositories.PlantRepository;
 import com.humanin.planpaz.repositories.PlantStageRepository;
-
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -70,16 +70,19 @@ public class GardenPlantService {
 	}
 
 	// LISTAR
+	@Transactional(readOnly = true)
 	public List<GardenPlant> listarPorUsuario(UUID ownerId) {
 		return gardenPlantRepository.findByOwnerId(ownerId);
 	}
 
 	// BUSCAR POR ID E USUÁRIO
+	@Transactional(readOnly = true)
 	public GardenPlant buscarPorIdEUsuario(UUID id, UUID ownerId) {
 		return gardenPlantRepository.findByIdAndOwnerId(id, ownerId)
 				.orElseThrow(() -> new ResourceNotFoundException("Planta não encontrada para este usuário."));
 	}
 
+	@Transactional(readOnly = true)
 	public Optional<GardenPlant> buscarPorId(UUID id) {
 		return gardenPlantRepository.findById(id);
 	}
@@ -99,8 +102,24 @@ public class GardenPlantService {
 			throw new BusinessException("Já existe uma planta com esse apelido.");
 		}
 
-		planta.setNickname(gardenPlant.getNickname());
-		planta.setStage(gardenPlant.getStage());
+		if (gardenPlant.getNickname() != null) {
+			planta.setNickname(gardenPlant.getNickname());
+		}
+		if (gardenPlant.getStage() != null) {
+			planta.setStage(gardenPlant.getStage());
+		}
+		if (gardenPlant.getRoom() != null) {
+			planta.setRoom(gardenPlant.getRoom());
+		}
+		if (gardenPlant.getDirectRain() != null) {
+			planta.setDirectRain(gardenPlant.getDirectRain());
+		}
+		if (gardenPlant.getWateringNotification() != null) {
+			planta.setWateringNotification(gardenPlant.getWateringNotification());
+		}
+		if (gardenPlant.getImagePath() != null) {
+			planta.setImagePath(gardenPlant.getImagePath());
+		}
 
 		if (gardenPlant.getLastWatering() != null) {
 			planta.setLastWatering(gardenPlant.getLastWatering());

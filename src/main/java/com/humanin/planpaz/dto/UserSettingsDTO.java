@@ -17,51 +17,19 @@ import com.humanin.planpaz.model.enums.TimeAvailability;
 /**
  * DTO completo para tela de perfil e configurações do usuário.
  */
-public record UserSettingsDTO(
-    UUID id,
-    String name,
-    String username,
-    String email,
-    String bio,
-    LocalDate birthdate,
-    Gender gender,
-    MainGoal mainGoal,
-    Set<RoomLuminosity> roomLuminosity,
-    Set<SpaceAvailability> spaceAvailability,
-    ExperienceLevel experienceLevel,
-    TimeAvailability timeAvailability,
-    LocalTime wateringTime,
-    Integer ecoscore,
-    String cityName,
-    Double latitude,
-    Double longitude,
-    String fcmToken,
-    LocalDateTime createdAt
-) {
-    public static UserSettingsDTO fromEntity(User user) {
-        if (user == null) {
-            return null;
-        }
-        return new UserSettingsDTO(
-            user.getId(),
-            user.getName(),
-            user.getUsername(),
-            user.getEmail(),
-            user.getBio(),
-            user.getBirthdate(),
-            user.getGender(),
-            user.getMainGoal(),
-            user.getRoomLuminosity(),
-            user.getSpaceAvailability(),
-            user.getExperienceLevel(),
-            user.getTimeAvailability(),
-            user.getWateringTime(),
-            user.getEcoscore(),
-            user.getCityName(),
-            user.getLatitude(),
-            user.getLongitude(),
-            user.getFcmToken(),
-            user.getCreatedAt()
-        );
-    }
+public record UserSettingsDTO(UUID id, String name, String username, String email, String bio, LocalDate birthdate,
+		Gender gender, MainGoal mainGoal, Set<RoomLuminosity> roomLuminosity, Set<SpaceAvailability> spaceAvailability,
+		ExperienceLevel experienceLevel, TimeAvailability timeAvailability, LocalTime wateringTime, Integer ecoscore,
+		String cityName, Double latitude, Double longitude, String fcmToken, // <-- Adicionado aqui
+		String avatarUrl, LocalDateTime createdAt) {
+	public static UserSettingsDTO fromEntity(User user) {
+		if (user == null) {
+			return null;
+		}
+		return new UserSettingsDTO(user.getId(), user.getName(), user.getUsername(), user.getEmail(), user.getBio(),
+				user.getBirthdate(), user.getGender(), user.getMainGoal(), user.getRoomLuminosity(),
+				user.getSpaceAvailability(), user.getExperienceLevel(), user.getTimeAvailability(),
+				user.getWateringTime(), user.getEcoscore(), user.getCityName(), user.getLatitude(), user.getLongitude(),
+				user.getFcmToken(), user.getAvatarUrl(), user.getCreatedAt());
+	}
 }

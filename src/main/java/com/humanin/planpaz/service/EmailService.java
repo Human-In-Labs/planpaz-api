@@ -36,8 +36,8 @@ public class EmailService {
 			"✨ Frase do Dia: \"Cada folha nova é uma vitória da sua dedicação!\" 🍃🎉\n\n",
 			"✨ Frase do Dia: \"O amor e a atenção que você dedica hoje voltam em forma de natureza viva.\" 💚🌷\n\n");
 
-	//Sorteia uma frase aleatória da lista.
-	 
+	// Sorteia uma frase aleatória da lista.
+
 	private String obterFraseAleatoria() {
 		int index = ThreadLocalRandom.current().nextInt(frasesMotivacionais.size());
 		return frasesMotivacionais.get(index);
@@ -123,14 +123,55 @@ public class EmailService {
 		mailSender.send(message);
 	}
 
+	// ======================================
+	// E-MAIL DE DENÚNCIA / MODERAÇÃO (RF14)
+	// ======================================
+
+	public void enviarEmailDeDenuncia(String paraEquipe, String contentType, String contentId, String authorUsername,
+			String reporterUsername, String reason, String mensagemJustificativa, String conteudoDenunciado) {
+		SimpleMailMessage message = new SimpleMailMessage();
+
+		String destino = (paraEquipe != null && !paraEquipe.isBlank()) ? paraEquipe : "moderacao@planpaz.com";
+		message.setTo(destino);
+		message.setSubject("🚨 [MODERAÇÃO PLANPAZ] Nova Denúncia de Conteúdo (" + contentType + ")");
+
+		StringBuilder body = new StringBuilder();
+		body.append("🚨 NOTIFICAÇÃO DE DENÚNCIA DE CONTEÚDO 🚨\n\n");
+		body.append("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
+		body.append("📌 Tipo de Conteúdo: ").append(contentType).append("\n");
+		body.append("🆔 ID do Conteúdo Denunciado: ").append(contentId).append("\n");
+		body.append("👤 Autor do Conteúdo: @")
+				.append(authorUsername != null ? authorUsername.replace("@", "") : "Desconhecido").append("\n");
+		body.append("🕵️ Usuário Denunciante: @")
+				.append(reporterUsername != null ? reporterUsername.replace("@", "") : "Anônimo").append("\n");
+		body.append("⚠️ Tipo / Motivo da Denúncia: ").append(reason).append("\n");
+		if (mensagemJustificativa != null && !mensagemJustificativa.isBlank()) {
+			body.append("💬 Mensagem / Justificativa: ").append(mensagemJustificativa).append("\n");
+		}
+		body.append("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n");
+		body.append("📝 TEXTO DO CONTEÚDO DENUNCIADO:\n");
+		body.append("\"").append(conteudoDenunciado != null ? conteudoDenunciado : "(Sem texto / imagem)")
+				.append("\"\n\n");
+		body.append("Por favor, acesse o painel de moderação para analisar e tomar as providências necessárias.\n\n");
+		body.append("Atenciosamente,\nSistema de Moderação PlanPaz");
+
+		message.setText(body.toString());
+
+		try {
+			mailSender.send(message);
+		} catch (Exception e) {
+			System.err.println("[EMAIL MODERACAO] Erro ao enviar e-mail de denúncia: " + e.getMessage());
+		}
+	}
+
 	private String formatarStatusRega(String status) {
 		if (status == null) {
 			return "🌿 Em dia -";
 		}
 		return switch (status) {
-			case "atrasado" -> "🔴 Atrasada -";
-			case "hoje" -> "💧 Regar hoje -";
-			default -> "🌿 Em dia -";
+		case "atrasado" -> "🔴 Atrasada -";
+		case "hoje" -> "💧 Regar hoje -";
+		default -> "🌿 Em dia -";
 		};
 	}
 }

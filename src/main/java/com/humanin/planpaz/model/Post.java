@@ -50,6 +50,7 @@ public class Post {
 	@Column(columnDefinition = "TEXT")
 	private String content;
 
+	@Column(name = "media", columnDefinition = "TEXT")
 	private String media;
 
 	@Convert(converter = StringListConverter.class)

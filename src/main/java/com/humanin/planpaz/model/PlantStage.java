@@ -2,6 +2,8 @@ package com.humanin.planpaz.model;
 
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -30,6 +32,7 @@ public class PlantStage {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "plant_id", nullable = false)
+	@JsonIgnore
 	private Plant plant;
 
 	@Column(nullable = false, length = 50)

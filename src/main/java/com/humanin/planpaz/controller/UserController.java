@@ -1,6 +1,7 @@
 package com.humanin.planpaz.controller;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.humanin.planpaz.dto.ApiResponseDTO;
+import com.humanin.planpaz.dto.PublicUserProfileDTO;
 import com.humanin.planpaz.dto.UserPreferencesDTO;
 import com.humanin.planpaz.dto.UserSettingsDTO;
 import com.humanin.planpaz.dto.UserSummaryDTO;
@@ -74,6 +76,16 @@ public class UserController {
 	}
 
 	// ==========================
+	// VERIFICA DISPONIBILIDADE DO USERNAME
+	// ==========================
+
+	@GetMapping("/check-username")
+	public ResponseEntity<Map<String, Boolean>> checkUsernameAvailability(@RequestParam String username) {
+		boolean exists = userService.existsByUsername(username);
+		return ResponseEntity.ok(Map.of("exists", exists, "available", !exists));
+	}
+
+	// ==========================
 	// PESQUISA USUÁRIOS PELO USERNAME
 	// ==========================
 
@@ -122,6 +134,17 @@ public class UserController {
 	public ResponseEntity<List<UserSummaryDTO>> getFollowing(@PathVariable UUID id) {
 		List<UserSummaryDTO> following = userService.getFollowing(id);
 		return ResponseEntity.ok(following);
+	}
+
+	// ==========================
+	// PERFIL PÚBLICO DO USUÁRIO
+	// ==========================
+
+	@GetMapping("/{id}/profile")
+	public ResponseEntity<PublicUserProfileDTO> getPublicProfile(@AuthenticationPrincipal User currentUser,
+			@PathVariable UUID id) {
+		PublicUserProfileDTO profile = userService.getPublicUserProfile(currentUser, id);
+		return ResponseEntity.ok(profile);
 	}
 
 	// ==========================
