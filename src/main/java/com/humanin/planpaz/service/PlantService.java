@@ -15,6 +15,7 @@ import com.humanin.planpaz.model.Plant;
 import com.humanin.planpaz.model.User;
 import com.humanin.planpaz.model.enums.LuminosityLevel;
 import com.humanin.planpaz.model.enums.Size;
+import com.humanin.planpaz.model.enums.TemperatureLevel;
 import com.humanin.planpaz.model.enums.Type;
 import com.humanin.planpaz.model.enums.WateringLevel;
 import com.humanin.planpaz.repositories.PlantRepository;
@@ -42,7 +43,7 @@ public class PlantService {
 
 	@Transactional(readOnly = true)
 	public List<PlantResponseDTO> listarECalcularRecomendacoes(User userParam, String search, String typeStr,
-			String luminosityStr, String wateringStr, String sizeStr) {
+			String temperatureStr, String luminosityStr, String wateringStr, String sizeStr) {
 
 		User user = null;
 		if (userParam != null) {
@@ -66,6 +67,7 @@ public class PlantService {
 		LuminosityLevel luminosity = parseEnum(LuminosityLevel.class, luminosityStr);
 		WateringLevel watering = parseEnum(WateringLevel.class, wateringStr);
 		Size size = parseEnum(Size.class, sizeStr);
+		TemperatureLevel temperature = parseEnum(TemperatureLevel.class, temperatureStr);
 
 		List<Plant> plantas = plantRepository.findAll();
 		final User finalUser = user;
@@ -92,6 +94,8 @@ public class PlantService {
 				return false;
 			if (size != null && p.getSize() != size)
 				return false;
+			if (temperature != null && p.getTemperatureLevel() != temperature)
+    			return false;
 			return true;
 		}).map(p -> {
 			int score = calcularScoreMatch(p, finalUser);

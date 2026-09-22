@@ -98,6 +98,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/auth/register").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/user/check-username").permitAll()
                 .requestMatchers("/test", "/test.html").permitAll()
                 .requestMatchers("/api/clima/**").permitAll()
                 .requestMatchers("/error").permitAll()
