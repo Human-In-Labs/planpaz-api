@@ -13,7 +13,8 @@ public record OpenWeatherResponse(
         List<WeatherData> weather,
         Rain rain,
         Double pop,
-        Integer timezone
+        Integer timezone,
+        WindData wind
 ) {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -39,6 +40,12 @@ public record OpenWeatherResponse(
     public record Rain(
             @JsonProperty("1h") Double oneHour,
             @JsonProperty("3h") Double threeHours
+    ) {
+    }
+    
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public record WindData(
+            Double speed
     ) {
     }
 }

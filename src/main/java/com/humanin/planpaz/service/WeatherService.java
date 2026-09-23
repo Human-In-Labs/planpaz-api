@@ -201,40 +201,43 @@ public class WeatherService {
 
         if (response.pop() != null) {
             probabilidadeChuva =
-                    Math.round(response.pop() * 100.0 * 10.0) / 10.0;
-
+                    Math.round(
+                            response.pop()
+                                    * 100.0
+                                    * 10.0
+                    ) / 10.0;
         } else if (isChovendo) {
             probabilidadeChuva = 100.0;
         }
 
-        ZoneId currentZone = ZoneId.systemDefault();
+        Double velocidadeVentoKmh = null;
 
-        if (response.timezone() != null) {
-            currentZone = ZoneOffset.ofTotalSeconds(
-                    response.timezone()
-            );
+        if (
+                response.wind() != null
+                        && response.wind().speed() != null
+        ) {
+            velocidadeVentoKmh =
+                    Math.round(
+                            response.wind().speed()
+                                    * 3.6
+                                    * 10.0
+                    ) / 10.0;
         }
 
-        String dataHora;
-
-        if (response.dt() != null) {
-            dataHora = LocalDateTime.ofInstant(
-                            Instant.ofEpochSecond(response.dt()),
-                            currentZone
-                    )
-                    .format(
-                            DateTimeFormatter.ofPattern(
-                                    "yyyy-MM-dd HH:mm:ss"
-                            )
-                    );
-        } else {
-            dataHora = LocalDateTime.now(currentZone)
-                    .format(
-                            DateTimeFormatter.ofPattern(
-                                    "yyyy-MM-dd HH:mm:ss"
-                            )
-                    );
-        }
+        String dataHora = response.dt() != null
+                ? Instant.ofEpochSecond(response.dt())
+                        .atZone(ZoneId.systemDefault())
+                        .format(
+                                DateTimeFormatter.ofPattern(
+                                        "yyyy-MM-dd HH:mm:ss"
+                                )
+                        )
+                : LocalDateTime.now()
+                        .format(
+                                DateTimeFormatter.ofPattern(
+                                        "yyyy-MM-dd HH:mm:ss"
+                                )
+                        );
 
         return new WeatherResponseDTO(
                 descricao,
@@ -243,6 +246,7 @@ public class WeatherService {
                 response.main().tempMin(),
                 response.main().tempMax(),
                 response.main().humidity(),
+                velocidadeVentoKmh,
                 probabilidadeChuva,
                 isChovendo,
                 icone,

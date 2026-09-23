@@ -10,6 +10,7 @@ public record WeatherResponseDTO(
     Double tempMin,
     Double tempMax,
     Integer umidade,
+    Double velocidadeVentoKmh,
     Double probabilidadeChuva,
     Boolean chovendo,
     String icone,
