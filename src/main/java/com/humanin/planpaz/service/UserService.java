@@ -1,5 +1,6 @@
 package com.humanin.planpaz.service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -12,6 +13,7 @@ import com.humanin.planpaz.dto.AchievementProgressDTO;
 import com.humanin.planpaz.dto.PublicUserProfileDTO;
 import com.humanin.planpaz.dto.UserPreferencesDTO;
 import com.humanin.planpaz.dto.UserSettingsDTO;
+import com.humanin.planpaz.dto.UserStatsDTO;
 import com.humanin.planpaz.dto.UserSummaryDTO;
 import com.humanin.planpaz.infra.exception.BusinessException;
 import com.humanin.planpaz.infra.exception.ResourceNotFoundException;
@@ -35,6 +37,39 @@ public class UserService {
 	private final AchievementService achievementService;
 
 	@Transactional(readOnly = true)
+	public UserStatsDTO getUserStats(UUID targetUserId) {
+		User targetUser = findUserById(targetUserId);
+
+		List<com.humanin.planpaz.model.GardenPlant> gardenPlants = gardenPlantRepository.findByOwnerId(targetUserId);
+		long totalPlants = gardenPlants.size();
+		long totalPosts = postRepository.countByAuthorId(targetUserId);
+
+		long daysOnApp = 0;
+		if (targetUser.getCreatedAt() != null) {
+			daysOnApp = Math.max(0, ChronoUnit.DAYS.between(targetUser.getCreatedAt(), LocalDateTime.now()));
+		}
+
+		double totalCo2Grams = 0.0;
+		for (com.humanin.planpaz.model.GardenPlant planta : gardenPlants) {
+			long cultivationDays = 0;
+			if (planta.getPlantedAt() != null) {
+				cultivationDays = Math.max(0,
+						ChronoUnit.DAYS.between(planta.getPlantedAt().toLocalDate(), LocalDate.now()));
+			}
+			double co2PerYear = (planta.getPlant() != null
+					&& planta.getPlant().getSize() == com.humanin.planpaz.model.enums.Size.LARGE) ? 1300.0 : 50.0;
+			totalCo2Grams += cultivationDays * (co2PerYear / 365.0);
+		}
+		totalCo2Grams = java.math.BigDecimal.valueOf(totalCo2Grams).setScale(1, java.math.RoundingMode.HALF_UP)
+				.doubleValue();
+
+		int totalEcoScore = targetUser.getEcoscore() != null ? targetUser.getEcoscore() : 0;
+
+		return new com.humanin.planpaz.dto.UserStatsDTO(targetUser.getId(), totalCo2Grams, totalEcoScore, totalPlants,
+				totalPosts, daysOnApp);
+	}
+
+	@Transactional(readOnly = true)
 	public PublicUserProfileDTO getPublicUserProfile(User currentUser, UUID targetUserId) {
 		User targetUser = findUserById(targetUserId);
 
@@ -43,22 +78,14 @@ public class UserService {
 		boolean isFollowing = currentUser != null
 				&& followersRepository.existsByFollowerAndFollowed(currentUser, targetUser);
 
-		long totalPlants = gardenPlantRepository.countByOwnerId(targetUserId);
-		long totalPosts = postRepository.countByAuthorId(targetUserId);
-
-		long daysOnApp = 0;
-		if (targetUser.getCreatedAt() != null) {
-			daysOnApp = Math.max(0, ChronoUnit.DAYS.between(targetUser.getCreatedAt(), LocalDateTime.now()));
-		}
-
-		long carbonPoints = targetUser.getEcoscore() != null ? targetUser.getEcoscore().longValue()
-				: (totalPlants * 10);
+		UserStatsDTO stats = getUserStats(targetUserId);
 
 		List<AchievementProgressDTO> achievements = achievementService.obterConquistasProgressoDoUsuario(targetUserId);
 
 		return new PublicUserProfileDTO(targetUser.getId(), targetUser.getName(), targetUser.getUsername(),
 				targetUser.getEmail(), targetUser.getBio(), targetUser.getAvatarUrl(), followersCount, followingCount,
-				isFollowing, totalPlants, totalPosts, daysOnApp, carbonPoints, achievements);
+				isFollowing, stats.totalPlants(), stats.totalPosts(), stats.daysOnApp(),
+				Math.round(stats.totalCo2Grams()), stats.totalEcoScore(), achievements);
 	}
 
 	@Transactional(readOnly = true)

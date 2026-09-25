@@ -37,16 +37,16 @@ public class PlantController {
 	@GetMapping
 	public ResponseEntity<List<PlantResponseDTO>> listSpecies(@RequestParam(required = false) String search,
 			@RequestParam(required = false) String type, @RequestParam(required = false) String luminosity,
-			@RequestParam(required = false) String watering, @RequestParam(required = false) String temperature, @RequestParam(required = false) String size,
-			Authentication authentication) {
+			@RequestParam(required = false) String watering, @RequestParam(required = false) String temperature,
+			@RequestParam(required = false) String size, Authentication authentication) {
 
 		User user = null;
 		if (authentication != null && authentication.getPrincipal() instanceof User authenticatedUser) {
 			user = authenticatedUser;
 		}
 
-		List<PlantResponseDTO> resultado = plantService.listarECalcularRecomendacoes(user, search, type, temperature, luminosity,
-				watering, size);
+		List<PlantResponseDTO> resultado = plantService.listarECalcularRecomendacoes(user, search, type, temperature,
+				luminosity, watering, size);
 
 		return ResponseEntity.ok(resultado);
 	}

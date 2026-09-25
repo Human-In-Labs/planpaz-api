@@ -34,6 +34,10 @@ public class PostResponseDTO {
 	private boolean likedByCurrentUser;
 	private long commentsCount;
 
+	// Conquistas desbloqueadas pela ação
+	private AchievementProgressDTO unlockedAchievement;
+	private List<AchievementProgressDTO> unlockedAchievements;
+
 	public static PostResponseDTO fromEntity(Post post, long likesCount, boolean likedByCurrentUser,
 			long commentsCount) {
 		PostResponseDTO dto = new PostResponseDTO();

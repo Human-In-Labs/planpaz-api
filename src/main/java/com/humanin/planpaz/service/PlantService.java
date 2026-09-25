@@ -95,7 +95,7 @@ public class PlantService {
 			if (size != null && p.getSize() != size)
 				return false;
 			if (temperature != null && p.getTemperatureLevel() != temperature)
-    			return false;
+				return false;
 			return true;
 		}).map(p -> {
 			int score = calcularScoreMatch(p, finalUser);

@@ -17,4 +17,7 @@ public interface CommentRepository extends JpaRepository<Comment, UUID> {
 
 	// Conta total de comentários em um post
 	long countByPostId(UUID postId);
+
+	// Conta total de comentários feitos por um autor
+	long countByAuthorId(UUID authorId);
 }

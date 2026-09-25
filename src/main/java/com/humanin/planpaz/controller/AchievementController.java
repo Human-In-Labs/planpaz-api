@@ -35,7 +35,16 @@ public class AchievementController {
 	@GetMapping("/me")
 	public ResponseEntity<List<AchievementProgressDTO>> getMyAchievementsProgress(Authentication authentication) {
 		User user = getAuthenticatedUser(authentication);
+		achievementService.checkAndGrantAll(user.getId());
 		List<AchievementProgressDTO> conquistas = achievementService.obterConquistasProgressoDoUsuario(user.getId());
+		return ResponseEntity.ok(conquistas);
+	}
+
+	@GetMapping("/user/{userId}")
+	public ResponseEntity<List<AchievementProgressDTO>> getUserAchievementsProgress(
+			@org.springframework.web.bind.annotation.PathVariable java.util.UUID userId) {
+		achievementService.checkAndGrantAll(userId);
+		List<AchievementProgressDTO> conquistas = achievementService.obterConquistasProgressoDoUsuario(userId);
 		return ResponseEntity.ok(conquistas);
 	}
 

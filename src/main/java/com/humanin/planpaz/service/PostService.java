@@ -29,6 +29,7 @@ public class PostService {
 	private final LikeRepository likeRepository;
 	private final CommentRepository commentRepository;
 	private final ContentModerationService contentModerationService;
+	private final AchievementService achievementService;
 
 	@Transactional
 	public PostResponseDTO createPost(PostCreateDTO dto) {
@@ -51,7 +52,26 @@ public class PostService {
 		}
 
 		Post savedPost = postRepository.save(post);
-		return mapToDTO(savedPost, dto.getAuthorId());
+
+		// Atribuir +5 EcoScore ao autor pela criação do post
+		int currentEcoscore = author.getEcoscore() != null ? author.getEcoscore() : 0;
+		author.setEcoscore(currentEcoscore + 5);
+		userRepository.save(author);
+
+		List<com.humanin.planpaz.dto.AchievementProgressDTO> unlockedList = List.of();
+		try {
+			unlockedList = achievementService.checkAndGrantAll(author.getId());
+		} catch (Exception e) {
+			// ignore
+		}
+
+		PostResponseDTO response = mapToDTO(savedPost, dto.getAuthorId());
+		if (unlockedList != null && !unlockedList.isEmpty()) {
+			response.setUnlockedAchievement(unlockedList.get(0));
+			response.setUnlockedAchievements(unlockedList);
+		}
+
+		return response;
 	}
 
 	@Transactional(readOnly = true)

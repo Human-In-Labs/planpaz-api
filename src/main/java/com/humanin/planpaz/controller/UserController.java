@@ -20,6 +20,7 @@ import com.humanin.planpaz.dto.ApiResponseDTO;
 import com.humanin.planpaz.dto.PublicUserProfileDTO;
 import com.humanin.planpaz.dto.UserPreferencesDTO;
 import com.humanin.planpaz.dto.UserSettingsDTO;
+import com.humanin.planpaz.dto.UserStatsDTO;
 import com.humanin.planpaz.dto.UserSummaryDTO;
 import com.humanin.planpaz.model.User;
 import com.humanin.planpaz.service.UserService;
@@ -41,6 +42,26 @@ public class UserController {
 	public ResponseEntity<String> getUser() {
 		System.out.println("[SUCESS] Usuário autenticado com token válido.");
 		return ResponseEntity.ok("Sucesso!");
+	}
+
+	// ==========================
+	// RETORNA ESTATÍSTICAS DO USUÁRIO AUTENTICADO
+	// ==========================
+
+	@GetMapping("/stats")
+	public ResponseEntity<UserStatsDTO> getMyStats(@AuthenticationPrincipal User currentUser) {
+		UserStatsDTO stats = userService.getUserStats(currentUser.getId());
+		return ResponseEntity.ok(stats);
+	}
+
+	// ==========================
+	// RETORNA ESTATÍSTICAS DO USUÁRIO POR ID
+	// ==========================
+
+	@GetMapping("/{id}/stats")
+	public ResponseEntity<UserStatsDTO> getUserStatsById(@PathVariable UUID id) {
+		UserStatsDTO stats = userService.getUserStats(id);
+		return ResponseEntity.ok(stats);
 	}
 
 	// ==========================

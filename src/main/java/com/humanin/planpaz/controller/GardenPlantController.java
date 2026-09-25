@@ -16,26 +16,36 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.humanin.planpaz.dto.ApiResponseDTO;
-import com.humanin.planpaz.dto.WeatherResponseDTO;
+import com.humanin.planpaz.dto.PlantStatsDTO;
 import com.humanin.planpaz.dto.WateringReminderDTO;
 import com.humanin.planpaz.dto.WateringStatusDTO;
+import com.humanin.planpaz.dto.WeatherResponseDTO;
 import com.humanin.planpaz.model.GardenPlant;
 import com.humanin.planpaz.model.User;
-import com.humanin.planpaz.service.WeatherService;
-// import com.humanin.planpaz.service.EmailService;
 import com.humanin.planpaz.service.GardenPlantService;
 import com.humanin.planpaz.service.WateringService;
+import com.humanin.planpaz.service.WeatherService;
 
 import lombok.RequiredArgsConstructor;
 
+import com.humanin.planpaz.dto.AchievementProgressDTO;
+import com.humanin.planpaz.service.AchievementService;
+
 @RestController
-@RequestMapping({"/api/garden", "/api/user-plants"})
-@RequiredArgsConstructor
+@RequestMapping({"/api/garden", "/api/user-plants", "/api/plants"})
 public class GardenPlantController {
 	private final GardenPlantService gardenPlantService;
 	private final WeatherService weatherService;
 	private final WateringService wateringService;
-	// private final EmailService emailService;
+	private final AchievementService achievementService;
+
+	public GardenPlantController(GardenPlantService gardenPlantService, WeatherService weatherService,
+			WateringService wateringService, AchievementService achievementService) {
+		this.gardenPlantService = gardenPlantService;
+		this.weatherService = weatherService;
+		this.wateringService = wateringService;
+		this.achievementService = achievementService;
+	}
 
 	private User getAuthenticatedUser(Authentication authentication) {
 		return (User) authentication.getPrincipal();
@@ -50,7 +60,8 @@ public class GardenPlantController {
 		User user = getAuthenticatedUser(authentication);
 		gardenPlant.setOwner(user);
 		gardenPlantService.adicionarPlanta(gardenPlant);
-		return ResponseEntity.ok(ApiResponseDTO.ok("Planta adicionada com sucesso ao seu jardim!"));
+		List<AchievementProgressDTO> unlockedList = achievementService.checkAndGrantAll(user.getId());
+		return ResponseEntity.ok(ApiResponseDTO.ok("Planta adicionada com sucesso ao seu jardim!", unlockedList));
 	}
 
 	// =========================
@@ -73,6 +84,17 @@ public class GardenPlantController {
 		User user = getAuthenticatedUser(authentication);
 		GardenPlant planta = gardenPlantService.buscarPorIdEUsuario(id, user.getId());
 		return ResponseEntity.ok(planta);
+	}
+
+	// =========================
+	// ESTATÍSTICAS DA PLANTA (CO₂ + ECOSCORE)
+	// =========================
+
+	@GetMapping("/{id}/stats")
+	public ResponseEntity<PlantStatsDTO> getPlantStats(@PathVariable UUID id, Authentication authentication) {
+		User user = getAuthenticatedUser(authentication);
+		PlantStatsDTO stats = gardenPlantService.getPlantStats(id, user.getId());
+		return ResponseEntity.ok(stats);
 	}
 
 	// =========================
@@ -124,15 +146,40 @@ public class GardenPlantController {
 	// REGAR PLANTA DO MEU JARDIM
 	// =========================
 
-	@PostMapping("/watering/{id}")
+	@PostMapping({"/watering/{id}", "/{id}/care/water"})
 	public ResponseEntity<ApiResponseDTO> waterGardenPlant(@PathVariable UUID id, Authentication authentication) {
 		User user = getAuthenticatedUser(authentication);
 		wateringService.registrarRega(id, user.getId());
-		return ResponseEntity.ok(ApiResponseDTO.ok("Planta regada com sucesso!"));
+		List<AchievementProgressDTO> unlockedList = achievementService.checkAndGrantAll(user.getId());
+		return ResponseEntity.ok(ApiResponseDTO.ok("Planta regada com sucesso!", unlockedList));
 	}
 
 	// =========================
-	// CONSULTAR STATUS DE REGA + CLIMA + NOTIFICAÇÃO DE EMAIL
+	// ADUBAR PLANTA DO MEU JARDIM
+	// =========================
+
+	@PostMapping({"/fertilize/{id}", "/{id}/care/fertilize"})
+	public ResponseEntity<ApiResponseDTO> fertilizeGardenPlant(@PathVariable UUID id, Authentication authentication) {
+		User user = getAuthenticatedUser(authentication);
+		gardenPlantService.adubarPlanta(id, user.getId());
+		List<AchievementProgressDTO> unlockedList = achievementService.checkAndGrantAll(user.getId());
+		return ResponseEntity.ok(ApiResponseDTO.ok("Planta adubada com sucesso!", unlockedList));
+	}
+
+	// =========================
+	// PODAR PLANTA DO MEU JARDIM
+	// =========================
+
+	@PostMapping({"/prune/{id}", "/{id}/care/prune"})
+	public ResponseEntity<ApiResponseDTO> pruneGardenPlant(@PathVariable UUID id, Authentication authentication) {
+		User user = getAuthenticatedUser(authentication);
+		gardenPlantService.podarPlanta(id, user.getId());
+		List<AchievementProgressDTO> unlockedList = achievementService.checkAndGrantAll(user.getId());
+		return ResponseEntity.ok(ApiResponseDTO.ok("Planta podada com sucesso!", unlockedList));
+	}
+
+	// =========================
+	// CONSULTAR STATUS DE REGA + CLIMA
 	// =========================
 
 	@GetMapping("/watering-status/{id}")
@@ -149,9 +196,6 @@ public class GardenPlantController {
 
 		// Processa a recomendação com base nas regras do sistema
 		String recomendacao = wateringService.analisarClima(planta, clima);
-
-		// Dispara o e-mail de notificação para o usuário autenticado
-		// emailService.enviarAlertaRega(user.getEmail(), planta.getNickname(), recomendacao);
 
 		WateringStatusDTO resposta = new WateringStatusDTO(planta.getId(), planta.getNickname(), cidade, clima.getTemperatura(),
 				clima.getUmidade(), clima.isChovendo(), recomendacao);

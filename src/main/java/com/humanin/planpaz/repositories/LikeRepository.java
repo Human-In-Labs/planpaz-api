@@ -16,4 +16,7 @@ public interface LikeRepository extends JpaRepository<Like, UUID> {
 
 	// Conta o total de curtidas do post
 	long countByPostId(UUID postId);
+
+	// Conta o total de curtidas recebidas em todas as publicações de um autor
+	long countByPostAuthorId(UUID authorId);
 }

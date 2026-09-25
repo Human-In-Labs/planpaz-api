@@ -99,7 +99,10 @@ public class User {
 	private LocalTime wateringTime;
 
 	@Column(name = "ecoscore")
-	private Integer ecoscore;
+	private Integer ecoscore = 0;
+
+	@Column(name = "highest_like_tier")
+	private Integer highestLikeTier = 0;
 
 	@Column(name = "latitude")
 	private Double latitude;

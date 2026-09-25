@@ -25,6 +25,7 @@ public class AuthService {
 	private final UserRepository userRepository;
 	private final PasswordEncoder passwordEncoder;
 	private final TokenService tokenService;
+	private final AchievementService achievementService;
 	// private final EmailService emailService; // TEMPORARIAMENTE DESATIVADO
 
 	@Value("${app.base-url}")
@@ -95,11 +96,17 @@ public class AuthService {
 		// Conta começa não verificada, com um token de confirmação válido por 24h
 		newUser.setEmailVerified(true);
 
-		userRepository.save(newUser);
+		User savedUser = userRepository.save(newUser);
+
+		try {
+			achievementService.checkAndGrantAll(savedUser.getId());
+		} catch (Exception e) {
+			log.error("Erro ao conceder conquistas iniciais: {}", e.getMessage());
+		}
 
 		// enviarEmailDeVerificacao(newUser); // TEMPORARIAMENTE DESATIVADO
 
-		log.info("Novo usuário registrado: {}", newUser.getUsername());
+		log.info("Novo usuário registrado: {}", savedUser.getUsername());
 
 		// Retorna o token JWT diretamente no registro para facilitar o uso sem precisar enviar e-mail
 		String token = tokenService.generateToken(newUser);

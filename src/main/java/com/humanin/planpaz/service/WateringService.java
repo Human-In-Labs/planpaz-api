@@ -8,33 +8,85 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.humanin.planpaz.dto.WateringReminderDTO;
 import com.humanin.planpaz.dto.WeatherResponseDTO;
+import com.humanin.planpaz.infra.exception.BusinessException;
 import com.humanin.planpaz.model.GardenPlant;
+import com.humanin.planpaz.model.PlantCareLog;
+import com.humanin.planpaz.model.User;
+import com.humanin.planpaz.model.enums.CareType;
 import com.humanin.planpaz.model.enums.WateringLevel;
 import com.humanin.planpaz.repositories.GardenPlantRepository;
+import com.humanin.planpaz.repositories.PlantCareLogRepository;
+import com.humanin.planpaz.repositories.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 
 @Service
-@RequiredArgsConstructor 
+@RequiredArgsConstructor
 public class WateringService {
 	private final GardenPlantRepository gardenPlantRepository;
 	private final GardenPlantService gardenPlantService;
 	private final AchievementService achievementService;
+	private final PlantCareLogRepository plantCareLogRepository;
+	private final UserRepository userRepository;
 
 	// ============================
-	// CONCLUIR REGA DE PLANTA DO MEU JARDIM (TODO: TER QUE PASSAR A DATA COMO PARÂMETRO, PORQUE ASSIM VOCÊ PODE CONCLUIR LEMBRETES DE OUTROS DIAS)
+	// CONCLUIR REGA DE PLANTA DO MEU JARDIM
 	// ============================
 
+	@Transactional
 	public void registrarRega(UUID id, UUID ownerId) {
 		GardenPlant planta = gardenPlantService.buscarPorIdEUsuario(id, ownerId);
+		LocalDate hoje = LocalDate.now();
 
-		planta.setLastWatering(LocalDate.now());
+		// Validação de rega no máximo 1x ao dia por planta
+		if (planta.getLastWatering() != null && planta.getLastWatering().isEqual(hoje)) {
+			throw new BusinessException("Você já regou esta planta hoje! Só é possível regá-la 1 vez ao dia.");
+		}
+
+		// Atualiza o Streak de cuidados da planta
+		int streakActual = planta.getStreakDays() != null ? planta.getStreakDays() : 0;
+		LocalDate lastCare = planta.getLastCareDate();
+
+		if (lastCare != null) {
+			if (lastCare.equals(hoje.minusDays(1))) {
+				streakActual += 1;
+			} else if (!lastCare.equals(hoje)) {
+				streakActual = 1;
+			}
+		} else {
+			streakActual = 1;
+		}
+
+		planta.setStreakDays(streakActual);
+		planta.setLastCareDate(hoje);
+		planta.setLastWatering(hoje);
+
+		// Cálculo de pontuação: +10 pts por rega + (+2 pts x dias de streak)
+		int pontosGanhos = 10 + (2 * streakActual);
+
+		int plantEcoscore = planta.getEcoscore() != null ? planta.getEcoscore() : 0;
+		planta.setEcoscore(plantEcoscore + pontosGanhos);
+
+		User owner = planta.getOwner();
+		int userEcoscore = owner.getEcoscore() != null ? owner.getEcoscore() : 0;
+		owner.setEcoscore(userEcoscore + pontosGanhos);
+
+		// Registrar log de manejo
+		PlantCareLog log = new PlantCareLog();
+		log.setGardenPlant(planta);
+		log.setUser(owner);
+		log.setCareType(CareType.WATERING);
+		log.setPointsEarned(pontosGanhos);
+		plantCareLogRepository.save(log);
+
 		gardenPlantRepository.save(planta);
+		userRepository.save(owner);
 
-		// VERIFICAÇÃO AUTOMÁTICA DE CONQUISTAS (Sequência de Cuidados)
+		// Verificação automática de conquistas
 		verificarConquistasDeSequencia(ownerId, planta);
 	}
 
@@ -66,23 +118,19 @@ public class WateringService {
 			return lembretes;
 		}
 
-		int intervaloDias = getDaysInterval(
-				planta.getPlant() != null ? planta.getPlant().getWateringLevel() : null
-		);
+		int intervaloDias = getDaysInterval(planta.getPlant() != null ? planta.getPlant().getWateringLevel() : null);
 
 		// data do primeiro lembrete
 		LocalDate dataBase = planta.getLastWatering();
 		if (dataBase == null) {
-			dataBase = planta.getPlantedAt() != null 
-					? planta.getPlantedAt().toLocalDate() 
+			dataBase = planta.getPlantedAt() != null ? planta.getPlantedAt().toLocalDate()
 					: LocalDate.now().minusDays(intervaloDias);
 		}
 
 		LocalDate proximaData = dataBase.plusDays(intervaloDias);
 		LocalDate hoje = LocalDate.now();
 
-		String imagem = (planta.getImagePath() != null && !planta.getImagePath().isBlank())
-				? planta.getImagePath()
+		String imagem = (planta.getImagePath() != null && !planta.getImagePath().isBlank()) ? planta.getImagePath()
 				: (planta.getPlant() != null ? planta.getPlant().getImagePath() : null);
 
 		DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM");
@@ -107,39 +155,24 @@ public class WateringService {
 				status = "pendente";
 			}
 
-			lembretes.add(new WateringReminderDTO(
-					i,
-					planta.getId(),
-					planta.getNickname(),
-					imagem,
-					dataLembrete.format(dateFormatter),
-					horario,
-					status
-			));
+			lembretes.add(new WateringReminderDTO(i, planta.getId(), planta.getNickname(), imagem,
+					dataLembrete.format(dateFormatter), horario, status));
 		}
 
 		return lembretes;
 	}
-
-	// ============================
-	// RETORNA A FREQUÊNCIA NÚMERICA DE DIAS PARA REGA
-	// ============================
 
 	private int getDaysInterval(WateringLevel level) {
 		if (level == null) {
 			return 3;
 		}
 		return switch (level) {
-			case DAILY -> 1;
-			case FREQUENT -> 3;
-			case WEEKLY -> 7;
-			case SPORADIC -> 14;
+		case DAILY -> 1;
+		case FREQUENT -> 3;
+		case WEEKLY -> 7;
+		case SPORADIC -> 14;
 		};
 	}
-
-	// ======================================
-	// ATUALIZAR REGA AUTOMATICAMENTE COM BASE NO CLIMA
-	// ======================================
 
 	public String analisarClima(GardenPlant planta, WeatherResponseDTO clima) {
 		if (planta == null) {
@@ -149,30 +182,21 @@ public class WateringService {
 			throw new IllegalArgumentException("Dados meteorológicos não podem ser nulos.");
 		}
 
-		// Regra 1: Se estiver chovendo, adia a rega para o dia seguinte
 		if (clima.isChovendo()) {
-			planta.setLastWatering(LocalDate.now()); // Considera "regada" pela chuva
+			planta.setLastWatering(LocalDate.now());
 			return "Chuva detectada na região. A rega foi adiada para amanhã!";
 		}
 
-		// Regra 2: Umidade muito alta (acima de 80%) diminui a necessidade de rega
-		// imediata
 		if (clima.getUmidade() > 80) {
 			return "Umidade do ar alta (" + clima.getUmidade() + "%). Não é necessário regar hoje.";
 		}
 
-		// Regra 3: Dias muito quentes (acima de 30°C) e secos aceleram a necessidade de
-		// rega
 		if (clima.getTemperatura() > 30.0 && clima.getUmidade() < 40) {
 			return "Alerta de calor e ar seco! Recomendado regar hoje no final da tarde.";
 		}
 
 		return "Condições normais. Siga o cronograma padrão da planta.";
 	}
-
-	// =============================
-	// MÉTODOS DE CONQUISTAS
-	// =============================
 
 	private void verificarConquistasDeSequencia(UUID ownerId, GardenPlant planta) {
 		if (planta.getPlantedAt() != null) {

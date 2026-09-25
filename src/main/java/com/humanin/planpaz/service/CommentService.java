@@ -1,5 +1,6 @@
 package com.humanin.planpaz.service;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.data.domain.Page;
@@ -27,6 +28,7 @@ public class CommentService {
 	private final PostRepository postRepository;
 	private final UserRepository userRepository;
 	private final ContentModerationService contentModerationService;
+	private final AchievementService achievementService;
 
 	@Transactional
 	public CommentResponseDTO addComment(UUID postId, CommentCreateDTO dto) {
@@ -50,7 +52,26 @@ public class CommentService {
 		}
 
 		Comment savedComment = commentRepository.save(comment);
-		return CommentResponseDTO.fromEntity(savedComment);
+
+		// Atribuir +2 EcoScore ao autor pelo comentário
+		int currentEcoscore = author.getEcoscore() != null ? author.getEcoscore() : 0;
+		author.setEcoscore(currentEcoscore + 2);
+		userRepository.save(author);
+
+		List<com.humanin.planpaz.dto.AchievementProgressDTO> unlockedList = List.of();
+		try {
+			unlockedList = achievementService.checkAndGrantAll(author.getId());
+		} catch (Exception e) {
+			// ignore
+		}
+
+		CommentResponseDTO response = CommentResponseDTO.fromEntity(savedComment);
+		if (unlockedList != null && !unlockedList.isEmpty()) {
+			response.setUnlockedAchievement(unlockedList.get(0));
+			response.setUnlockedAchievements(unlockedList);
+		}
+
+		return response;
 	}
 
 	@Transactional(readOnly = true)

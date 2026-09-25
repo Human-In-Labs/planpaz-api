@@ -43,6 +43,23 @@ public class LikeService {
 
 		Like like = new Like(author, post);
 		likeRepository.save(like);
+
+		// Verificar se o autor do post atingiu um NOVO patamar de 10 curtidas recebidas
+		if (post.getAuthor() != null) {
+			User postAuthor = post.getAuthor();
+			long totalReceivedLikes = likeRepository.countByPostAuthorId(postAuthor.getId());
+			int currentTier = (int) (totalReceivedLikes / 10);
+			int highestTier = postAuthor.getHighestLikeTier() != null ? postAuthor.getHighestLikeTier() : 0;
+
+			if (currentTier > highestTier) {
+				int newPoints = currentTier - highestTier;
+				postAuthor.setHighestLikeTier(currentTier);
+				int currentEcoscore = postAuthor.getEcoscore() != null ? postAuthor.getEcoscore() : 0;
+				postAuthor.setEcoscore(currentEcoscore + newPoints);
+				userRepository.save(postAuthor);
+			}
+		}
+
 		return true; // Curtiu
 	}
 

@@ -26,6 +26,10 @@ public class CommentResponseDTO {
 
 	private UUID parentCommentId;
 
+	// Conquistas desbloqueadas pela ação
+	private AchievementProgressDTO unlockedAchievement;
+	private java.util.List<AchievementProgressDTO> unlockedAchievements;
+
 	public static CommentResponseDTO fromEntity(Comment comment) {
 		CommentResponseDTO dto = new CommentResponseDTO();
 		dto.setId(comment.getId());

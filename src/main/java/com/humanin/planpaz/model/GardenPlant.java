@@ -53,6 +53,21 @@ public class GardenPlant {
 	@Column(name = "last_watering")
 	private LocalDate lastWatering;
 
+	@Column(name = "last_fertilizing")
+	private LocalDate lastFertilizing;
+
+	@Column(name = "last_pruning")
+	private LocalDate lastPruning;
+
+	@Column(name = "streak_days")
+	private Integer streakDays = 0;
+
+	@Column(name = "last_care_date")
+	private LocalDate lastCareDate;
+
+	@Column(name = "ecoscore")
+	private Integer ecoscore = 0;
+
 	@Column(name = "watering_notification")
 	private Boolean wateringNotification = true;
 
