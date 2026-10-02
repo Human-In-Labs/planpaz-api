@@ -30,6 +30,13 @@ public class GlobalExceptionHandler {
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
 	}
 
+	@ExceptionHandler(UserBannedException.class)
+	public ResponseEntity<ErrorResponseDTO> handleUserBanned(UserBannedException ex, HttpServletRequest request) {
+		ErrorResponseDTO error = new ErrorResponseDTO(HttpStatus.FORBIDDEN.value(),
+				HttpStatus.FORBIDDEN.getReasonPhrase(), ex.getMessage(), request.getRequestURI());
+		return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
+	}
+
 	@ExceptionHandler(IllegalArgumentException.class)
 	public ResponseEntity<ErrorResponseDTO> handleIllegalArgument(IllegalArgumentException ex,
 			HttpServletRequest request) {

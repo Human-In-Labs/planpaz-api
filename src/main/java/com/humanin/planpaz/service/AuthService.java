@@ -10,6 +10,7 @@ import com.humanin.planpaz.dto.LoginRequestDTO;
 import com.humanin.planpaz.dto.RegisterRequestDTO;
 import com.humanin.planpaz.dto.ResponseDTO;
 import com.humanin.planpaz.infra.exception.BusinessException;
+import com.humanin.planpaz.infra.exception.UserBannedException;
 import com.humanin.planpaz.infra.security.TokenService;
 import com.humanin.planpaz.model.User;
 import com.humanin.planpaz.repositories.UserRepository;
@@ -53,6 +54,11 @@ public class AuthService {
 		if (!passwordEncoder.matches(body.password(), user.getPassword())) {
 			log.warn("Falha de autenticação (senha incorreta) para o e-mail: {}", body.email());
 			throw new BadCredentialsException("Credenciais inválidas.");
+		}
+
+		if (Boolean.TRUE.equals(user.getBanned())) {
+			log.warn("Tentativa de login bloqueada para usuário banido: {}", body.email());
+			throw new UserBannedException("Sua conta foi suspensa por violar os termos de uso da plataforma. Entre em contato com o suporte para mais informações.");
 		}
 
 		/* TEMPORARIAMENTE DESATIVADO: Validação de e-mail no login

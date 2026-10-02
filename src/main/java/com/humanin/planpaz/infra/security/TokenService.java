@@ -10,6 +10,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.humanin.planpaz.model.Admin;
 import com.humanin.planpaz.model.User;
 
 @Service
@@ -23,10 +24,25 @@ public class TokenService {
 			Algorithm algorithm = Algorithm.HMAC256(secret);
 
 			return JWT.create().withIssuer("planpaz-api").withSubject(user.getEmail())
+					.withClaim("role", "USER")
 					.withExpiresAt(this.generateExpirationDate()).sign(algorithm);
 
 		} catch (JWTCreationException e) {
 			throw new RuntimeException("Error while authenticating.", e);
+		}
+	}
+
+	public String generateAdminToken(Admin admin) {
+		try {
+			Algorithm algorithm = Algorithm.HMAC256(secret);
+
+			return JWT.create().withIssuer("planpaz-api").withSubject(admin.getEmail())
+					.withClaim("role", "ADMIN")
+					.withClaim("adminId", admin.getId().toString())
+					.withExpiresAt(this.generateExpirationDate()).sign(algorithm);
+
+		} catch (JWTCreationException e) {
+			throw new RuntimeException("Error while authenticating admin.", e);
 		}
 	}
 
@@ -36,13 +52,11 @@ public class TokenService {
 			return JWT.require(algorithm).withIssuer("planpaz-api").build().verify(token).getSubject();
 
 		} catch (JWTVerificationException e) {
-			// Retorna nulo se o token estiver expirado ou com assinatura inválida
 			return null;
 		}
 	}
 
-	// Gera expiração correta de 2 horas a partir do momento atual em UTC
 	private Instant generateExpirationDate() {
-		return Instant.now().plus(2, ChronoUnit.HOURS);
+		return Instant.now().plus(24, ChronoUnit.HOURS);
 	}
 }

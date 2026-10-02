@@ -196,4 +196,76 @@ public class EmailService {
 			System.err.println("[EMAIL RECUPERACAO] Erro ao enviar e-mail de recuperação: " + e.getMessage());
 		}
 	}
+
+	// ======================================
+	// E-MAILS DE MODERAÇÃO (RF51 / RF52)
+	// ======================================
+
+	public void enviarEmailBanimento(String para, String nomeUsuario, String motivo, String observacao) {
+		try {
+			SimpleMailMessage message = new SimpleMailMessage();
+			message.setTo(para);
+			message.setSubject("Conta Suspensa / Banida - PlanPaz");
+
+			StringBuilder body = new StringBuilder();
+			body.append("Olá, ").append(nomeUsuario != null && !nomeUsuario.isBlank() ? nomeUsuario : "Usuário").append("!\n\n");
+			body.append("Informamos que sua conta no PlanPaz foi SUSPENSA / BANIDA devido a violações dos termos da comunidade.\n\n");
+			if (motivo != null && !motivo.isBlank()) {
+				body.append("📌 Motivo da Denúncia: ").append(motivo).append("\n");
+			}
+			if (observacao != null && !observacao.isBlank()) {
+				body.append("💬 Observação do Moderador: ").append(observacao.trim()).append("\n");
+			}
+			body.append("\nCaso acredite que isso ocorreu por engano, por favor entre em contato com nosso suporte.\n\n");
+			body.append("Atenciosamente,\nEquipe de Moderação PlanPaz");
+
+			message.setText(body.toString());
+			mailSender.send(message);
+		} catch (Exception e) {
+			System.err.println("[EMAIL BANIMENTO] Erro ao enviar e-mail de banimento: " + e.getMessage());
+		}
+	}
+
+	public void enviarEmailAdvertencia(String para, String nomeUsuario, String contentType, String motivo, String observacao) {
+		try {
+			SimpleMailMessage message = new SimpleMailMessage();
+			message.setTo(para);
+			message.setSubject("⚠️ Alerta de Moderação - PlanPaz");
+
+			String tipo = (contentType != null && contentType.equalsIgnoreCase("POST")) ? "sua publicação" : "seu comentário";
+
+			StringBuilder body = new StringBuilder();
+			body.append("Olá, ").append(nomeUsuario != null && !nomeUsuario.isBlank() ? nomeUsuario : "Cultivador").append("! 🌿\n\n");
+			body.append("Informamos que ").append(tipo).append(" foi analisado pela equipe de moderação PlanPaz e você está recebendo uma ADVERTÊNCIA OFICIAL.\n\n");
+			if (motivo != null && !motivo.isBlank()) {
+				body.append("📌 Motivo da Denúncia: ").append(motivo).append("\n");
+			}
+			if (observacao != null && !observacao.isBlank()) {
+				body.append("💬 Observação do Moderador: ").append(observacao.trim()).append("\n");
+			}
+			body.append("\nPor favor, siga as diretrizes da comunidade para evitar penalidades mais graves, como o banimento da sua conta.\n\n");
+			body.append("Atenciosamente,\nEquipe de Moderação PlanPaz");
+
+			message.setText(body.toString());
+			mailSender.send(message);
+		} catch (Exception e) {
+			System.err.println("[EMAIL ADVERTENCIA] Erro ao enviar e-mail de advertência: " + e.getMessage());
+		}
+	}
+
+	// ======================================
+	// E-MAIL GENÉRICO DE NOTIFICAÇÃO
+	// ======================================
+
+	public void sendEmail(String para, String assunto, String conteudo) {
+		try {
+			SimpleMailMessage message = new SimpleMailMessage();
+			message.setTo(para);
+			message.setSubject(assunto);
+			message.setText(conteudo);
+			mailSender.send(message);
+		} catch (Exception e) {
+			System.err.println("[EMAIL SERVICE] Erro ao enviar e-mail generico: " + e.getMessage());
+		}
+	}
 }

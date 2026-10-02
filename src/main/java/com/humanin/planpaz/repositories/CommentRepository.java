@@ -4,6 +4,9 @@ import com.humanin.planpaz.model.Comment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.UUID;
 
@@ -21,11 +24,11 @@ public interface CommentRepository extends JpaRepository<Comment, UUID> {
 	// Conta total de comentários feitos por um autor
 	long countByAuthorId(UUID authorId);
 
-	@org.springframework.data.jpa.repository.Modifying
-	@org.springframework.data.jpa.repository.Query("DELETE FROM Comment c WHERE c.post.id = :postId")
-	void deleteByPostId(@org.springframework.data.repository.query.Param("postId") UUID postId);
+	@Modifying(clearAutomatically = true)
+	@Query("DELETE FROM Comment c WHERE c.post.id = :postId")
+	void deleteByPostId(@Param("postId") UUID postId);
 
-	@org.springframework.data.jpa.repository.Modifying
-	@org.springframework.data.jpa.repository.Query("DELETE FROM Comment c WHERE c.parentComment.id = :parentCommentId")
-	void deleteByParentCommentId(@org.springframework.data.repository.query.Param("parentCommentId") UUID parentCommentId);
+	@Modifying(clearAutomatically = true)
+	@Query("DELETE FROM Comment c WHERE c.parentComment.id = :parentCommentId")
+	void deleteByParentCommentId(@Param("parentCommentId") UUID parentCommentId);
 }

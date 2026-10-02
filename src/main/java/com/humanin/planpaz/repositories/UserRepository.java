@@ -21,4 +21,10 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
 	// Usado para validar o link de verificação de e-mail
 	Optional<User> findByVerificationToken(String verificationToken);
+
+	long countByBanned(Boolean banned);
+
+	List<User> findAllByOrderByCreatedAtDesc();
+
+	List<User> findByBannedOrderByCreatedAtDesc(Boolean banned);
 }

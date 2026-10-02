@@ -4,8 +4,10 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.humanin.planpaz.model.enums.ReportActionTaken;
 import com.humanin.planpaz.model.enums.ReportContentType;
 import com.humanin.planpaz.model.enums.ReportReason;
 import com.humanin.planpaz.model.enums.ReportStatus;
@@ -61,7 +63,20 @@ public class Report {
 	@Column(name = "status", nullable = false)
 	private ReportStatus status = ReportStatus.PENDING;
 
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "reviewed_by")
+	@JsonIgnore
+	private Admin reviewedBy;
+
+	@Enumerated(EnumType.STRING)
+	@Column(name = "action_taken", nullable = false)
+	private ReportActionTaken actionTaken = ReportActionTaken.NONE;
+
 	@CreationTimestamp
 	@Column(name = "created_at", nullable = false, updatable = false)
 	private LocalDateTime createdAt;
+
+	@UpdateTimestamp
+	@Column(name = "updated_at")
+	private LocalDateTime updatedAt;
 }

@@ -136,4 +136,9 @@ public class User {
 
 	@Column(name = "verification_token_expires_at")
 	private LocalDateTime verificationTokenExpiresAt;
+
+	// ===== MODERAÇÃO =====
+
+	@Column(name = "banned", nullable = false)
+	private Boolean banned = false;
 }
