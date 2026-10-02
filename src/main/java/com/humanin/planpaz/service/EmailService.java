@@ -174,4 +174,26 @@ public class EmailService {
 		default -> "🌿 Em dia -";
 		};
 	}
+
+	// ======================================
+	// E-MAIL DE CÓDIGO DE RECUPERAÇÃO DE SENHA (RF03)
+	// ======================================
+
+	public void enviarCodigoRecuperacaoSenha(String para, String nomeUsuario, String codigo) {
+		SimpleMailMessage message = new SimpleMailMessage();
+		message.setTo(para);
+		message.setSubject("🔑 PlanPaz | Código de Recuperação de Senha");
+		message.setText("Olá, " + (nomeUsuario != null ? nomeUsuario : "Cultivador") + "! 🌿\n\n" +
+				"Recebemos uma solicitação para redefinir a senha da sua conta no PlanPaz.\n\n" +
+				"Seu código de verificação é: " + codigo + "\n\n" +
+				"Este código expira em 15 minutos e é válido para uma única utilização.\n\n" +
+				"Se você não solicitou esta redefinição, por favor ignore este e-mail.\n\n" +
+				"Até logo! 🌱\nEquipe PlanPaz");
+
+		try {
+			mailSender.send(message);
+		} catch (Exception e) {
+			System.err.println("[EMAIL RECUPERACAO] Erro ao enviar e-mail de recuperação: " + e.getMessage());
+		}
+	}
 }

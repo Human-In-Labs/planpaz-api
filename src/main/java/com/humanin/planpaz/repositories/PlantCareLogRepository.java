@@ -14,12 +14,11 @@ import com.humanin.planpaz.model.enums.CareType;
 @Repository
 public interface PlantCareLogRepository extends JpaRepository<PlantCareLog, UUID> {
 	List<PlantCareLog> findByGardenPlantIdOrderByPerformedAtDesc(UUID gardenPlantId);
-
-	Optional<PlantCareLog> findFirstByGardenPlantIdAndCareTypeOrderByPerformedAtDesc(UUID gardenPlantId,
-			CareType careType);
+	
+	Optional<PlantCareLog> findFirstByGardenPlantIdAndCareTypeOrderByPerformedAtDesc(UUID gardenPlantId, CareType careType);
 
 	List<PlantCareLog> findByUserId(UUID userId);
-
+	
 	long countByUserIdAndCareType(UUID userId, CareType careType);
 
 	void deleteByGardenPlantId(UUID gardenPlantId);

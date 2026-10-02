@@ -20,4 +20,12 @@ public interface CommentRepository extends JpaRepository<Comment, UUID> {
 
 	// Conta total de comentários feitos por um autor
 	long countByAuthorId(UUID authorId);
+
+	@org.springframework.data.jpa.repository.Modifying
+	@org.springframework.data.jpa.repository.Query("DELETE FROM Comment c WHERE c.post.id = :postId")
+	void deleteByPostId(@org.springframework.data.repository.query.Param("postId") UUID postId);
+
+	@org.springframework.data.jpa.repository.Modifying
+	@org.springframework.data.jpa.repository.Query("DELETE FROM Comment c WHERE c.parentComment.id = :parentCommentId")
+	void deleteByParentCommentId(@org.springframework.data.repository.query.Param("parentCommentId") UUID parentCommentId);
 }

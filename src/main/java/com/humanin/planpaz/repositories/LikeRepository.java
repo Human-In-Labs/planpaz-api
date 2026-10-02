@@ -19,4 +19,8 @@ public interface LikeRepository extends JpaRepository<Like, UUID> {
 
 	// Conta o total de curtidas recebidas em todas as publicações de um autor
 	long countByPostAuthorId(UUID authorId);
+
+	@org.springframework.data.jpa.repository.Modifying
+	@org.springframework.data.jpa.repository.Query("DELETE FROM Like l WHERE l.post.id = :postId")
+	void deleteByPostId(@org.springframework.data.repository.query.Param("postId") UUID postId);
 }

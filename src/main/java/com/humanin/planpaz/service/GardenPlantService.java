@@ -11,7 +11,7 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+  
 import com.humanin.planpaz.dto.PlantStatsDTO;
 import com.humanin.planpaz.infra.exception.BusinessException;
 import com.humanin.planpaz.infra.exception.ResourceNotFoundException;
@@ -43,6 +43,7 @@ public class GardenPlantService {
 	private final AchievementService achievementService;
 	private final PlantCareLogRepository plantCareLogRepository;
 	private final UserRepository userRepository;
+	private final StreakService streakService;
 
 	// ADICIONAR
 	@Transactional
@@ -52,8 +53,8 @@ public class GardenPlantService {
 		}
 
 		UUID ownerId = gardenPlant.getOwner().getId();
-		User realOwner = userRepository.findById(ownerId)
-				.orElseThrow(() -> new ResourceNotFoundException("Usuário proprietário não encontrado."));
+		User realOwner = userRepository.findById(ownerId).orElseThrow(
+				() -> new ResourceNotFoundException("Usuário proprietário não encontrado."));
 		gardenPlant.setOwner(realOwner);
 
 		if (gardenPlant.getPlant() != null && gardenPlant.getPlant().getId() != null) {
@@ -82,8 +83,7 @@ public class GardenPlantService {
 		gardenPlant.setLastCareDate(hoje);
 		gardenPlant.setStreakDays(1);
 
-		// Pontuação inicial ao criar uma nova planta: +100 (criação de planta) + 10
-		// (rega inicial) = +110 pts
+		// Pontuação inicial ao criar uma nova planta: +100 (criação de planta) + 10 (rega inicial) = +110 pts
 		int pontosIniciais = 110;
 		gardenPlant.setEcoscore(pontosIniciais);
 
@@ -203,28 +203,21 @@ public class GardenPlantService {
 			long diasDesdeUltima = ChronoUnit.DAYS.between(planta.getLastFertilizing(), hoje);
 			if (diasDesdeUltima < FERTILIZE_COOLDOWN_DAYS) {
 				long diasRestantes = FERTILIZE_COOLDOWN_DAYS - diasDesdeUltima;
-				throw new BusinessException(
-						"🌱 Essa planta já foi adubada recentemente. Você poderá adubá-la novamente em " + diasRestantes
-								+ " dia(s).");
+				throw new BusinessException("🌱 Essa planta já foi adubada recentemente. Você poderá adubá-la novamente em " + diasRestantes + " dia(s).");
 			}
 		}
 
 		planta.setLastFertilizing(hoje);
-		planta.setLastCareDate(hoje);
-
-		int pontos = 25;
-		int plantEcoscore = planta.getEcoscore() != null ? planta.getEcoscore() : 0;
-		planta.setEcoscore(plantEcoscore + pontos);
-
 		User owner = planta.getOwner();
-		int userEcoscore = owner.getEcoscore() != null ? owner.getEcoscore() : 0;
-		owner.setEcoscore(userEcoscore + pontos);
+
+		// Processa streak e EcoScore (+25 pts base)
+		int pontosGanhos = streakService.processCareActionAndGrantPoints(owner, planta, 25);
 
 		PlantCareLog log = new PlantCareLog();
 		log.setGardenPlant(planta);
 		log.setUser(owner);
 		log.setCareType(CareType.FERTILIZING);
-		log.setPointsEarned(pontos);
+		log.setPointsEarned(pontosGanhos);
 		plantCareLogRepository.save(log);
 
 		gardenPlantRepository.save(planta);
@@ -243,27 +236,21 @@ public class GardenPlantService {
 			long diasDesdeUltima = ChronoUnit.DAYS.between(planta.getLastPruning(), hoje);
 			if (diasDesdeUltima < PRUNE_COOLDOWN_DAYS) {
 				long diasRestantes = PRUNE_COOLDOWN_DAYS - diasDesdeUltima;
-				throw new BusinessException("✂️ Essa planta foi podada recentemente. Aguarde mais " + diasRestantes
-						+ " dia(s) para realizar uma nova poda.");
+				throw new BusinessException("✂️ Essa planta foi podada recentemente. Aguarde mais " + diasRestantes + " dia(s) para realizar uma nova poda.");
 			}
 		}
 
 		planta.setLastPruning(hoje);
-		planta.setLastCareDate(hoje);
-
-		int pontos = 15;
-		int plantEcoscore = planta.getEcoscore() != null ? planta.getEcoscore() : 0;
-		planta.setEcoscore(plantEcoscore + pontos);
-
 		User owner = planta.getOwner();
-		int userEcoscore = owner.getEcoscore() != null ? owner.getEcoscore() : 0;
-		owner.setEcoscore(userEcoscore + pontos);
+
+		// Processa streak e EcoScore (+15 pts base)
+		int pontosGanhos = streakService.processCareActionAndGrantPoints(owner, planta, 15);
 
 		PlantCareLog log = new PlantCareLog();
 		log.setGardenPlant(planta);
 		log.setUser(owner);
 		log.setCareType(CareType.PRUNING);
-		log.setPointsEarned(pontos);
+		log.setPointsEarned(pontosGanhos);
 		plantCareLogRepository.save(log);
 
 		gardenPlantRepository.save(planta);
@@ -279,8 +266,7 @@ public class GardenPlantService {
 
 		long cultivationDays = 0;
 		if (planta.getPlantedAt() != null) {
-			cultivationDays = Math.max(0,
-					ChronoUnit.DAYS.between(planta.getPlantedAt().toLocalDate(), LocalDate.now()));
+			cultivationDays = Math.max(0, ChronoUnit.DAYS.between(planta.getPlantedAt().toLocalDate(), LocalDate.now()));
 		}
 
 		// Cálculo do Sequestro de CO₂ proporcional ao porte e dias de cultivo
@@ -296,8 +282,16 @@ public class GardenPlantService {
 		int ecoScore = planta.getEcoscore() != null ? planta.getEcoscore() : 0;
 		int streakDays = planta.getStreakDays() != null ? planta.getStreakDays() : 0;
 
-		return new PlantStatsDTO(planta.getId(), co2Grams, ecoScore, cultivationDays, streakDays,
-				planta.getLastWatering(), planta.getLastFertilizing(), planta.getLastPruning());
+		return new PlantStatsDTO(
+				planta.getId(),
+				co2Grams,
+				ecoScore,
+				cultivationDays,
+				streakDays,
+				planta.getLastWatering(),
+				planta.getLastFertilizing(),
+				planta.getLastPruning()
+		);
 	}
 
 	// MÉTODOS PRIVADOS PARA REGRAS DE CONQUISTAS

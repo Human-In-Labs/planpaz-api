@@ -54,4 +54,7 @@ public class Comment {
 	@CreationTimestamp
 	@Column(name = "commented_at", nullable = false, updatable = false)
 	private LocalDateTime commentedAt;
+
+	@jakarta.persistence.OneToMany(mappedBy = "parentComment", cascade = jakarta.persistence.CascadeType.ALL, orphanRemoval = true)
+	private java.util.List<Comment> replies = new java.util.ArrayList<>();
 }

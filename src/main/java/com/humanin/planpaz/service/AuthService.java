@@ -14,6 +14,14 @@ import com.humanin.planpaz.infra.security.TokenService;
 import com.humanin.planpaz.model.User;
 import com.humanin.planpaz.repositories.UserRepository;
 
+import com.humanin.planpaz.dto.ForgotPasswordRequestDTO;
+import com.humanin.planpaz.dto.ResetPasswordRequestDTO;
+import com.humanin.planpaz.dto.VerifyCodeRequestDTO;
+import com.humanin.planpaz.model.PasswordResetToken;
+import com.humanin.planpaz.repositories.PasswordResetTokenRepository;
+import java.time.LocalDateTime;
+import java.util.concurrent.ThreadLocalRandom;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -26,7 +34,8 @@ public class AuthService {
 	private final PasswordEncoder passwordEncoder;
 	private final TokenService tokenService;
 	private final AchievementService achievementService;
-	// private final EmailService emailService; // TEMPORARIAMENTE DESATIVADO
+	private final EmailService emailService;
+	private final PasswordResetTokenRepository passwordResetTokenRepository;
 
 	@Value("${app.base-url}")
 	private String baseUrl;
@@ -164,9 +173,99 @@ public class AuthService {
 		log.info("Link de verificação reenviado para: {}", email);
 	}
 
+	/*
 	private void enviarEmailDeVerificacao(User user) {
 		String link = baseUrl + "/api/auth/verify-email?token=" + user.getVerificationToken();
 		emailService.enviarEmailDeVerificacao(user.getEmail(), user.getName(), link);
 	}
 	*/
+
+	// ==========================
+	// RECUPERAÇÃO DE SENHA POR E-MAIL (RF03)
+	// ==========================
+
+	@Transactional
+	public void requestPasswordReset(ForgotPasswordRequestDTO body) {
+		String emailClean = body.email().trim().toLowerCase();
+		log.info("Solicitação de redefinição de senha para o e-mail: {}", emailClean);
+
+		User user = userRepository.findByEmail(emailClean).orElse(null);
+		if (user == null) {
+			// Por segurança, não informamos se o e-mail existe ou não
+			log.warn("Solicitação de código para e-mail não encontrado: {}", emailClean);
+			return;
+		}
+
+		// Trava de 15 minutos: verifica se já existe um token ativo enviado nos últimos 15 minutos
+		passwordResetTokenRepository.findTopByEmailAndUsedFalseOrderByExpiresAtDesc(emailClean)
+				.ifPresent(existingToken -> {
+					if (existingToken.getExpiresAt().isAfter(LocalDateTime.now())) {
+						throw new BusinessException(
+								"RATE_LIMIT_EXCEEDED: Você já solicitou um código recentemente! Por favor, aguarde 15 minutos para enviar um novo e-mail e verifique sua caixa de entrada (e pasta de spam) para encontrar o código já enviado.");
+					}
+				});
+
+		// Remove tokens antigos para este e-mail
+		try {
+			passwordResetTokenRepository.deleteByEmail(emailClean);
+		} catch (Exception e) {
+			log.warn("Erro ao limpar tokens antigos de reset: {}", e.getMessage());
+		}
+
+		// Gera um código de 6 dígitos aleatório
+		String code = String.format("%06d", ThreadLocalRandom.current().nextInt(0, 1000000));
+		LocalDateTime expiresAt = LocalDateTime.now().plusMinutes(15);
+
+		PasswordResetToken resetToken = new PasswordResetToken();
+		resetToken.setEmail(emailClean);
+		resetToken.setCode(code);
+		resetToken.setExpiresAt(expiresAt);
+		resetToken.setUsed(false);
+
+		passwordResetTokenRepository.save(resetToken);
+
+		// Envia o e-mail com o código
+		emailService.enviarCodigoRecuperacaoSenha(emailClean, user.getName(), code);
+		log.info("Código de redefinição enviado com sucesso para: {}", emailClean);
+	}
+
+	@Transactional(readOnly = true)
+	public void verifyResetCode(VerifyCodeRequestDTO body) {
+		String emailClean = body.email().trim().toLowerCase();
+		String codeClean = body.code().trim();
+
+		PasswordResetToken token = passwordResetTokenRepository
+				.findByEmailAndCodeAndUsedFalse(emailClean, codeClean)
+				.orElseThrow(() -> new BusinessException("Código inválido ou já utilizado."));
+
+		if (token.getExpiresAt().isBefore(LocalDateTime.now())) {
+			throw new BusinessException("Este código de verificação expirou. Solicite um novo código.");
+		}
+	}
+
+	@Transactional
+	public void resetPassword(ResetPasswordRequestDTO body) {
+		String emailClean = body.email().trim().toLowerCase();
+		String codeClean = body.code().trim();
+
+		PasswordResetToken token = passwordResetTokenRepository
+				.findByEmailAndCodeAndUsedFalse(emailClean, codeClean)
+				.orElseThrow(() -> new BusinessException("Código inválido ou já utilizado."));
+
+		if (token.getExpiresAt().isBefore(LocalDateTime.now())) {
+			throw new BusinessException("Este código de verificação expirou. Solicite um novo código.");
+		}
+
+		User user = userRepository.findByEmail(emailClean)
+				.orElseThrow(() -> new BusinessException("Usuário não encontrado."));
+
+		user.setPassword(passwordEncoder.encode(body.newPassword()));
+		userRepository.save(user);
+
+		// Invalida o token
+		token.setUsed(true);
+		passwordResetTokenRepository.save(token);
+
+		log.info("Senha redefinida com sucesso para o e-mail: {}", emailClean);
+	}
 }

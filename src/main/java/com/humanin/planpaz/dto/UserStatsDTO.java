@@ -8,5 +8,6 @@ public record UserStatsDTO(
 		int totalEcoScore,
 		long totalPlants,
 		long totalPosts,
-		long daysOnApp
+		long daysOnApp,
+		int streakCount
 ) {}

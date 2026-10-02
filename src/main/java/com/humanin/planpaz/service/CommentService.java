@@ -90,18 +90,20 @@ public class CommentService {
 
 	@Transactional
 	public void deleteComment(UUID commentId, UUID authorId) {
-		Comment comment = commentRepository.findById(commentId)
-				.orElseThrow(() -> new RuntimeException("Comentário não encontrado"));
+		Comment comment = commentRepository.findById(commentId).orElseThrow(
+				() -> new com.humanin.planpaz.infra.exception.BusinessException("Comentário não encontrado"));
 
 		if (authorId != null) {
 			boolean isCommentAuthor = comment.getAuthor() != null && comment.getAuthor().getId().equals(authorId);
 			boolean isPostAuthor = comment.getPost() != null && comment.getPost().getAuthor() != null
 					&& comment.getPost().getAuthor().getId().equals(authorId);
 			if (!isCommentAuthor && !isPostAuthor) {
-				throw new RuntimeException("Você não tem permissão para deletar este comentário.");
+				throw new com.humanin.planpaz.infra.exception.BusinessException(
+						"Você não tem permissão para deletar este comentário.");
 			}
 		}
 
+		commentRepository.deleteByParentCommentId(commentId);
 		commentRepository.delete(comment);
 	}
 }

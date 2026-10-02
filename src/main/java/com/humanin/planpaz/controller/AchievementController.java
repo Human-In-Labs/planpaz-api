@@ -41,8 +41,7 @@ public class AchievementController {
 	}
 
 	@GetMapping("/user/{userId}")
-	public ResponseEntity<List<AchievementProgressDTO>> getUserAchievementsProgress(
-			@org.springframework.web.bind.annotation.PathVariable java.util.UUID userId) {
+	public ResponseEntity<List<AchievementProgressDTO>> getUserAchievementsProgress(@org.springframework.web.bind.annotation.PathVariable java.util.UUID userId) {
 		achievementService.checkAndGrantAll(userId);
 		List<AchievementProgressDTO> conquistas = achievementService.obterConquistasProgressoDoUsuario(userId);
 		return ResponseEntity.ok(conquistas);

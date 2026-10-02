@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.humanin.planpaz.dto.PostCreateDTO;
 import com.humanin.planpaz.dto.PostResponseDTO;
+import com.humanin.planpaz.infra.exception.BusinessException;
 import com.humanin.planpaz.model.Post;
 import com.humanin.planpaz.model.User;
 import com.humanin.planpaz.repositories.CommentRepository;
@@ -75,10 +76,12 @@ public class PostService {
 	}
 
 	@Transactional(readOnly = true)
-	public Page<PostResponseDTO> getFeed(int page, int size, UUID currentUserId, String tag) {
+	public Page<PostResponseDTO> getFeed(int page, int size, UUID currentUserId, String tag, boolean followingOnly) {
 		Pageable pageable = PageRequest.of(page, size);
 		Page<Post> posts;
-		if (tag != null && !tag.isBlank()) {
+		if (followingOnly && currentUserId != null) {
+			posts = postRepository.findByFollowedUsers(currentUserId, pageable);
+		} else if (tag != null && !tag.isBlank()) {
 			posts = postRepository.findByTag(tag.trim(), pageable);
 		} else {
 			posts = postRepository.findAllByOrderByPostedAtDesc(pageable);
@@ -87,8 +90,13 @@ public class PostService {
 	}
 
 	@Transactional(readOnly = true)
+	public Page<PostResponseDTO> getFeed(int page, int size, UUID currentUserId, String tag) {
+		return getFeed(page, size, currentUserId, tag, false);
+	}
+
+	@Transactional(readOnly = true)
 	public Page<PostResponseDTO> getFeed(int page, int size, UUID currentUserId) {
-		return getFeed(page, size, currentUserId, null);
+		return getFeed(page, size, currentUserId, null, false);
 	}
 
 	@Transactional(readOnly = true)
@@ -108,12 +116,14 @@ public class PostService {
 	@Transactional
 	public void deletePost(UUID postId, UUID authorId) {
 		Post post = postRepository.findById(postId)
-				.orElseThrow(() -> new RuntimeException("Post não encontrado com o ID: " + postId));
+				.orElseThrow(() -> new BusinessException("Post não encontrado com o ID: " + postId));
 
 		if (!post.getAuthor().getId().equals(authorId)) {
-			throw new RuntimeException("Você não tem permissão para deletar este post.");
+			throw new BusinessException("Você não tem permissão para deletar este post.");
 		}
 
+		likeRepository.deleteByPostId(postId);
+		commentRepository.deleteByPostId(postId);
 		postRepository.delete(post);
 	}
 

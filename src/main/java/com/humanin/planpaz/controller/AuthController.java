@@ -40,6 +40,28 @@ public class AuthController {
 	}
 
 	// ==========================
+	// RECUPERAÇÃO DE SENHA POR E-MAIL (RF03)
+	// ==========================
+
+	@PostMapping("/forgot-password")
+	public ResponseEntity<java.util.Map<String, String>> forgotPassword(@jakarta.validation.Valid @RequestBody com.humanin.planpaz.dto.ForgotPasswordRequestDTO body) {
+		authService.requestPasswordReset(body);
+		return ResponseEntity.ok(java.util.Map.of("message", "Código de verificação enviado por e-mail se o cadastro existir."));
+	}
+
+	@PostMapping("/verify-reset-code")
+	public ResponseEntity<java.util.Map<String, Object>> verifyResetCode(@jakarta.validation.Valid @RequestBody com.humanin.planpaz.dto.VerifyCodeRequestDTO body) {
+		authService.verifyResetCode(body);
+		return ResponseEntity.ok(java.util.Map.of("valid", true, "message", "Código verificado com sucesso."));
+	}
+
+	@PostMapping("/reset-password")
+	public ResponseEntity<java.util.Map<String, String>> resetPassword(@jakarta.validation.Valid @RequestBody com.humanin.planpaz.dto.ResetPasswordRequestDTO body) {
+		authService.resetPassword(body);
+		return ResponseEntity.ok(java.util.Map.of("message", "Senha redefinida com sucesso!"));
+	}
+
+	// ==========================
 	// LINK CLICADO NO E-MAIL DE VERIFICAÇÃO (TEMPORARIAMENTE DESATIVADO)
 	// ==========================
 

@@ -23,6 +23,7 @@ public class CommentResponseDTO {
 	private UUID authorId;
 	private String authorName;
 	private String authorUsername;
+	private String authorAvatarUrl;
 
 	private UUID parentCommentId;
 
@@ -40,6 +41,7 @@ public class CommentResponseDTO {
 			dto.setAuthorId(comment.getAuthor().getId());
 			dto.setAuthorName(comment.getAuthor().getName());
 			dto.setAuthorUsername(comment.getAuthor().getUsername());
+			dto.setAuthorAvatarUrl(comment.getAuthor().getAvatarUrl());
 		}
 
 		if (comment.getParentComment() != null) {

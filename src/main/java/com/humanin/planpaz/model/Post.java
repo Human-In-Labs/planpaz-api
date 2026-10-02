@@ -56,4 +56,10 @@ public class Post {
 	@Convert(converter = StringListConverter.class)
 	@Column(name = "tags")
 	private List<String> tags = new ArrayList<>();
+
+	@jakarta.persistence.OneToMany(mappedBy = "post", cascade = jakarta.persistence.CascadeType.ALL, orphanRemoval = true)
+	private List<Comment> comments = new ArrayList<>();
+
+	@jakarta.persistence.OneToMany(mappedBy = "post", cascade = jakarta.persistence.CascadeType.ALL, orphanRemoval = true)
+	private List<Like> likes = new ArrayList<>();
 }

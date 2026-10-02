@@ -38,8 +38,17 @@ public class PostController {
 	public ResponseEntity<Page<PostResponseDTO>> getFeed(@RequestParam(defaultValue = "0") int page,
 			@RequestParam(defaultValue = "15") int size, 
 			@RequestParam(required = false) UUID currentUserId,
-			@RequestParam(required = false) String tag) {
-		Page<PostResponseDTO> feed = postService.getFeed(page, size, currentUserId, tag);
+			@RequestParam(required = false) String tag,
+			@RequestParam(defaultValue = "false") boolean followingOnly) {
+		Page<PostResponseDTO> feed = postService.getFeed(page, size, currentUserId, tag, followingOnly);
+		return ResponseEntity.ok(feed);
+	}
+
+	@GetMapping("/following")
+	public ResponseEntity<Page<PostResponseDTO>> getFeedFollowing(@RequestParam(defaultValue = "0") int page,
+			@RequestParam(defaultValue = "15") int size, 
+			@RequestParam(required = false) UUID currentUserId) {
+		Page<PostResponseDTO> feed = postService.getFeed(page, size, currentUserId, null, true);
 		return ResponseEntity.ok(feed);
 	}
 

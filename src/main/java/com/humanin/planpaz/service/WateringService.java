@@ -32,6 +32,7 @@ public class WateringService {
 	private final AchievementService achievementService;
 	private final PlantCareLogRepository plantCareLogRepository;
 	private final UserRepository userRepository;
+	private final StreakService streakService;
 
 	// ============================
 	// CONCLUIR REGA DE PLANTA DO MEU JARDIM
@@ -47,33 +48,11 @@ public class WateringService {
 			throw new BusinessException("Você já regou esta planta hoje! Só é possível regá-la 1 vez ao dia.");
 		}
 
-		// Atualiza o Streak de cuidados da planta
-		int streakActual = planta.getStreakDays() != null ? planta.getStreakDays() : 0;
-		LocalDate lastCare = planta.getLastCareDate();
-
-		if (lastCare != null) {
-			if (lastCare.equals(hoje.minusDays(1))) {
-				streakActual += 1;
-			} else if (!lastCare.equals(hoje)) {
-				streakActual = 1;
-			}
-		} else {
-			streakActual = 1;
-		}
-
-		planta.setStreakDays(streakActual);
-		planta.setLastCareDate(hoje);
+		User owner = planta.getOwner();
 		planta.setLastWatering(hoje);
 
-		// Cálculo de pontuação: +10 pts por rega + (+2 pts x dias de streak)
-		int pontosGanhos = 10 + (2 * streakActual);
-
-		int plantEcoscore = planta.getEcoscore() != null ? planta.getEcoscore() : 0;
-		planta.setEcoscore(plantEcoscore + pontosGanhos);
-
-		User owner = planta.getOwner();
-		int userEcoscore = owner.getEcoscore() != null ? owner.getEcoscore() : 0;
-		owner.setEcoscore(userEcoscore + pontosGanhos);
+		// Processa o Streak e EcoScore centralizado (+10 pts base de rega)
+		int pontosGanhos = streakService.processCareActionAndGrantPoints(owner, planta, 10);
 
 		// Registrar log de manejo
 		PlantCareLog log = new PlantCareLog();
@@ -118,19 +97,23 @@ public class WateringService {
 			return lembretes;
 		}
 
-		int intervaloDias = getDaysInterval(planta.getPlant() != null ? planta.getPlant().getWateringLevel() : null);
+		int intervaloDias = getDaysInterval(
+				planta.getPlant() != null ? planta.getPlant().getWateringLevel() : null
+		);
 
 		// data do primeiro lembrete
 		LocalDate dataBase = planta.getLastWatering();
 		if (dataBase == null) {
-			dataBase = planta.getPlantedAt() != null ? planta.getPlantedAt().toLocalDate()
+			dataBase = planta.getPlantedAt() != null 
+					? planta.getPlantedAt().toLocalDate() 
 					: LocalDate.now().minusDays(intervaloDias);
 		}
 
 		LocalDate proximaData = dataBase.plusDays(intervaloDias);
 		LocalDate hoje = LocalDate.now();
 
-		String imagem = (planta.getImagePath() != null && !planta.getImagePath().isBlank()) ? planta.getImagePath()
+		String imagem = (planta.getImagePath() != null && !planta.getImagePath().isBlank())
+				? planta.getImagePath()
 				: (planta.getPlant() != null ? planta.getPlant().getImagePath() : null);
 
 		DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM");
@@ -155,8 +138,15 @@ public class WateringService {
 				status = "pendente";
 			}
 
-			lembretes.add(new WateringReminderDTO(i, planta.getId(), planta.getNickname(), imagem,
-					dataLembrete.format(dateFormatter), horario, status));
+			lembretes.add(new WateringReminderDTO(
+					i,
+					planta.getId(),
+					planta.getNickname(),
+					imagem,
+					dataLembrete.format(dateFormatter),
+					horario,
+					status
+			));
 		}
 
 		return lembretes;
@@ -167,10 +157,10 @@ public class WateringService {
 			return 3;
 		}
 		return switch (level) {
-		case DAILY -> 1;
-		case FREQUENT -> 3;
-		case WEEKLY -> 7;
-		case SPORADIC -> 14;
+			case DAILY -> 1;
+			case FREQUENT -> 3;
+			case WEEKLY -> 7;
+			case SPORADIC -> 14;
 		};
 	}
 

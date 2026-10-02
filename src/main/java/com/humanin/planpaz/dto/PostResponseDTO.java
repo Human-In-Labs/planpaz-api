@@ -28,6 +28,7 @@ public class PostResponseDTO {
 	private UUID authorId;
 	private String authorName;
 	private String authorUsername;
+	private String authorAvatarUrl;
 
 	// Métricas
 	private long likesCount;
@@ -52,6 +53,7 @@ public class PostResponseDTO {
 			dto.setAuthorId(post.getAuthor().getId());
 			dto.setAuthorName(post.getAuthor().getName());
 			dto.setAuthorUsername(post.getAuthor().getUsername());
+			dto.setAuthorAvatarUrl(post.getAuthor().getAvatarUrl());
 		}
 
 		dto.setLikesCount(likesCount);

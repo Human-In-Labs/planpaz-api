@@ -19,4 +19,7 @@ public interface PostRepository extends JpaRepository<Post, UUID> {
 
 	@Query("SELECT p FROM Post p WHERE LOWER(p.tags) LIKE LOWER(CONCAT('%', :tag, '%')) ORDER BY p.postedAt DESC")
 	Page<Post> findByTag(@Param("tag") String tag, Pageable pageable);
+
+	@Query("SELECT p FROM Post p WHERE p.author.id IN (SELECT f.followed.id FROM Follow f WHERE f.follower.id = :followerId) ORDER BY p.postedAt DESC")
+	Page<Post> findByFollowedUsers(@Param("followerId") UUID followerId, Pageable pageable);
 }

@@ -169,6 +169,16 @@ public class UserController {
 	}
 
 	// ==========================
+	// ATIVIDADES RECENTES DE USUÁRIOS SEGUIDOS (RF57)
+	// ==========================
+
+	@GetMapping("/{id}/activities")
+	public ResponseEntity<List<com.humanin.planpaz.dto.RecentActivityDTO>> getFollowingActivities(@PathVariable UUID id) {
+		List<com.humanin.planpaz.dto.RecentActivityDTO> activities = userService.getFollowingActivities(id);
+		return ResponseEntity.ok(activities);
+	}
+
+	// ==========================
 	// REMOVE UM SEGUIDOR DA SUA CONTA
 	// ==========================
 

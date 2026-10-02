@@ -64,9 +64,10 @@ public class UserService {
 				.doubleValue();
 
 		int totalEcoScore = targetUser.getEcoscore() != null ? targetUser.getEcoscore() : 0;
+		int streakCount = targetUser.getStreakDays() != null ? targetUser.getStreakDays() : 0;
 
 		return new com.humanin.planpaz.dto.UserStatsDTO(targetUser.getId(), totalCo2Grams, totalEcoScore, totalPlants,
-				totalPosts, daysOnApp);
+				totalPosts, daysOnApp, streakCount);
 	}
 
 	@Transactional(readOnly = true)
@@ -85,7 +86,7 @@ public class UserService {
 		return new PublicUserProfileDTO(targetUser.getId(), targetUser.getName(), targetUser.getUsername(),
 				targetUser.getEmail(), targetUser.getBio(), targetUser.getAvatarUrl(), followersCount, followingCount,
 				isFollowing, stats.totalPlants(), stats.totalPosts(), stats.daysOnApp(),
-				Math.round(stats.totalCo2Grams()), stats.totalEcoScore(), achievements);
+				Math.round(stats.totalCo2Grams()), stats.totalEcoScore(), stats.streakCount(), achievements);
 	}
 
 	@Transactional(readOnly = true)
@@ -238,6 +239,44 @@ public class UserService {
 	public void removeFollower(User currentUser, UUID followerId) {
 		User followerUser = findUserById(followerId);
 		followersRepository.deleteByFollowerAndFollowed(followerUser, currentUser);
+	}
+
+	@Transactional(readOnly = true)
+	public List<com.humanin.planpaz.dto.RecentActivityDTO> getFollowingActivities(UUID currentUserId) {
+		User currentUser = findUserById(currentUserId);
+		List<Follow> follows = followersRepository.findByFollower(currentUser);
+		List<UUID> followedUserIds = new java.util.ArrayList<>(
+				follows.stream().map(f -> f.getFollowed().getId()).toList());
+
+		boolean noFollowings = followedUserIds.isEmpty();
+		if (noFollowings) {
+			followedUserIds.add(currentUserId);
+		}
+
+		List<com.humanin.planpaz.dto.RecentActivityDTO> list = new java.util.ArrayList<>();
+
+		for (UUID targetId : followedUserIds) {
+			User targetUser = userRepository.findById(targetId).orElse(null);
+			if (targetUser == null)
+				continue;
+
+			List<com.humanin.planpaz.model.GardenPlant> plants = gardenPlantRepository.findByOwnerId(targetId);
+			for (com.humanin.planpaz.model.GardenPlant p : plants) {
+				String speciesName = (p.getPlant() != null && p.getPlant().getName() != null) ? p.getPlant().getName()
+						: p.getNickname();
+				String text = "Cultivando " + (p.getNickname() != null ? p.getNickname() : speciesName);
+				String img = p.getImagePath() != null ? p.getImagePath()
+						: (p.getPlant() != null ? p.getPlant().getImagePath() : null);
+				LocalDateTime date = p.getPlantedAt() != null ? p.getPlantedAt() : LocalDateTime.now();
+
+				list.add(new com.humanin.planpaz.dto.RecentActivityDTO("plant-" + p.getId(), targetUser.getId(),
+						targetUser.getName(), targetUser.getUsername(), targetUser.getAvatarUrl(), "NEW_PLANT", text,
+						"Plantado recentemente", img, date));
+			}
+		}
+
+		list.sort((a, b) -> b.createdAt().compareTo(a.createdAt()));
+		return list.stream().limit(10).toList();
 	}
 
 	private User findUserById(UUID id) {

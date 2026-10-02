@@ -101,6 +101,12 @@ public class User {
 	@Column(name = "ecoscore")
 	private Integer ecoscore = 0;
 
+	@Column(name = "streak_days")
+	private Integer streakDays = 0;
+
+	@Column(name = "last_care_date")
+	private LocalDate lastCareDate;
+
 	@Column(name = "highest_like_tier")
 	private Integer highestLikeTier = 0;
 
