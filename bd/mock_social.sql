@@ -6,7 +6,7 @@
 
 -- 1. INSERTS DE USUÁRIOS
 INSERT INTO public.users (
-    id, name, username, email, password, bio, email_verified, ecoscore, created_at
+    id, name, username, email, password, bio, email_verified, ecoscore, created_at, banned
 ) VALUES 
 (
     'a1111111-1111-1111-1111-111111111111',
@@ -17,7 +17,8 @@ INSERT INTO public.users (
     'Cultivando plantas e buscando harmonia no dia a dia. Focado em hortas urbanas e suculentas.',
     TRUE,
     140,
-    NOW() - INTERVAL '15 days'
+    NOW() - INTERVAL '15 days',
+	FALSE
 ),
 (
     'a2222222-2222-2222-2222-222222222222',
@@ -28,7 +29,8 @@ INSERT INTO public.users (
     'Urban jungle em apartamento pequeno! Compartilhando o progresso das orquídeas e folhagens.',
     TRUE,
     185,
-    NOW() - INTERVAL '10 days'
+    NOW() - INTERVAL '10 days',
+	FALSE
 ),
 (
     'a3333333-3333-3333-3333-333333333333',
@@ -39,7 +41,8 @@ INSERT INTO public.users (
     'Plantando hoje para colher bem-estar amanhã. Ervas aromáticas, chás e alimentação consciente.',
     TRUE,
     110,
-    NOW() - INTERVAL '7 days'
+    NOW() - INTERVAL '7 days',
+	FALSE
 )
 ON CONFLICT (id) DO NOTHING;
 

@@ -1,6 +1,8 @@
 package com.humanin.planpaz.service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -13,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.humanin.planpaz.dto.WateringReminderDTO;
 import com.humanin.planpaz.dto.WeatherResponseDTO;
 import com.humanin.planpaz.infra.exception.BusinessException;
+import com.humanin.planpaz.infra.exception.WateringNotAllowedException;
 import com.humanin.planpaz.model.GardenPlant;
 import com.humanin.planpaz.model.PlantCareLog;
 import com.humanin.planpaz.model.User;
@@ -43,13 +46,35 @@ public class WateringService {
 		GardenPlant planta = gardenPlantService.buscarPorIdEUsuario(id, ownerId);
 		LocalDate hoje = LocalDate.now();
 
-		// Validação de rega no máximo 1x ao dia por planta
-		if (planta.getLastWatering() != null && planta.getLastWatering().isEqual(hoje)) {
-			throw new BusinessException("Você já regou esta planta hoje! Só é possível regá-la 1 vez ao dia.");
+		// Validação da janela de 36 horas
+		int intervaloDias = getDaysInterval(
+				planta.getPlant() != null ? planta.getPlant().getWateringLevel() : null
+		);
+
+		LocalDate dataBase = planta.getLastWatering();
+		if (dataBase == null) {
+			dataBase = planta.getPlantedAt() != null 
+					? planta.getPlantedAt().toLocalDate() 
+					: LocalDate.now().minusDays(intervaloDias);
+		}
+
+		LocalDate proximaData = dataBase.plusDays(intervaloDias);
+		LocalTime horarioRega = LocalTime.of(12, 0);
+		if (planta.getOwner() != null && planta.getOwner().getWateringTime() != null) {
+			horarioRega = planta.getOwner().getWateringTime();
+		}
+
+		LocalDateTime proximaDataHora = LocalDateTime.of(proximaData, horarioRega);
+		LocalDateTime limiteFuturo = LocalDateTime.now().plusHours(36);
+
+		if (limiteFuturo.isBefore(proximaDataHora)) {
+			throw new WateringNotAllowedException("WATERING_TOO_EARLY",
+					"Não é possível concluir lembretes com mais de 36 horas de antecedência.");
 		}
 
 		User owner = planta.getOwner();
-		planta.setLastWatering(hoje);
+		// Atualiza o lastWatering para a data do lembrete concluído (ou hoje se estava atrasado)
+		planta.setLastWatering(proximaData.isAfter(hoje) ? proximaData : hoje);
 
 		// Processa o Streak e EcoScore centralizado (+10 pts base de rega)
 		int pontosGanhos = streakService.processCareActionAndGrantPoints(owner, planta, 10);

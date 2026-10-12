@@ -30,6 +30,14 @@ public class GlobalExceptionHandler {
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
 	}
 
+	@ExceptionHandler(WateringNotAllowedException.class)
+	public ResponseEntity<ErrorResponseDTO> handleWateringNotAllowed(WateringNotAllowedException ex,
+			HttpServletRequest request) {
+		ErrorResponseDTO error = new ErrorResponseDTO(HttpStatus.BAD_REQUEST.value(),
+				HttpStatus.BAD_REQUEST.getReasonPhrase(), ex.getMessage(), request.getRequestURI(), ex.getErrorCode());
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+	}
+
 	@ExceptionHandler(UserBannedException.class)
 	public ResponseEntity<ErrorResponseDTO> handleUserBanned(UserBannedException ex, HttpServletRequest request) {
 		ErrorResponseDTO error = new ErrorResponseDTO(HttpStatus.FORBIDDEN.value(),

@@ -7,9 +7,14 @@ public record ErrorResponseDTO(
     int status,
     String error,
     String message,
-    String path
+    String path,
+    String errorCode
 ) {
     public ErrorResponseDTO(int status, String error, String message, String path) {
-        this(LocalDateTime.now(), status, error, message, path);
+        this(LocalDateTime.now(), status, error, message, path, null);
+    }
+
+    public ErrorResponseDTO(int status, String error, String message, String path, String errorCode) {
+        this(LocalDateTime.now(), status, error, message, path, errorCode);
     }
 }
