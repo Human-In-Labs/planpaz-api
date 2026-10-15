@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.humanin.planpaz.dto.ApiResponseDTO;
 import com.humanin.planpaz.dto.PlantStatsDTO;
+import com.humanin.planpaz.dto.StageSuggestionDTO;
 import com.humanin.planpaz.dto.WateringReminderDTO;
 import com.humanin.planpaz.dto.WateringStatusDTO;
 import com.humanin.planpaz.dto.WeatherResponseDTO;
@@ -95,6 +96,18 @@ public class GardenPlantController {
 		User user = getAuthenticatedUser(authentication);
 		PlantStatsDTO stats = gardenPlantService.getPlantStats(id, user.getId());
 		return ResponseEntity.ok(stats);
+	}
+
+	// =========================
+	// SUGESTÃO DE MUDANÇA DE ESTÁGIO (204 se não houver)
+	// =========================
+
+	@GetMapping("/{id}/stage-suggestion")
+	public ResponseEntity<StageSuggestionDTO> getStageSuggestion(@PathVariable UUID id, Authentication authentication) {
+		User user = getAuthenticatedUser(authentication);
+		return gardenPlantService.getStageSuggestion(id, user.getId())
+				.map(ResponseEntity::ok)
+				.orElseGet(() -> ResponseEntity.noContent().build());
 	}
 
 	// =========================

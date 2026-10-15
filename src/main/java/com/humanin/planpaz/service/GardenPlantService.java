@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
   
 import com.humanin.planpaz.dto.PlantStatsDTO;
+import com.humanin.planpaz.dto.StageSuggestionDTO;
 import com.humanin.planpaz.infra.exception.BusinessException;
 import com.humanin.planpaz.infra.exception.ResourceNotFoundException;
 import com.humanin.planpaz.model.GardenPlant;
@@ -292,6 +293,64 @@ public class GardenPlantService {
 				planta.getLastFertilizing(),
 				planta.getLastPruning()
 		);
+	}
+
+	// ==========================================
+	// SUGESTÃO DE MUDANÇA DE ESTÁGIO
+	// ==========================================
+	@Transactional(readOnly = true)
+	public Optional<StageSuggestionDTO> getStageSuggestion(UUID id, UUID ownerId) {
+		GardenPlant planta = buscarPorIdEUsuario(id, ownerId);
+		PlantStage estagioAtual = planta.getStage();
+
+		if (planta.getPlantedAt() == null || estagioAtual == null || planta.getPlant() == null) {
+			return Optional.empty();
+		}
+
+		long cultivationDays = Math.max(0, ChronoUnit.DAYS.between(planta.getPlantedAt().toLocalDate(), LocalDate.now()));
+		List<PlantStage> estagios = plantStageRepository.findByPlantIdOrderByOrderAsc(planta.getPlant().getId());
+
+		int indiceIdeal = calcularIndiceEstagioIdeal(estagios, cultivationDays);
+		int indiceAtual = indiceDoEstagio(estagios, estagioAtual.getId());
+
+		// Só sugere avanço: a planta pode ter sido cadastrada já em estágio avançado
+		if (indiceIdeal < 0 || indiceAtual < 0 || indiceIdeal <= indiceAtual) {
+			return Optional.empty();
+		}
+
+		return Optional.of(new StageSuggestionDTO(
+				planta.getId(),
+				cultivationDays,
+				estagioAtual,
+				estagios.get(indiceIdeal)
+		));
+	}
+
+	// Cada estágio cobre [início, início + days). Estágio com days nulo é tratado como terminal.
+	static int calcularIndiceEstagioIdeal(List<PlantStage> estagios, long diasDecorridos) {
+		int indiceIdeal = -1;
+		long acumulado = 0;
+		for (int i = 0; i < estagios.size(); i++) {
+			indiceIdeal = i;
+			Integer dias = estagios.get(i).getDays();
+			if (dias == null) {
+				break;
+			}
+			acumulado += dias;
+			if (diasDecorridos < acumulado) {
+				break;
+			}
+		}
+		return indiceIdeal;
+	}
+
+	private static int indiceDoEstagio(List<PlantStage> estagios, UUID stageId) {
+		for (int i = 0; i < estagios.size(); i++) {
+			if (estagios.get(i).getId().equals(stageId)) {
+				return i;
+			}
+		}
+		return -1;
 	}
 
 	// MÉTODOS PRIVADOS PARA REGRAS DE CONQUISTAS
