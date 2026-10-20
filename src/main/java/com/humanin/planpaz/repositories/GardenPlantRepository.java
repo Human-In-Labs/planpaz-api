@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.humanin.planpaz.model.GardenPlant;
@@ -20,6 +21,7 @@ public interface GardenPlantRepository extends JpaRepository<GardenPlant, UUID> 
 	
 	long countByOwnerId(UUID ownerId);
 
-	// Usado pelo job diário de e-mail: só notifica quem manteve o checkbox ativado
+	// Usado pelo job diário de e-mail e pelo job horário de push: só notifica quem manteve o checkbox ativado
+	@EntityGraph(attributePaths = { "owner", "plant" })
 	List<GardenPlant> findByWateringNotificationTrue();
 }

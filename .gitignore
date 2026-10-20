@@ -233,3 +233,7 @@ README.html
 *.iml
 .idea
 .exercism
+
+# Firebase Service Account (nunca versionar credenciais)
+firebase-service-account.json
+*firebase-adminsdk*.json

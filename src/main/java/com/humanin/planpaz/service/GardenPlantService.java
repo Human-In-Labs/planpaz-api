@@ -16,6 +16,7 @@ import com.humanin.planpaz.dto.PlantStatsDTO;
 import com.humanin.planpaz.dto.StageSuggestionDTO;
 import com.humanin.planpaz.infra.exception.BusinessException;
 import com.humanin.planpaz.infra.exception.ResourceNotFoundException;
+import com.humanin.planpaz.model.Follow;
 import com.humanin.planpaz.model.GardenPlant;
 import com.humanin.planpaz.model.Plant;
 import com.humanin.planpaz.model.PlantCareLog;
@@ -23,6 +24,7 @@ import com.humanin.planpaz.model.PlantStage;
 import com.humanin.planpaz.model.User;
 import com.humanin.planpaz.model.enums.CareType;
 import com.humanin.planpaz.model.enums.Size;
+import com.humanin.planpaz.repositories.FollowRepository;
 import com.humanin.planpaz.repositories.GardenPlantRepository;
 import com.humanin.planpaz.repositories.PlantCareLogRepository;
 import com.humanin.planpaz.repositories.PlantRepository;
@@ -45,6 +47,8 @@ public class GardenPlantService {
 	private final PlantCareLogRepository plantCareLogRepository;
 	private final UserRepository userRepository;
 	private final StreakService streakService;
+	private final FollowRepository followRepository;
+	private final FirebasePushNotificationService firebasePushNotificationService;
 
 	// ADICIONAR
 	@Transactional
@@ -109,6 +113,12 @@ public class GardenPlantService {
 			verificarConquistasDeCultivo(ownerId);
 		} catch (Exception e) {
 			System.err.println("[ACHIEVEMENTS] Erro ao verificar conquistas após adicionar planta: " + e.getMessage());
+		}
+
+		try {
+			notificarSeguidoresNovaPlanta(realOwner, saved);
+		} catch (Exception e) {
+			System.err.println("[PUSH] Erro ao notificar seguidores sobre nova planta: " + e.getMessage());
 		}
 
 		return saved;
@@ -204,7 +214,7 @@ public class GardenPlantService {
 			long diasDesdeUltima = ChronoUnit.DAYS.between(planta.getLastFertilizing(), hoje);
 			if (diasDesdeUltima < FERTILIZE_COOLDOWN_DAYS) {
 				long diasRestantes = FERTILIZE_COOLDOWN_DAYS - diasDesdeUltima;
-				throw new BusinessException("🌱 Essa planta já foi adubada recentemente. Você poderá adubá-la novamente em " + diasRestantes + " dia(s).");
+				throw new BusinessException("Essa planta já foi adubada recentemente. Você poderá adubá-la novamente em " + diasRestantes + " dia(s).");
 			}
 		}
 
@@ -377,6 +387,33 @@ public class GardenPlantService {
 				achievementService.concederEstagioCrescimento(ownerId);
 			} else if (ordem >= 3) {
 				achievementService.concederEstagioColheitaOuFloracao(ownerId);
+			}
+		}
+	}
+
+	private void notificarSeguidoresNovaPlanta(User owner, GardenPlant planta) {
+		List<Follow> seguidores = followRepository.findByFollowed(owner);
+		if (seguidores.isEmpty()) {
+			return;
+		}
+
+		String nomePlanta = (planta.getNickname() != null && !planta.getNickname().isBlank())
+				? planta.getNickname()
+				: (planta.getPlant() != null && planta.getPlant().getName() != null
+						? planta.getPlant().getName()
+						: "uma nova planta");
+
+		String titulo = "Nova planta no jardim! 🌱";
+		String mensagem = owner.getName() + " (@" + owner.getUsername() + ") começou a cultivar " + nomePlanta + ".";
+
+		for (Follow follow : seguidores) {
+			if (follow.getFollower() != null && !follow.getFollower().getId().equals(owner.getId())) {
+				firebasePushNotificationService.sendPushNotification(
+						follow.getFollower(),
+						titulo,
+						mensagem,
+						"NEW_PLANT"
+				);
 			}
 		}
 	}

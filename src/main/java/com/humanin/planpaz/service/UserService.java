@@ -35,6 +35,7 @@ public class UserService {
 	private final GardenPlantRepository gardenPlantRepository;
 	private final PostRepository postRepository;
 	private final AchievementService achievementService;
+	private final FirebasePushNotificationService firebasePushNotificationService;
 
 	@Transactional(readOnly = true)
 	public UserStatsDTO getUserStats(UUID targetUserId) {
@@ -124,7 +125,7 @@ public class UserService {
 		if (preferences.longitude() != null)
 			user.setLongitude(preferences.longitude());
 		if (preferences.fcmToken() != null)
-			user.setFcmToken(preferences.fcmToken());
+			user.setFcmToken(preferences.fcmToken().isBlank() ? null : preferences.fcmToken().trim());
 
 		User saved = userRepository.save(user);
 		return UserSettingsDTO.fromEntity(saved);
@@ -177,7 +178,7 @@ public class UserService {
 		if (settings.longitude() != null)
 			user.setLongitude(settings.longitude());
 		if (settings.fcmToken() != null)
-			user.setFcmToken(settings.fcmToken());
+			user.setFcmToken(settings.fcmToken().isBlank() ? null : settings.fcmToken().trim());
 		if (settings.avatarUrl() != null)
 			user.setAvatarUrl(settings.avatarUrl());
 
@@ -196,7 +197,7 @@ public class UserService {
 	public List<UserSummaryDTO> searchByUsername(String query) {
 		String cleanQuery = query.replace("@", "");
 		return userRepository.findByUsernameContainingIgnoreCase(cleanQuery).stream()
-				.map(u -> new UserSummaryDTO(u.getId(), u.getName(), u.getUsername(), u.getEmail())).toList();
+				.map(u -> new UserSummaryDTO(u.getId(), u.getName(), u.getUsername(), u.getEmail(), u.getAvatarUrl())).toList();
 	}
 
 	@Transactional
@@ -210,6 +211,13 @@ public class UserService {
 		if (!followersRepository.existsByFollowerAndFollowed(currentUser, targetUser)) {
 			Follow relation = new Follow(currentUser, targetUser);
 			followersRepository.save(relation);
+
+			firebasePushNotificationService.sendPushNotification(
+					targetUser,
+					"Novo seguidor! 🌿",
+					currentUser.getName() + " (@" + currentUser.getUsername() + ") começou a seguir você.",
+					"NEW_FOLLOWER"
+			);
 		}
 	}
 
@@ -224,7 +232,7 @@ public class UserService {
 		User user = findUserById(userId);
 
 		return followersRepository.findByFollowed(user).stream().map(f -> new UserSummaryDTO(f.getFollower().getId(),
-				f.getFollower().getName(), f.getFollower().getUsername(), f.getFollower().getEmail())).toList();
+				f.getFollower().getName(), f.getFollower().getUsername(), f.getFollower().getEmail(), f.getFollower().getAvatarUrl())).toList();
 	}
 
 	@Transactional(readOnly = true)
@@ -232,7 +240,7 @@ public class UserService {
 		User user = findUserById(userId);
 
 		return followersRepository.findByFollower(user).stream().map(f -> new UserSummaryDTO(f.getFollowed().getId(),
-				f.getFollowed().getName(), f.getFollowed().getUsername(), f.getFollowed().getEmail())).toList();
+				f.getFollowed().getName(), f.getFollowed().getUsername(), f.getFollowed().getEmail(), f.getFollowed().getAvatarUrl())).toList();
 	}
 
 	@Transactional
@@ -245,12 +253,14 @@ public class UserService {
 	public List<com.humanin.planpaz.dto.RecentActivityDTO> getFollowingActivities(UUID currentUserId) {
 		User currentUser = findUserById(currentUserId);
 		List<Follow> follows = followersRepository.findByFollower(currentUser);
-		List<UUID> followedUserIds = new java.util.ArrayList<>(
-				follows.stream().map(f -> f.getFollowed().getId()).toList());
+		List<UUID> followedUserIds = follows.stream()
+				.map(f -> f.getFollowed().getId())
+				.filter(id -> !id.equals(currentUserId))
+				.distinct()
+				.toList();
 
-		boolean noFollowings = followedUserIds.isEmpty();
-		if (noFollowings) {
-			followedUserIds.add(currentUserId);
+		if (followedUserIds.isEmpty()) {
+			return java.util.List.of();
 		}
 
 		List<com.humanin.planpaz.dto.RecentActivityDTO> list = new java.util.ArrayList<>();
