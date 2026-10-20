@@ -65,4 +65,8 @@ public class Plant {
 
 	@Column(name = "image")
 	private String imagePath;
+
+	@jakarta.persistence.OneToOne(mappedBy = "plant", cascade = jakarta.persistence.CascadeType.ALL, fetch = jakarta.persistence.FetchType.LAZY)
+	@com.fasterxml.jackson.annotation.JsonIgnore
+	private PlantCare care;
 }

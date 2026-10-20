@@ -29,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 public class PlantController {
 	private final PlantService plantService;
 	private final PlantStageService plantStageService;
+	private final com.humanin.planpaz.service.PlantCareService plantCareService;
 
 	// ==========================
 	// LISTA TODAS AS ESPÉCIES DO BANCO COM FILTROS E RECOMENDAÇÃO INTELIGENTE
@@ -98,5 +99,14 @@ public class PlantController {
 	@GetMapping("/{id}/stages")
 	public ResponseEntity<List<com.humanin.planpaz.model.PlantStage>> getSpecieStages(@PathVariable UUID id) {
 		return ResponseEntity.ok(plantStageService.getStages(id));
+	}
+
+	// ==========================
+	// RETORNA OS CUIDADOS DETALHADOS DE UMA ESPÉCIE DO BANCO
+	// ==========================
+
+	@GetMapping("/{id}/care")
+	public ResponseEntity<com.humanin.planpaz.dto.PlantCareResponseDTO> getSpecieCare(@PathVariable UUID id) {
+		return ResponseEntity.ok(plantCareService.buscarPorPlantId(id));
 	}
 }

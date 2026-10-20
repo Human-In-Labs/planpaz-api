@@ -11,5 +11,12 @@ import com.humanin.planpaz.model.enums.WateringLevel;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record PlantResponseDTO(UUID id, String name, String scientificName, String description, String careGuide,
 		WateringLevel wateringLevel, LuminosityLevel luminosityLevel, TemperatureLevel temperatureLevel, Size size,
-		Type type, String imagePath, Boolean isRecommended) {
+		Type type, String imagePath, Boolean isRecommended, PlantCareResponseDTO plantCare) {
+
+	public PlantResponseDTO(UUID id, String name, String scientificName, String description, String careGuide,
+			WateringLevel wateringLevel, LuminosityLevel luminosityLevel, TemperatureLevel temperatureLevel, Size size,
+			Type type, String imagePath, Boolean isRecommended) {
+		this(id, name, scientificName, description, careGuide, wateringLevel, luminosityLevel, temperatureLevel, size,
+				type, imagePath, isRecommended, null);
+	}
 }
