@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
+import com.humanin.planpaz.dto.PlantStageResponseDTO;
 import com.humanin.planpaz.model.PlantStage;
 import com.humanin.planpaz.repositories.PlantStageRepository;
 
@@ -17,5 +18,12 @@ public class PlantStageService {
 
     public List<PlantStage> getStages(UUID plantId) {
         return plantStageRepository.findByPlantIdOrderByOrderAsc(plantId);
+    }
+
+    public List<PlantStageResponseDTO> getStageDTOs(UUID plantId) {
+        return plantStageRepository.findByPlantIdOrderByOrderAsc(plantId)
+                .stream()
+                .map(PlantStageResponseDTO::fromEntity)
+                .toList();
     }
 }

@@ -46,6 +46,7 @@ public class AchievementService {
 	private final PlantCareLogRepository plantCareLogRepository;
 	private final PostRepository postRepository;
 	private final CommentRepository commentRepository;
+	private final StreakService streakService;
 
 	public record AchievementDef(
 			String name,
@@ -101,8 +102,10 @@ public class AchievementService {
 		}
 	}
 
-	@Transactional(readOnly = true)
+	@Transactional
 	public List<AchievementProgressDTO> obterConquistasProgressoDoUsuario(UUID userId) {
+		sanitizarConquistasDeStreakIndevidas(userId);
+
 		User user = userRepository.findById(userId)
 				.orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado com ID: " + userId));
 
@@ -119,10 +122,8 @@ public class AchievementService {
 		long totalPosts = postRepository.countByAuthorId(userId);
 		long totalComments = commentRepository.countByAuthorId(userId);
 
-		int maxStreak = plants.stream()
-				.mapToInt(p -> p.getStreakDays() != null ? p.getStreakDays() : 0)
-				.max()
-				.orElse(0);
+		// Apenas a ofensiva consecutiva real e ativa do usuário no jardim é considerada
+		int userStreak = streakService.getActiveStreak(user);
 
 		int ecoscore = user.getEcoscore() != null ? user.getEcoscore() : 0;
 
@@ -153,7 +154,7 @@ public class AchievementService {
 				     "Mata Atlântica Particular", "Amazônia em Casa" -> (int) totalPlants;
 				case "Voz da Comunidade", "Influenciador Botânico" -> (int) totalPosts;
 				case "Avaliador Ecológico", "Membro Ativo" -> (int) totalComments;
-				case "Constância Verde", "Mestre da Rega", "Guardião Botânico" -> maxStreak;
+				case "Constância Verde", "Mestre da Rega", "Guardião Botânico" -> userStreak;
 				case "Jardineiro Dedicado", "Eco Mestre" -> ecoscore;
 				case "Protetor da Natureza", "Pulmão Verde", "Guardião do Planeta" -> totalCo2Grams;
 				default -> 0;
@@ -248,15 +249,73 @@ public class AchievementService {
 	}
 
 	public UserAchievement concederCuidarPlanta3Dias(UUID userId) {
-		return concederConquista(userId, "Constância Verde", "Manter 3 dias seguidos de Streak");
+		User user = userRepository.findById(userId).orElse(null);
+		if (user != null && streakService.getActiveStreak(user) >= 3) {
+			return concederConquista(userId, "Constância Verde", "Manter 3 dias seguidos de Streak");
+		}
+		return null;
 	}
 
 	public UserAchievement concederCuidarPlanta5Dias(UUID userId) {
-		return concederConquista(userId, "Constância Verde", "Manter 3 dias seguidos de Streak");
+		User user = userRepository.findById(userId).orElse(null);
+		if (user != null && streakService.getActiveStreak(user) >= 3) {
+			return concederConquista(userId, "Constância Verde", "Manter 3 dias seguidos de Streak");
+		}
+		return null;
 	}
 
 	public UserAchievement concederCuidarPlanta10Dias(UUID userId) {
-		return concederConquista(userId, "Mestre da Rega", "Manter 7 dias seguidos de Streak");
+		User user = userRepository.findById(userId).orElse(null);
+		if (user != null && streakService.getActiveStreak(user) >= 7) {
+			return concederConquista(userId, "Mestre da Rega", "Manter 7 dias seguidos de Streak");
+		}
+		return null;
+	}
+
+	/**
+	 * Sanitiza com segurança concessões antigas indevidas de conquistas de streak geradas
+	 * pelo bug que considerava o tempo de cultivo (plantedAt) da planta como ofensiva.
+	 * Não afeta conquistas de usuários legítimos com histórico compatível.
+	 */
+	@Transactional
+	public void sanitizarConquistasDeStreakIndevidas(UUID userId) {
+		User user = userRepository.findById(userId).orElse(null);
+		if (user == null) {
+			return;
+		}
+
+		List<UserAchievement> userAchievements = userAchievementRepository.findByUserId(userId);
+		if (userAchievements.isEmpty()) {
+			return;
+		}
+
+		long diasDesdeCriacao = user.getCreatedAt() != null
+				? Math.max(1, ChronoUnit.DAYS.between(user.getCreatedAt().toLocalDate(), LocalDate.now(StreakService.ZONE_BRASILIA)) + 1)
+				: 1;
+
+		long diasDistintosDeCuidado = plantCareLogRepository.findByUserId(userId).stream()
+				.map(log -> log.getPerformedAt().toLocalDate())
+				.distinct()
+				.count();
+
+		long maxDiasPossiveis = Math.max(diasDesdeCriacao, diasDistintosDeCuidado);
+
+		for (UserAchievement ua : userAchievements) {
+			String achName = ua.getAchievement().getName();
+			if ("Mestre da Rega".equals(achName) && maxDiasPossiveis < 7) {
+				log.warn("Removendo conquista indevida 'Mestre da Rega' do usuário {} (dias possíveis: {})",
+						user.getUsername(), maxDiasPossiveis);
+				userAchievementRepository.delete(ua);
+			} else if ("Guardião Botânico".equals(achName) && maxDiasPossiveis < 30) {
+				log.warn("Removendo conquista indevida 'Guardião Botânico' do usuário {} (dias possíveis: {})",
+						user.getUsername(), maxDiasPossiveis);
+				userAchievementRepository.delete(ua);
+			} else if ("Constância Verde".equals(achName) && maxDiasPossiveis < 3) {
+				log.warn("Removendo conquista indevida 'Constância Verde' do usuário {} (dias possíveis: {})",
+						user.getUsername(), maxDiasPossiveis);
+				userAchievementRepository.delete(ua);
+			}
+		}
 	}
 
 	public UserAchievement concederEstagioCrescimento(UUID userId) {

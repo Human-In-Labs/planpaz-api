@@ -29,6 +29,15 @@ public class PlantService {
 	public final PlantRepository plantRepository;
 	public final UserRepository userRepository;
 
+	@Transactional
+	public PlantResponseDTO adicionarPlanta(com.humanin.planpaz.dto.PlantCreateDTO dto) {
+		if (plantRepository.existsByNameIgnoreCase(dto.name())) {
+			throw new BusinessException("Já existe uma planta com esse nome.");
+		}
+		Plant saved = plantRepository.save(dto.toEntity());
+		return PlantResponseDTO.fromEntity(saved);
+	}
+
 	public Plant adicionarPlanta(Plant planta) {
 		if (plantRepository.existsByNameIgnoreCase(planta.getName())) {
 			throw new BusinessException("Já existe uma planta com esse nome.");
@@ -205,6 +214,32 @@ public class PlantService {
 		return plantRepository.save(novaPlanta);
 	}
 
+	@Transactional
+	public PlantResponseDTO editarPlanta(UUID id, com.humanin.planpaz.dto.PlantUpdateDTO dto) {
+		Plant novaPlanta = plantRepository.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("Planta não encontrada com ID: " + id));
+
+		if (dto.name() != null && !dto.name().isBlank()) {
+			if (plantRepository.existsByNameIgnoreCaseAndIdNot(dto.name(), id)) {
+				throw new BusinessException("Já existe uma planta com esse nome.");
+			}
+			novaPlanta.setName(dto.name());
+		}
+
+		if (dto.scientificName() != null) novaPlanta.setScientificName(dto.scientificName());
+		if (dto.description() != null) novaPlanta.setDescription(dto.description());
+		if (dto.careGuide() != null) novaPlanta.setCareGuide(dto.careGuide());
+		if (dto.imagePath() != null) novaPlanta.setImagePath(dto.imagePath());
+		if (dto.luminosityLevel() != null) novaPlanta.setLuminosityLevel(dto.luminosityLevel());
+		if (dto.size() != null) novaPlanta.setSize(dto.size());
+		if (dto.temperatureLevel() != null) novaPlanta.setTemperatureLevel(dto.temperatureLevel());
+		if (dto.type() != null) novaPlanta.setType(dto.type());
+		if (dto.wateringLevel() != null) novaPlanta.setWateringLevel(dto.wateringLevel());
+
+		Plant saved = plantRepository.save(novaPlanta);
+		return PlantResponseDTO.fromEntity(saved);
+	}
+
 	public void excluirPlanta(UUID idPlanta) {
 		if (!plantRepository.existsById(idPlanta)) {
 			throw new ResourceNotFoundException("Planta não encontrada com ID: " + idPlanta);
@@ -216,5 +251,9 @@ public class PlantService {
 	public Plant buscarPorId(UUID id) {
 		return plantRepository.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException("Planta não encontrada com ID: " + id));
+	}
+
+	public PlantResponseDTO buscarDTOPorId(UUID id) {
+		return PlantResponseDTO.fromEntity(buscarPorId(id));
 	}
 }

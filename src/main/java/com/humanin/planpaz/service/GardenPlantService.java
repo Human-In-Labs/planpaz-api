@@ -12,6 +12,10 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
   
+import com.humanin.planpaz.dto.GardenPlantCreateDTO;
+import com.humanin.planpaz.dto.GardenPlantResponseDTO;
+import com.humanin.planpaz.dto.GardenPlantUpdateDTO;
+import com.humanin.planpaz.dto.PlantStageResponseDTO;
 import com.humanin.planpaz.dto.PlantStatsDTO;
 import com.humanin.planpaz.dto.StageSuggestionDTO;
 import com.humanin.planpaz.infra.exception.BusinessException;
@@ -50,7 +54,83 @@ public class GardenPlantService {
 	private final FollowRepository followRepository;
 	private final FirebasePushNotificationService firebasePushNotificationService;
 
-	// ADICIONAR
+	// ADICIONAR COM DTO
+	@Transactional
+	public GardenPlantResponseDTO adicionarPlanta(GardenPlantCreateDTO dto, UUID ownerId) {
+		if (ownerId == null) {
+			throw new BusinessException("Proprietário da planta não informado.");
+		}
+
+		User realOwner = userRepository.findById(ownerId).orElseThrow(
+				() -> new ResourceNotFoundException("Usuário proprietário não encontrado."));
+
+		UUID plantId = dto.getResolvedPlantId();
+		if (plantId == null) {
+			throw new BusinessException("Espécie de planta não informada.");
+		}
+		Plant realPlant = plantRepository.findById(plantId).orElseThrow(
+				() -> new ResourceNotFoundException("Espécie de planta não encontrada com o ID informado."));
+
+		PlantStage realStage = null;
+		UUID stageId = dto.getResolvedStageId();
+		if (stageId != null) {
+			realStage = plantStageRepository.findById(stageId).orElse(null);
+		}
+
+		if (gardenPlantRepository.existsByOwnerIdAndNicknameIgnoreCase(ownerId, dto.nickname())) {
+			throw new BusinessException("Já existe uma planta com esse apelido.");
+		}
+
+		GardenPlant gardenPlant = new GardenPlant();
+		gardenPlant.setOwner(realOwner);
+		gardenPlant.setPlant(realPlant);
+		gardenPlant.setStage(realStage);
+		gardenPlant.setNickname(dto.nickname());
+		gardenPlant.setRoom(dto.room());
+		gardenPlant.setDirectRain(dto.directRain() != null ? dto.directRain() : false);
+		gardenPlant.setWateringNotification(dto.wateringNotification() != null ? dto.wateringNotification() : true);
+		gardenPlant.setImagePath(dto.imagePath());
+		gardenPlant.setPlantedAt(dto.plantedAt() != null ? dto.plantedAt() : LocalDateTime.now());
+
+		LocalDate hoje = LocalDate.now(StreakService.ZONE_BRASILIA);
+		gardenPlant.setLastWatering(hoje);
+		gardenPlant.setLastCareDate(hoje);
+
+		int pontosIniciais = 110;
+		gardenPlant.setEcoscore(pontosIniciais);
+
+		GardenPlant saved = gardenPlantRepository.save(gardenPlant);
+
+		// Registra a interação com o próprio jardim e atualiza a ofensiva do usuário
+		streakService.processCareActionAndGrantPoints(realOwner, saved, pontosIniciais);
+
+		try {
+			PlantCareLog log = new PlantCareLog();
+			log.setGardenPlant(saved);
+			log.setUser(saved.getOwner());
+			log.setCareType(CareType.WATERING);
+			log.setPointsEarned(10);
+			plantCareLogRepository.save(log);
+		} catch (Exception e) {
+			System.err.println("[LOG] Erro ao registrar log de rega inicial: " + e.getMessage());
+		}
+
+		try {
+			verificarConquistasDeCultivo(ownerId);
+		} catch (Exception e) {
+			System.err.println("[ACHIEVEMENTS] Erro ao verificar conquistas após adicionar planta: " + e.getMessage());
+		}
+
+		try {
+			notificarSeguidoresNovaPlanta(realOwner, saved);
+		} catch (Exception e) {
+			System.err.println("[PUSH] Erro ao notificar seguidores sobre nova planta: " + e.getMessage());
+		}
+
+		return GardenPlantResponseDTO.fromEntity(saved);
+	}
+
+	// ADICIONAR (LEGADO / ENTIDADE)
 	@Transactional
 	public GardenPlant adicionarPlanta(GardenPlant gardenPlant) {
 		if (gardenPlant.getOwner() == null || gardenPlant.getOwner().getId() == null) {
@@ -83,20 +163,17 @@ public class GardenPlantService {
 			gardenPlant.setPlantedAt(LocalDateTime.now());
 		}
 
-		LocalDate hoje = LocalDate.now();
+		LocalDate hoje = LocalDate.now(StreakService.ZONE_BRASILIA);
 		gardenPlant.setLastWatering(hoje);
 		gardenPlant.setLastCareDate(hoje);
-		gardenPlant.setStreakDays(1);
 
-		// Pontuação inicial ao criar uma nova planta: +100 (criação de planta) + 10 (rega inicial) = +110 pts
 		int pontosIniciais = 110;
 		gardenPlant.setEcoscore(pontosIniciais);
 
-		int userEcoscore = realOwner.getEcoscore() != null ? realOwner.getEcoscore() : 0;
-		realOwner.setEcoscore(userEcoscore + pontosIniciais);
-		userRepository.save(realOwner);
-
 		GardenPlant saved = gardenPlantRepository.save(gardenPlant);
+
+		// Registra a interação com o próprio jardim e atualiza a ofensiva do usuário
+		streakService.processCareActionAndGrantPoints(realOwner, saved, pontosIniciais);
 
 		try {
 			PlantCareLog log = new PlantCareLog();
@@ -124,13 +201,29 @@ public class GardenPlantService {
 		return saved;
 	}
 
-	// LISTAR
+	// LISTAR COM DTO
+	@Transactional(readOnly = true)
+	public List<GardenPlantResponseDTO> listarPorUsuarioDTO(UUID ownerId) {
+		return gardenPlantRepository.findByOwnerId(ownerId)
+				.stream()
+				.map(GardenPlantResponseDTO::fromEntity)
+				.toList();
+	}
+
+	// LISTAR (ENTIDADE)
 	@Transactional(readOnly = true)
 	public List<GardenPlant> listarPorUsuario(UUID ownerId) {
 		return gardenPlantRepository.findByOwnerId(ownerId);
 	}
 
-	// BUSCAR POR ID E USUÁRIO
+	// BUSCAR POR ID E USUÁRIO (DTO)
+	@Transactional(readOnly = true)
+	public GardenPlantResponseDTO buscarDTOPorIdEUsuario(UUID id, UUID ownerId) {
+		GardenPlant gp = buscarPorIdEUsuario(id, ownerId);
+		return GardenPlantResponseDTO.fromEntity(gp);
+	}
+
+	// BUSCAR POR ID E USUÁRIO (ENTIDADE)
 	@Transactional(readOnly = true)
 	public GardenPlant buscarPorIdEUsuario(UUID id, UUID ownerId) {
 		return gardenPlantRepository.findByIdAndOwnerId(id, ownerId)
@@ -142,7 +235,55 @@ public class GardenPlantService {
 		return gardenPlantRepository.findById(id);
 	}
 
-	// EDITAR
+	// EDITAR COM DTO
+	@Transactional
+	public GardenPlantResponseDTO editarPlanta(UUID id, UUID ownerId, GardenPlantUpdateDTO dto) {
+		GardenPlant planta = gardenPlantRepository.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("Planta não encontrada com ID: " + id));
+
+		if (!planta.getOwner().getId().equals(ownerId)) {
+			throw new BusinessException("Esta planta não pertence ao usuário autenticado.");
+		}
+
+		if (dto.nickname() != null && !dto.nickname().isBlank()) {
+			if (gardenPlantRepository.existsByOwnerIdAndNicknameIgnoreCaseAndIdNot(ownerId, dto.nickname(), id)) {
+				throw new BusinessException("Já existe uma planta com esse apelido.");
+			}
+			planta.setNickname(dto.nickname());
+		}
+
+		UUID stageId = dto.getResolvedStageId();
+		if (stageId != null) {
+			PlantStage realStage = plantStageRepository.findById(stageId).orElse(null);
+			planta.setStage(realStage);
+		}
+
+		if (dto.room() != null) {
+			planta.setRoom(dto.room());
+		}
+		if (dto.directRain() != null) {
+			planta.setDirectRain(dto.directRain());
+		}
+		if (dto.wateringNotification() != null) {
+			planta.setWateringNotification(dto.wateringNotification());
+		}
+		if (dto.imagePath() != null) {
+			planta.setImagePath(dto.imagePath());
+		}
+		if (dto.lastWatering() != null) {
+			planta.setLastWatering(dto.lastWatering());
+		}
+
+		GardenPlant saved = gardenPlantRepository.save(planta);
+		verificarConquistasDeEstagio(ownerId, planta.getStage());
+
+		// Registra a edição da planta como interação válida com o próprio jardim
+		streakService.processCareActionAndGrantPoints(planta.getOwner(), saved, 0);
+
+		return GardenPlantResponseDTO.fromEntity(saved);
+	}
+
+	// EDITAR (LEGADO / ENTIDADE)
 	@Transactional
 	public GardenPlant editarPlanta(UUID id, UUID ownerId, GardenPlant gardenPlant) {
 		GardenPlant planta = gardenPlantRepository.findById(id)
@@ -184,6 +325,9 @@ public class GardenPlantService {
 
 		// VERIFICAÇÃO AUTOMÁTICA DE CONQUISTAS (Estágio da Planta)
 		verificarConquistasDeEstagio(ownerId, planta.getStage());
+
+		// Registra a edição da planta como interação válida com o próprio jardim
+		streakService.processCareActionAndGrantPoints(planta.getOwner(), saved, 0);
 
 		return saved;
 	}
@@ -331,8 +475,8 @@ public class GardenPlantService {
 		return Optional.of(new StageSuggestionDTO(
 				planta.getId(),
 				cultivationDays,
-				estagioAtual,
-				estagios.get(indiceIdeal)
+				PlantStageResponseDTO.fromEntity(estagioAtual),
+				PlantStageResponseDTO.fromEntity(estagios.get(indiceIdeal))
 		));
 	}
 

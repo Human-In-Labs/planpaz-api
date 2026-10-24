@@ -15,7 +15,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.humanin.planpaz.dto.AchievementProgressDTO;
 import com.humanin.planpaz.dto.ApiResponseDTO;
+import com.humanin.planpaz.dto.GardenPlantCreateDTO;
+import com.humanin.planpaz.dto.GardenPlantResponseDTO;
+import com.humanin.planpaz.dto.GardenPlantUpdateDTO;
 import com.humanin.planpaz.dto.PlantStatsDTO;
 import com.humanin.planpaz.dto.StageSuggestionDTO;
 import com.humanin.planpaz.dto.WateringReminderDTO;
@@ -23,14 +27,12 @@ import com.humanin.planpaz.dto.WateringStatusDTO;
 import com.humanin.planpaz.dto.WeatherResponseDTO;
 import com.humanin.planpaz.model.GardenPlant;
 import com.humanin.planpaz.model.User;
+import com.humanin.planpaz.service.AchievementService;
 import com.humanin.planpaz.service.GardenPlantService;
 import com.humanin.planpaz.service.WateringService;
 import com.humanin.planpaz.service.WeatherService;
 
-import lombok.RequiredArgsConstructor;
-
-import com.humanin.planpaz.dto.AchievementProgressDTO;
-import com.humanin.planpaz.service.AchievementService;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping({"/api/garden", "/api/user-plants", "/api/plants"})
@@ -57,10 +59,9 @@ public class GardenPlantController {
 	// =========================
 
 	@PostMapping("/add")
-	public ResponseEntity<ApiResponseDTO> addGardenPlant(@RequestBody GardenPlant gardenPlant, Authentication authentication) {
+	public ResponseEntity<ApiResponseDTO> addGardenPlant(@Valid @RequestBody GardenPlantCreateDTO dto, Authentication authentication) {
 		User user = getAuthenticatedUser(authentication);
-		gardenPlant.setOwner(user);
-		gardenPlantService.adicionarPlanta(gardenPlant);
+		gardenPlantService.adicionarPlanta(dto, user.getId());
 		List<AchievementProgressDTO> unlockedList = achievementService.checkAndGrantAll(user.getId());
 		return ResponseEntity.ok(ApiResponseDTO.ok("Planta adicionada com sucesso ao seu jardim!", unlockedList));
 	}
@@ -70,9 +71,9 @@ public class GardenPlantController {
 	// =========================
 
 	@GetMapping
-	public ResponseEntity<List<GardenPlant>> getAllGardenPlants(Authentication authentication) {
+	public ResponseEntity<List<GardenPlantResponseDTO>> getAllGardenPlants(Authentication authentication) {
 		User user = getAuthenticatedUser(authentication);
-		List<GardenPlant> plantas = gardenPlantService.listarPorUsuario(user.getId());
+		List<GardenPlantResponseDTO> plantas = gardenPlantService.listarPorUsuarioDTO(user.getId());
 		return ResponseEntity.ok(plantas);
 	}
 
@@ -81,9 +82,9 @@ public class GardenPlantController {
 	// =========================
 
 	@GetMapping("/{id}")
-	public ResponseEntity<GardenPlant> getGardenPlant(@PathVariable UUID id, Authentication authentication) {
+	public ResponseEntity<GardenPlantResponseDTO> getGardenPlant(@PathVariable UUID id, Authentication authentication) {
 		User user = getAuthenticatedUser(authentication);
-		GardenPlant planta = gardenPlantService.buscarPorIdEUsuario(id, user.getId());
+		GardenPlantResponseDTO planta = gardenPlantService.buscarDTOPorIdEUsuario(id, user.getId());
 		return ResponseEntity.ok(planta);
 	}
 
@@ -115,10 +116,10 @@ public class GardenPlantController {
 	// =========================
 
 	@PutMapping("/{id}")
-	public ResponseEntity<ApiResponseDTO> editGardenPlant(@PathVariable UUID id, @RequestBody GardenPlant gardenPlant,
+	public ResponseEntity<ApiResponseDTO> editGardenPlant(@PathVariable UUID id, @Valid @RequestBody GardenPlantUpdateDTO dto,
 			Authentication authentication) {
 		User user = getAuthenticatedUser(authentication);
-		gardenPlantService.editarPlanta(id, user.getId(), gardenPlant);
+		gardenPlantService.editarPlanta(id, user.getId(), dto);
 		return ResponseEntity.ok(ApiResponseDTO.ok("Planta atualizada com sucesso."));
 	}
 

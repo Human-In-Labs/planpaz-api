@@ -11,8 +11,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.humanin.planpaz.dto.LikeRequestDTO;
 import com.humanin.planpaz.service.LikeService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -22,17 +24,12 @@ public class LikeController {
 
 	private final LikeService likeService;
 
-	// Adicione a anotação @PostMapping aqui
 	@PostMapping
-	public ResponseEntity<Map<String, Object>> toggleLike(@PathVariable UUID postId,
-			@RequestBody Map<String, UUID> payload) {
+	public ResponseEntity<Map<String, Object>> toggleLike(
+			@PathVariable UUID postId,
+			@Valid @RequestBody LikeRequestDTO payload) {
 
-		UUID authorId = payload.get("authorId");
-
-		if (authorId == null) {
-			throw new IllegalArgumentException("O campo 'authorId' é obrigatório no corpo da requisição.");
-		}
-
+		UUID authorId = payload.authorId();
 		boolean liked = likeService.toggleLike(postId, authorId);
 		long totalLikes = likeService.countLikes(postId);
 

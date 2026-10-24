@@ -36,6 +36,48 @@ public class DailyReminderScheduler {
 	private final WateringService wateringService;
 	private final EmailService emailService;
 	private final FirebasePushNotificationService firebasePushNotificationService;
+	private final com.humanin.planpaz.repositories.UserRepository userRepository;
+	private final StreakService streakService;
+
+	@Scheduled(cron = "0 5 0 * * *", zone = "America/Sao_Paulo")
+	@Transactional
+	public void verificarEQuebrarStreaksExpiradosAgendado() {
+		log.info("Verificando streaks expirados por inatividade à meia-noite...");
+		List<User> usuariosComStreak = userRepository.findAll().stream()
+				.filter(u -> u.getStreakDays() != null && u.getStreakDays() > 0)
+				.toList();
+
+		int zerados = 0;
+		for (User user : usuariosComStreak) {
+			if (streakService.getActiveStreak(user) == 0) {
+				user.setStreakDays(0);
+				userRepository.save(user);
+				zerados++;
+			}
+		}
+
+		if (zerados > 0) {
+			log.info("{} usuário(s) tiveram a sequência de ofensiva zerada por inatividade no dia anterior.", zerados);
+		}
+	}
+
+	@Scheduled(cron = "0 0 8,14,20 * * *", zone = "America/Sao_Paulo")
+	@Transactional
+	public void atualizarLembretesPorClimaAgendado() {
+		log.info("Iniciando verificação agendada de clima para atualização de lembretes (RF24)...");
+		List<User> usuariosComLocal = userRepository.findAll().stream()
+				.filter(u -> (u.getLatitude() != null && u.getLongitude() != null)
+						|| (u.getCityName() != null && !u.getCityName().isBlank()))
+				.toList();
+
+		for (User user : usuariosComLocal) {
+			try {
+				wateringService.atualizarLembretesPorClima(user, user.getLatitude(), user.getLongitude(), user.getCityName());
+			} catch (Exception e) {
+				log.warn("Falha ao atualizar lembretes por clima para o usuário {}: {}", user.getUsername(), e.getMessage());
+			}
+		}
+	}
 
 	@Scheduled(cron = "0 0 * * * *", zone = "America/Sao_Paulo")
 	@Transactional(readOnly = true)

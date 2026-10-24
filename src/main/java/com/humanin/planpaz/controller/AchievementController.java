@@ -1,18 +1,20 @@
 package com.humanin.planpaz.controller;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.humanin.planpaz.dto.AchievementProgressDTO;
-import com.humanin.planpaz.model.Achievement;
+import com.humanin.planpaz.dto.AchievementResponseDTO;
+import com.humanin.planpaz.dto.UserAchievementResponseDTO;
 import com.humanin.planpaz.model.User;
-import com.humanin.planpaz.model.UserAchievement;
 import com.humanin.planpaz.service.AchievementService;
 
 import lombok.RequiredArgsConstructor;
@@ -41,16 +43,19 @@ public class AchievementController {
 	}
 
 	@GetMapping("/user/{userId}")
-	public ResponseEntity<List<AchievementProgressDTO>> getUserAchievementsProgress(@org.springframework.web.bind.annotation.PathVariable java.util.UUID userId) {
+	public ResponseEntity<List<AchievementProgressDTO>> getUserAchievementsProgress(@PathVariable UUID userId) {
 		achievementService.checkAndGrantAll(userId);
 		List<AchievementProgressDTO> conquistas = achievementService.obterConquistasProgressoDoUsuario(userId);
 		return ResponseEntity.ok(conquistas);
 	}
 
 	@GetMapping
-	public ResponseEntity<List<UserAchievement>> getUserAchievements(Authentication authentication) {
+	public ResponseEntity<List<UserAchievementResponseDTO>> getUserAchievements(Authentication authentication) {
 		User user = getAuthenticatedUser(authentication);
-		List<UserAchievement> conquistas = achievementService.obterConquistasDoUsuario(user.getId());
+		List<UserAchievementResponseDTO> conquistas = achievementService.obterConquistasDoUsuario(user.getId())
+				.stream()
+				.map(UserAchievementResponseDTO::fromEntity)
+				.toList();
 		return ResponseEntity.ok(conquistas);
 	}
 
@@ -58,8 +63,11 @@ public class AchievementController {
 	// LISTAR TODAS AS CONQUISTAS DO SISTEMA (CATÁLOGO)
 	// ==========================
 	@GetMapping("/catalog")
-	public ResponseEntity<List<Achievement>> getAchievementsCatalog() {
-		List<Achievement> todas = achievementService.listarTodas();
+	public ResponseEntity<List<AchievementResponseDTO>> getAchievementsCatalog() {
+		List<AchievementResponseDTO> todas = achievementService.listarTodas()
+				.stream()
+				.map(AchievementResponseDTO::fromEntity)
+				.toList();
 		return ResponseEntity.ok(todas);
 	}
 

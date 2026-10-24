@@ -36,8 +36,9 @@ public class UserService {
 	private final PostRepository postRepository;
 	private final AchievementService achievementService;
 	private final FirebasePushNotificationService firebasePushNotificationService;
+	private final StreakService streakService;
 
-	@Transactional(readOnly = true)
+	@Transactional
 	public UserStatsDTO getUserStats(UUID targetUserId) {
 		User targetUser = findUserById(targetUserId);
 
@@ -65,7 +66,13 @@ public class UserService {
 				.doubleValue();
 
 		int totalEcoScore = targetUser.getEcoscore() != null ? targetUser.getEcoscore() : 0;
-		int streakCount = targetUser.getStreakDays() != null ? targetUser.getStreakDays() : 0;
+		int streakCount = streakService.getActiveStreak(targetUser);
+
+		// Sincroniza persistência caso a ofensiva tenha quebrado por inatividade
+		if (targetUser.getStreakDays() != null && targetUser.getStreakDays() > 0 && streakCount == 0) {
+			targetUser.setStreakDays(0);
+			userRepository.save(targetUser);
+		}
 
 		return new com.humanin.planpaz.dto.UserStatsDTO(targetUser.getId(), totalCo2Grams, totalEcoScore, totalPlants,
 				totalPosts, daysOnApp, streakCount);

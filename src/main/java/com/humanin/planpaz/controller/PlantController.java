@@ -15,12 +15,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.humanin.planpaz.dto.ApiResponseDTO;
+import com.humanin.planpaz.dto.PlantCareResponseDTO;
+import com.humanin.planpaz.dto.PlantCreateDTO;
 import com.humanin.planpaz.dto.PlantResponseDTO;
-import com.humanin.planpaz.model.Plant;
+import com.humanin.planpaz.dto.PlantStageResponseDTO;
+import com.humanin.planpaz.dto.PlantUpdateDTO;
 import com.humanin.planpaz.model.User;
+import com.humanin.planpaz.service.PlantCareService;
 import com.humanin.planpaz.service.PlantService;
 import com.humanin.planpaz.service.PlantStageService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -29,7 +35,7 @@ import lombok.RequiredArgsConstructor;
 public class PlantController {
 	private final PlantService plantService;
 	private final PlantStageService plantStageService;
-	private final com.humanin.planpaz.service.PlantCareService plantCareService;
+	private final PlantCareService plantCareService;
 
 	// ==========================
 	// LISTA TODAS AS ESPÉCIES DO BANCO COM FILTROS E RECOMENDAÇÃO INTELIGENTE
@@ -57,9 +63,9 @@ public class PlantController {
 	// ==========================
 
 	@PostMapping
-	public ResponseEntity<String> addSpecie(@RequestBody Plant plant) {
-		plantService.adicionarPlanta(plant);
-		return ResponseEntity.ok("Planta criada com sucesso.");
+	public ResponseEntity<ApiResponseDTO> addSpecie(@Valid @RequestBody PlantCreateDTO dto) {
+		plantService.adicionarPlanta(dto);
+		return ResponseEntity.ok(ApiResponseDTO.ok("Planta criada com sucesso."));
 	}
 
 	// ==========================
@@ -67,10 +73,9 @@ public class PlantController {
 	// ==========================
 
 	@PutMapping("/{id}")
-	public ResponseEntity<String> editSpecie(@PathVariable UUID id, @RequestBody Plant plant) {
-		plant.setId(id);
-		plantService.editarPlanta(plant);
-		return ResponseEntity.ok("Planta atualizada com sucesso.");
+	public ResponseEntity<ApiResponseDTO> editSpecie(@PathVariable UUID id, @Valid @RequestBody PlantUpdateDTO dto) {
+		plantService.editarPlanta(id, dto);
+		return ResponseEntity.ok(ApiResponseDTO.ok("Planta atualizada com sucesso."));
 	}
 
 	// ==========================
@@ -78,9 +83,9 @@ public class PlantController {
 	// ==========================
 
 	@DeleteMapping("/{id}")
-	public ResponseEntity<String> deleteSpecie(@PathVariable UUID id) {
+	public ResponseEntity<ApiResponseDTO> deleteSpecie(@PathVariable UUID id) {
 		plantService.excluirPlanta(id);
-		return ResponseEntity.ok("Planta deletada com sucesso.");
+		return ResponseEntity.ok(ApiResponseDTO.ok("Planta deletada com sucesso."));
 	}
 
 	// ==========================
@@ -88,8 +93,8 @@ public class PlantController {
 	// ==========================
 
 	@GetMapping("/{id}")
-	public ResponseEntity<Plant> getSpecie(@PathVariable UUID id) {
-		return ResponseEntity.ok(plantService.buscarPorId(id));
+	public ResponseEntity<PlantResponseDTO> getSpecie(@PathVariable UUID id) {
+		return ResponseEntity.ok(plantService.buscarDTOPorId(id));
 	}
 
 	// ==========================
@@ -97,8 +102,8 @@ public class PlantController {
 	// ==========================
 
 	@GetMapping("/{id}/stages")
-	public ResponseEntity<List<com.humanin.planpaz.model.PlantStage>> getSpecieStages(@PathVariable UUID id) {
-		return ResponseEntity.ok(plantStageService.getStages(id));
+	public ResponseEntity<List<PlantStageResponseDTO>> getSpecieStages(@PathVariable UUID id) {
+		return ResponseEntity.ok(plantStageService.getStageDTOs(id));
 	}
 
 	// ==========================
@@ -106,7 +111,7 @@ public class PlantController {
 	// ==========================
 
 	@GetMapping("/{id}/care")
-	public ResponseEntity<com.humanin.planpaz.dto.PlantCareResponseDTO> getSpecieCare(@PathVariable UUID id) {
+	public ResponseEntity<PlantCareResponseDTO> getSpecieCare(@PathVariable UUID id) {
 		return ResponseEntity.ok(plantCareService.buscarPorPlantId(id));
 	}
 }

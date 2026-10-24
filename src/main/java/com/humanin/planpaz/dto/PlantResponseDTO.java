@@ -19,4 +19,26 @@ public record PlantResponseDTO(UUID id, String name, String scientificName, Stri
 		this(id, name, scientificName, description, careGuide, wateringLevel, luminosityLevel, temperatureLevel, size,
 				type, imagePath, isRecommended, null);
 	}
+
+	public static PlantResponseDTO fromEntity(com.humanin.planpaz.model.Plant p) {
+		if (p == null) {
+			return null;
+		}
+		PlantCareResponseDTO careDTO = p.getCare() != null ? PlantCareResponseDTO.fromEntity(p.getCare()) : null;
+		return new PlantResponseDTO(
+				p.getId(),
+				p.getName(),
+				p.getScientificName(),
+				p.getDescription(),
+				p.getCareGuide(),
+				p.getWateringLevel(),
+				p.getLuminosityLevel(),
+				p.getTemperatureLevel(),
+				p.getSize(),
+				p.getType(),
+				p.getImagePath(),
+				null,
+				careDTO
+		);
+	}
 }

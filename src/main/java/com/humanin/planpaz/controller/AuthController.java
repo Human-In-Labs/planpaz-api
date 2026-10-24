@@ -24,7 +24,7 @@ public class AuthController {
 	// ==========================
 
 	@PostMapping("/login")
-	public ResponseEntity<ResponseDTO> login(@RequestBody LoginRequestDTO body) {
+	public ResponseEntity<ResponseDTO> login(@jakarta.validation.Valid @RequestBody LoginRequestDTO body) {
 		ResponseDTO response = authService.login(body);
 		return ResponseEntity.ok(response);
 	}
@@ -34,7 +34,7 @@ public class AuthController {
 	// ==========================
 
 	@PostMapping("/register")
-	public ResponseEntity<ResponseDTO> register(@RequestBody RegisterRequestDTO body) {
+	public ResponseEntity<ResponseDTO> register(@jakarta.validation.Valid @RequestBody RegisterRequestDTO body) {
 		ResponseDTO response = authService.register(body);
 		return ResponseEntity.ok(response);
 	}

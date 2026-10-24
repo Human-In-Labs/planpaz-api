@@ -48,9 +48,9 @@ public class AdminModerationController {
 	}
 
 	@GetMapping("/me")
-	public ResponseEntity<Admin> getMe(Authentication authentication) {
+	public ResponseEntity<com.humanin.planpaz.dto.AdminResponseDTO> getMe(Authentication authentication) {
 		Admin admin = extractAdmin(authentication);
-		return ResponseEntity.ok(admin);
+		return ResponseEntity.ok(com.humanin.planpaz.dto.AdminResponseDTO.fromEntity(admin));
 	}
 
 	@GetMapping("/reports")
