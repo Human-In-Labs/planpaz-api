@@ -1,6 +1,8 @@
 package com.humanin.planpaz.dto;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import com.humanin.planpaz.model.Comment;
@@ -27,9 +29,11 @@ public class CommentResponseDTO {
 
 	private UUID parentCommentId;
 
+	private List<CommentResponseDTO> replies = new ArrayList<>();
+
 	// Conquistas desbloqueadas pela ação
 	private AchievementProgressDTO unlockedAchievement;
-	private java.util.List<AchievementProgressDTO> unlockedAchievements;
+	private List<AchievementProgressDTO> unlockedAchievements;
 
 	public static CommentResponseDTO fromEntity(Comment comment) {
 		CommentResponseDTO dto = new CommentResponseDTO();

@@ -5,6 +5,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import com.humanin.planpaz.dto.PlantWateringStatusDTO;
@@ -43,6 +44,7 @@ public class EmailService {
 		return frasesMotivacionais.get(index);
 	}
 
+	@Async
 	public void enviarAlertaRega(String para, String nomePlanta, String statusRega) {
 
 		String fraseDoDia = obterFraseAleatoria();
@@ -73,6 +75,7 @@ public class EmailService {
 	// E-MAIL DE VERIFICAÇÃO DE CADASTRO
 	// ======================================
 
+	@Async
 	public void enviarEmailDeVerificacao(String para, String nomeUsuario, String linkDeVerificacao) {
 		SimpleMailMessage message = new SimpleMailMessage();
 
@@ -98,6 +101,7 @@ public class EmailService {
 	// E-MAIL DE RESUMO DIÁRIO (ENVIADO TODOS OS DIAS ÀS 9H)
 	// ======================================
 
+	@Async
 	public void enviarResumoDiario(String para, String nomeUsuario, List<PlantWateringStatusDTO> plantas) {
 		String fraseDoDia = obterFraseAleatoria();
 
@@ -127,6 +131,7 @@ public class EmailService {
 	// E-MAIL DE DENÚNCIA / MODERAÇÃO (RF14)
 	// ======================================
 
+	@Async
 	public void enviarEmailDeDenuncia(String paraEquipe, String contentType, String contentId, String authorUsername,
 			String reporterUsername, String reason, String mensagemJustificativa, String conteudoDenunciado) {
 		SimpleMailMessage message = new SimpleMailMessage();
@@ -179,6 +184,7 @@ public class EmailService {
 	// E-MAIL DE CÓDIGO DE RECUPERAÇÃO DE SENHA (RF03)
 	// ======================================
 
+	@Async
 	public void enviarCodigoRecuperacaoSenha(String para, String nomeUsuario, String codigo) {
 		SimpleMailMessage message = new SimpleMailMessage();
 		message.setTo(para);
@@ -201,6 +207,7 @@ public class EmailService {
 	// E-MAILS DE MODERAÇÃO (RF51 / RF52)
 	// ======================================
 
+	@Async
 	public void enviarEmailBanimento(String para, String nomeUsuario, String motivo, String observacao) {
 		try {
 			SimpleMailMessage message = new SimpleMailMessage();
@@ -226,6 +233,7 @@ public class EmailService {
 		}
 	}
 
+	@Async
 	public void enviarEmailAdvertencia(String para, String nomeUsuario, String contentType, String motivo, String observacao) {
 		try {
 			SimpleMailMessage message = new SimpleMailMessage();
@@ -257,6 +265,7 @@ public class EmailService {
 	// E-MAIL GENÉRICO DE NOTIFICAÇÃO
 	// ======================================
 
+	@Async
 	public void sendEmail(String para, String assunto, String conteudo) {
 		try {
 			SimpleMailMessage message = new SimpleMailMessage();

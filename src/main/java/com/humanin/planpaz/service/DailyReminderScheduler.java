@@ -62,7 +62,6 @@ public class DailyReminderScheduler {
 	}
 
 	@Scheduled(cron = "0 0 8,14,20 * * *", zone = "America/Sao_Paulo")
-	@Transactional
 	public void atualizarLembretesPorClimaAgendado() {
 		log.info("Iniciando verificação agendada de clima para atualização de lembretes (RF24)...");
 		List<User> usuariosComLocal = userRepository.findAll().stream()
@@ -80,7 +79,6 @@ public class DailyReminderScheduler {
 	}
 
 	@Scheduled(cron = "0 0 * * * *", zone = "America/Sao_Paulo")
-	@Transactional(readOnly = true)
 	public void enviarNotificacoesPushDeRega() {
 		int horaAtual = ZonedDateTime.now(ZONE_BRASILIA).getHour();
 		log.info("Verificando lembretes push de rega para o horário {:02d}:00h...", horaAtual);
@@ -142,7 +140,6 @@ public class DailyReminderScheduler {
 	}
 
 	@Scheduled(cron = "0 0 9 * * *", zone = "America/Sao_Paulo")
-	@Transactional(readOnly = true)
 	public void enviarResumoDiarioDeRega() {
 		log.info("Iniciando envio do resumo diário de rega (09h)...");
 

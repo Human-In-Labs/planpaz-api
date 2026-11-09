@@ -5,10 +5,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.humanin.planpaz.config.CacheConfig;
 import com.humanin.planpaz.dto.AdminLoginRequestDTO;
 import com.humanin.planpaz.dto.AdminLoginResponseDTO;
 import com.humanin.planpaz.dto.AdminReportDetailDTO;
@@ -120,6 +122,7 @@ public class ModerationService {
 	}
 
 	@Transactional
+	@CacheEvict(value = CacheConfig.AUTH_PRINCIPAL_CACHE, allEntries = true)
 	public AdminReportDetailDTO reviewReport(UUID reportId, AdminReportReviewDTO dto, Admin reviewer) {
 		Report report = reportRepository.findById(reportId)
 				.orElseThrow(() -> new ResourceNotFoundException("Denúncia não encontrada com ID: " + reportId));
@@ -291,6 +294,7 @@ public class ModerationService {
 	}
 
 	@Transactional
+	@CacheEvict(value = CacheConfig.AUTH_PRINCIPAL_CACHE, allEntries = true)
 	public AdminUserManagementDTO banUser(UUID userId) {
 		User user = userRepository.findById(userId)
 				.orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado com ID: " + userId));
@@ -311,6 +315,7 @@ public class ModerationService {
 	}
 
 	@Transactional
+	@CacheEvict(value = CacheConfig.AUTH_PRINCIPAL_CACHE, allEntries = true)
 	public AdminUserManagementDTO unbanUser(UUID userId) {
 		User user = userRepository.findById(userId)
 				.orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado com ID: " + userId));

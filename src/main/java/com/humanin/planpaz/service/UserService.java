@@ -6,11 +6,15 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.humanin.planpaz.config.CacheConfig;
 import com.humanin.planpaz.dto.AchievementProgressDTO;
 import com.humanin.planpaz.dto.PublicUserProfileDTO;
+import com.humanin.planpaz.dto.RecentActivityDTO;
 import com.humanin.planpaz.dto.UserPreferencesDTO;
 import com.humanin.planpaz.dto.UserSettingsDTO;
 import com.humanin.planpaz.dto.UserStatsDTO;
@@ -18,6 +22,7 @@ import com.humanin.planpaz.dto.UserSummaryDTO;
 import com.humanin.planpaz.infra.exception.BusinessException;
 import com.humanin.planpaz.infra.exception.ResourceNotFoundException;
 import com.humanin.planpaz.model.Follow;
+import com.humanin.planpaz.model.GardenPlant;
 import com.humanin.planpaz.model.User;
 import com.humanin.planpaz.repositories.FollowRepository;
 import com.humanin.planpaz.repositories.GardenPlantRepository;
@@ -42,9 +47,11 @@ public class UserService {
 	public UserStatsDTO getUserStats(UUID targetUserId) {
 		User targetUser = findUserById(targetUserId);
 
-		List<com.humanin.planpaz.model.GardenPlant> gardenPlants = gardenPlantRepository.findByOwnerId(targetUserId);
+		List<GardenPlant> gardenPlants = gardenPlantRepository.findByOwnerId(targetUserId);
 		long totalPlants = gardenPlants.size();
 		long totalPosts = postRepository.countByAuthorId(targetUserId);
+		long followersCount = followersRepository.countByFollowed(targetUser);
+		long followingCount = followersRepository.countByFollower(targetUser);
 
 		long daysOnApp = 0;
 		if (targetUser.getCreatedAt() != null) {
@@ -52,7 +59,7 @@ public class UserService {
 		}
 
 		double totalCo2Grams = 0.0;
-		for (com.humanin.planpaz.model.GardenPlant planta : gardenPlants) {
+		for (GardenPlant planta : gardenPlants) {
 			long cultivationDays = 0;
 			if (planta.getPlantedAt() != null) {
 				cultivationDays = Math.max(0,
@@ -74,16 +81,14 @@ public class UserService {
 			userRepository.save(targetUser);
 		}
 
-		return new com.humanin.planpaz.dto.UserStatsDTO(targetUser.getId(), totalCo2Grams, totalEcoScore, totalPlants,
-				totalPosts, daysOnApp, streakCount);
+		return new UserStatsDTO(targetUser.getId(), totalCo2Grams, totalEcoScore, totalPlants,
+				totalPosts, daysOnApp, streakCount, followersCount, followingCount);
 	}
 
-	@Transactional(readOnly = true)
+	@Transactional
 	public PublicUserProfileDTO getPublicUserProfile(User currentUser, UUID targetUserId) {
 		User targetUser = findUserById(targetUserId);
 
-		long followersCount = followersRepository.countByFollowed(targetUser);
-		long followingCount = followersRepository.countByFollower(targetUser);
 		boolean isFollowing = currentUser != null
 				&& followersRepository.existsByFollowerAndFollowed(currentUser, targetUser);
 
@@ -92,20 +97,29 @@ public class UserService {
 		List<AchievementProgressDTO> achievements = achievementService.obterConquistasProgressoDoUsuario(targetUserId);
 
 		return new PublicUserProfileDTO(targetUser.getId(), targetUser.getName(), targetUser.getUsername(),
-				targetUser.getEmail(), targetUser.getBio(), targetUser.getAvatarUrl(), followersCount, followingCount,
+				targetUser.getEmail(), targetUser.getBio(), targetUser.getAvatarUrl(), stats.followersCount(), stats.followingCount(),
 				isFollowing, stats.totalPlants(), stats.totalPosts(), stats.daysOnApp(),
 				Math.round(stats.totalCo2Grams()), stats.totalEcoScore(), stats.streakCount(), achievements);
 	}
 
 	@Transactional(readOnly = true)
 	public UserSettingsDTO getUserSettings(UUID userId) {
-		User user = findUserById(userId);
+		User user = userRepository.findWithPreferencesById(userId)
+				.orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado com ID: " + userId));
+		if (user.getRoomLuminosity() != null) {
+			user.getRoomLuminosity().size();
+		}
+		if (user.getSpaceAvailability() != null) {
+			user.getSpaceAvailability().size();
+		}
 		return UserSettingsDTO.fromEntity(user);
 	}
 
 	@Transactional
+	@CacheEvict(value = CacheConfig.AUTH_PRINCIPAL_CACHE, allEntries = true)
 	public UserSettingsDTO updatePreferences(UUID userId, UserPreferencesDTO preferences) {
-		User user = findUserById(userId);
+		User user = userRepository.findWithPreferencesById(userId)
+				.orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado com ID: " + userId));
 
 		if (preferences.bio() != null)
 			user.setBio(preferences.bio());
@@ -135,12 +149,20 @@ public class UserService {
 			user.setFcmToken(preferences.fcmToken().isBlank() ? null : preferences.fcmToken().trim());
 
 		User saved = userRepository.save(user);
+		if (saved.getRoomLuminosity() != null) {
+			saved.getRoomLuminosity().size();
+		}
+		if (saved.getSpaceAvailability() != null) {
+			saved.getSpaceAvailability().size();
+		}
 		return UserSettingsDTO.fromEntity(saved);
 	}
 
 	@Transactional
+	@CacheEvict(value = CacheConfig.AUTH_PRINCIPAL_CACHE, allEntries = true)
 	public UserSettingsDTO updateSettings(UUID userId, UserSettingsDTO settings) {
-		User user = findUserById(userId);
+		User user = userRepository.findWithPreferencesById(userId)
+				.orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado com ID: " + userId));
 
 		if (settings.email() != null && !settings.email().equalsIgnoreCase(user.getEmail())) {
 			if (userRepository.existsByEmail(settings.email())) {
@@ -190,6 +212,12 @@ public class UserService {
 			user.setAvatarUrl(settings.avatarUrl());
 
 		User saved = userRepository.save(user);
+		if (saved.getRoomLuminosity() != null) {
+			saved.getRoomLuminosity().size();
+		}
+		if (saved.getSpaceAvailability() != null) {
+			saved.getSpaceAvailability().size();
+		}
 		return UserSettingsDTO.fromEntity(saved);
 	}
 
@@ -257,43 +285,36 @@ public class UserService {
 	}
 
 	@Transactional(readOnly = true)
-	public List<com.humanin.planpaz.dto.RecentActivityDTO> getFollowingActivities(UUID currentUserId) {
-		User currentUser = findUserById(currentUserId);
-		List<Follow> follows = followersRepository.findByFollower(currentUser);
-		List<UUID> followedUserIds = follows.stream()
-				.map(f -> f.getFollowed().getId())
-				.filter(id -> !id.equals(currentUserId))
-				.distinct()
-				.toList();
+	public List<RecentActivityDTO> getFollowingActivities(UUID currentUserId) {
+		List<GardenPlant> recentPlants = gardenPlantRepository.findRecentByFollowedUsers(
+				currentUserId,
+				PageRequest.of(0, 10)
+		);
 
-		if (followedUserIds.isEmpty()) {
-			return java.util.List.of();
-		}
+		return recentPlants.stream().map(p -> {
+			User targetUser = p.getOwner();
+			String speciesName = (p.getPlant() != null && p.getPlant().getName() != null)
+					? p.getPlant().getName()
+					: p.getNickname();
+			String text = "Cultivando " + (p.getNickname() != null ? p.getNickname() : speciesName);
+			String img = p.getImagePath() != null
+					? p.getImagePath()
+					: (p.getPlant() != null ? p.getPlant().getImagePath() : null);
+			LocalDateTime date = p.getPlantedAt() != null ? p.getPlantedAt() : LocalDateTime.now();
 
-		List<com.humanin.planpaz.dto.RecentActivityDTO> list = new java.util.ArrayList<>();
-
-		for (UUID targetId : followedUserIds) {
-			User targetUser = userRepository.findById(targetId).orElse(null);
-			if (targetUser == null)
-				continue;
-
-			List<com.humanin.planpaz.model.GardenPlant> plants = gardenPlantRepository.findByOwnerId(targetId);
-			for (com.humanin.planpaz.model.GardenPlant p : plants) {
-				String speciesName = (p.getPlant() != null && p.getPlant().getName() != null) ? p.getPlant().getName()
-						: p.getNickname();
-				String text = "Cultivando " + (p.getNickname() != null ? p.getNickname() : speciesName);
-				String img = p.getImagePath() != null ? p.getImagePath()
-						: (p.getPlant() != null ? p.getPlant().getImagePath() : null);
-				LocalDateTime date = p.getPlantedAt() != null ? p.getPlantedAt() : LocalDateTime.now();
-
-				list.add(new com.humanin.planpaz.dto.RecentActivityDTO("plant-" + p.getId(), targetUser.getId(),
-						targetUser.getName(), targetUser.getUsername(), targetUser.getAvatarUrl(), "NEW_PLANT", text,
-						"Plantado recentemente", img, date));
-			}
-		}
-
-		list.sort((a, b) -> b.createdAt().compareTo(a.createdAt()));
-		return list.stream().limit(10).toList();
+			return new RecentActivityDTO(
+					"plant-" + p.getId(),
+					targetUser.getId(),
+					targetUser.getName(),
+					targetUser.getUsername(),
+					targetUser.getAvatarUrl(),
+					"NEW_PLANT",
+					text,
+					"Plantado recentemente",
+					img,
+					date
+			);
+		}).toList();
 	}
 
 	private User findUserById(UUID id) {

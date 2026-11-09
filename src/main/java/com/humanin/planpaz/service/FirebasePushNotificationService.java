@@ -5,13 +5,14 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 import java.time.LocalDateTime;
+import java.util.Base64;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import com.google.auth.oauth2.GoogleCredentials;
@@ -103,6 +104,7 @@ public class FirebasePushNotificationService {
 	 * Envia uma notificação push via Firebase Cloud Messaging (FCM) sem persistir no banco.
 	 * Os metadados também são enviados no bloco data para armazenamento local no dispositivo.
 	 */
+	@Async
 	public void sendPushNotification(User recipient, String title, String body, String type) {
 		if (recipient == null) {
 			return;

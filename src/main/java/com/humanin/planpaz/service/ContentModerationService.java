@@ -25,8 +25,16 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class ContentModerationService {
 
+	private record LongForbiddenTerm(String word, String compactWord) {
+	}
+
+	private record ShortForbiddenPattern(String word, Pattern pattern) {
+	}
+
 	private final Set<String> forbiddenWords = new HashSet<>();
 	private final List<Pattern> forbiddenPatterns = new ArrayList<>();
+	private final List<LongForbiddenTerm> longForbiddenTerms = new ArrayList<>();
+	private final List<ShortForbiddenPattern> shortForbiddenPatterns = new ArrayList<>();
 
 	@PostConstruct
 	public void init() {
@@ -36,6 +44,8 @@ public class ContentModerationService {
 	public synchronized void loadForbiddenWords() {
 		forbiddenWords.clear();
 		forbiddenPatterns.clear();
+		longForbiddenTerms.clear();
+		shortForbiddenPatterns.clear();
 
 		List<String> lines = readLinesFromResourcesOrFile();
 
@@ -60,13 +70,19 @@ public class ContentModerationService {
 
 				if (!cleanToken.isEmpty()) {
 					String normalized = normalize(cleanToken);
-					if (!normalized.isEmpty()) {
-						forbiddenWords.add(normalized);
-
-						// Compile regex word boundary pattern for short words to avoid false positives
-						// inside regular words
+					if (!normalized.isEmpty() && forbiddenWords.add(normalized)) {
+						// Compile regex word boundary pattern once at startup
 						String regex = "(?i)(?:^|\\W)" + Pattern.quote(normalized) + "(?:$|\\W)";
-						forbiddenPatterns.add(Pattern.compile(regex));
+						Pattern compiled = Pattern.compile(regex);
+						forbiddenPatterns.add(compiled);
+
+						if (normalized.contains(" ") || normalized.length() >= 4) {
+							String compactWord = removeNonAlphanumeric(normalized);
+							longForbiddenTerms.add(new LongForbiddenTerm(normalized,
+									compactWord.length() >= 4 ? compactWord : ""));
+						} else {
+							shortForbiddenPatterns.add(new ShortForbiddenPattern(normalized, compiled));
+						}
 					}
 				}
 			}
@@ -130,35 +146,26 @@ public class ContentModerationService {
 		String normalizedText = normalize(text);
 		String compactText = removeNonAlphanumeric(normalizedText);
 
-		// 1. Direct search of exact normalized forbidden terms
-		for (String word : forbiddenWords) {
-			if (word.isBlank())
-				continue;
+		// 1. Expressões de múltiplas palavras ou termos longos (>= 4 letras) pré-computados
+		for (LongForbiddenTerm term : longForbiddenTerms) {
+			if (normalizedText.contains(term.word())) {
+				log.warn("[MODERATION] Conteúdo bloqueado contendo termo inadequado: {}", term.word());
+				throw new BusinessException(
+						"O conteúdo informado contém termos inadequados ou não permitidos pelas regras da comunidade PlanPaz.");
+			}
+			if (!term.compactWord().isEmpty() && compactText.contains(term.compactWord())) {
+				log.warn("[MODERATION] Conteúdo bloqueado contendo termo inadequado compactado: {}", term.word());
+				throw new BusinessException(
+						"O conteúdo informado contém termos inadequados ou não permitidos pelas regras da comunidade PlanPaz.");
+			}
+		}
 
-			// Se for uma expressão de múltiplas palavras ou termo longo (>= 4 letras),
-			// verifica inclusão no texto normalizado
-			if (word.contains(" ") || word.length() >= 4) {
-				if (normalizedText.contains(word)) {
-					log.warn("[MODERATION] Conteúdo bloqueado contendo termo inadequado: {}", word);
-					throw new BusinessException(
-							"O conteúdo informado contém termos inadequados ou não permitidos pelas regras da comunidade PlanPaz.");
-				}
-				// Verifica variação compacta (sem pontuação nem espaços, ex: f.o.d.a -> foda)
-				String compactWord = removeNonAlphanumeric(word);
-				if (compactWord.length() >= 4 && compactText.contains(compactWord)) {
-					log.warn("[MODERATION] Conteúdo bloqueado contendo termo inadequado compactado: {}", word);
-					throw new BusinessException(
-							"O conteúdo informado contém termos inadequados ou não permitidos pelas regras da comunidade PlanPaz.");
-				}
-			} else {
-				// Para termos muito curtos (ex: cu, krl, prr, fdp), usa limite de palavra (\b)
-				// para evitar falsos positivos
-				Pattern pattern = Pattern.compile("(?i)(?:^|\\W)" + Pattern.quote(word) + "(?:$|\\W)");
-				if (pattern.matcher(normalizedText).find()) {
-					log.warn("[MODERATION] Conteúdo bloqueado contendo termo curto inadequado: {}", word);
-					throw new BusinessException(
-							"O conteúdo informado contém termos inadequados ou não permitidos pelas regras da comunidade PlanPaz.");
-				}
+		// 2. Termos curtos pré-compilados com limite de palavra
+		for (ShortForbiddenPattern shortTerm : shortForbiddenPatterns) {
+			if (shortTerm.pattern().matcher(normalizedText).find()) {
+				log.warn("[MODERATION] Conteúdo bloqueado contendo termo curto inadequado: {}", shortTerm.word());
+				throw new BusinessException(
+						"O conteúdo informado contém termos inadequados ou não permitidos pelas regras da comunidade PlanPaz.");
 			}
 		}
 	}

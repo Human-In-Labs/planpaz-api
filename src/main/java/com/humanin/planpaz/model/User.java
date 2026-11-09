@@ -75,13 +75,13 @@ public class User {
 	@Column(name = "main_goal")
 	private MainGoal mainGoal;
 
-	@ElementCollection(targetClass = RoomLuminosity.class, fetch = FetchType.EAGER)
+	@ElementCollection(targetClass = RoomLuminosity.class, fetch = FetchType.LAZY)
 	@CollectionTable(name = "user_room_luminosity", joinColumns = @JoinColumn(name = "user_id"))
 	@Enumerated(EnumType.STRING)
 	@Column(name = "luminosity")
 	private Set<RoomLuminosity> roomLuminosity = new HashSet<>();
 
-	@ElementCollection(targetClass = SpaceAvailability.class, fetch = FetchType.EAGER)
+	@ElementCollection(targetClass = SpaceAvailability.class, fetch = FetchType.LAZY)
 	@CollectionTable(name = "user_space_availability", joinColumns = @JoinColumn(name = "user_id"))
 	@Enumerated(EnumType.STRING)
 	@Column(name = "space")

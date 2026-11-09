@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -12,10 +11,10 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.humanin.planpaz.dto.GardenRemindersResponseDTO;
 import com.humanin.planpaz.dto.WateringReminderDTO;
 import com.humanin.planpaz.dto.WeatherRemindersSyncDTO;
 import com.humanin.planpaz.dto.WeatherResponseDTO;
-import com.humanin.planpaz.infra.exception.BusinessException;
 import com.humanin.planpaz.infra.exception.WateringNotAllowedException;
 import com.humanin.planpaz.model.GardenPlant;
 import com.humanin.planpaz.model.PlantCareLog;
@@ -98,6 +97,41 @@ public class WateringService {
 	}
 
 	// ============================
+	// RETORNAR TODOS OS LEMBRETES DO JARDIM EM LOTE (OPT-02)
+	// ============================
+
+	@Transactional(readOnly = true)
+	public GardenRemindersResponseDTO getAllGardenReminders(UUID ownerId, int countPerPlant) {
+		List<GardenPlant> plants = gardenPlantRepository.findByOwnerId(ownerId);
+		if (plants.isEmpty()) {
+			return new GardenRemindersResponseDTO(0, List.of());
+		}
+
+		boolean arSeco = false;
+		try {
+			User owner = plants.get(0).getOwner();
+			if (owner == null) {
+				owner = userRepository.findById(ownerId).orElse(null);
+			}
+			WeatherResponseDTO clima = consultarClimaLocal(owner, null, null, null);
+			if (clima != null && clima.getUmidade() != null && clima.getUmidade() < 40) {
+				arSeco = true;
+			}
+		} catch (Exception ignored) {}
+
+		int safeCount = Math.max(1, countPerPlant);
+		List<WateringReminderDTO> allReminders = new ArrayList<>();
+
+		for (GardenPlant plant : plants) {
+			if (plant.getWateringNotification() == null || plant.getWateringNotification()) {
+				allReminders.addAll(calculateNextWaterings(plant, safeCount, arSeco));
+			}
+		}
+
+		return new GardenRemindersResponseDTO(plants.size(), allReminders);
+	}
+
+	// ============================
 	// RETONAR AS PRÓXIMAS 4 REGAS DE UMA PLANTA DO MEU JARDIM
 	// ============================
 
@@ -162,6 +196,10 @@ public class WateringService {
 				? planta.getImagePath()
 				: (planta.getPlant() != null ? planta.getPlant().getImagePath() : null);
 
+		String plantNickname = (planta.getNickname() != null && !planta.getNickname().isBlank())
+				? planta.getNickname()
+				: (planta.getPlant() != null && planta.getPlant().getName() != null ? planta.getPlant().getName() : "Planta");
+
 		DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM");
 		DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
 
@@ -176,7 +214,7 @@ public class WateringService {
 			lembretes.add(new WateringReminderDTO(
 					0,
 					planta.getId(),
-					planta.getNickname(),
+					plantNickname,
 					imagem,
 					hoje.format(dateFormatter),
 					horario,
@@ -202,7 +240,7 @@ public class WateringService {
 			lembretes.add(new WateringReminderDTO(
 					i,
 					planta.getId(),
-					planta.getNickname(),
+					plantNickname,
 					imagem,
 					dataLembrete.format(dateFormatter),
 					horario,

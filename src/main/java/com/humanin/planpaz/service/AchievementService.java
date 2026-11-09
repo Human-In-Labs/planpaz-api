@@ -1,9 +1,9 @@
 package com.humanin.planpaz.service;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -11,10 +11,12 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.humanin.planpaz.config.CacheConfig;
 import com.humanin.planpaz.dto.AchievementProgressDTO;
 import com.humanin.planpaz.infra.exception.ResourceNotFoundException;
 import com.humanin.planpaz.model.Achievement;
@@ -116,9 +118,21 @@ public class AchievementService {
 		// Métricas do usuário
 		List<GardenPlant> plants = gardenPlantRepository.findByOwnerId(userId);
 		long totalPlants = plants.size();
-		long waterings = plantCareLogRepository.countByUserIdAndCareType(userId, CareType.WATERING);
-		long fertilizings = plantCareLogRepository.countByUserIdAndCareType(userId, CareType.FERTILIZING);
-		long prunings = plantCareLogRepository.countByUserIdAndCareType(userId, CareType.PRUNING);
+
+		Map<CareType, Long> careCounts = new EnumMap<>(CareType.class);
+		List<Object[]> groupedCare = plantCareLogRepository.countByUserIdGroupByCareType(userId);
+		if (groupedCare != null && !groupedCare.isEmpty()) {
+			for (Object[] row : groupedCare) {
+				if (row != null && row.length >= 2 && row[0] instanceof CareType type && row[1] instanceof Number count) {
+					careCounts.put(type, count.longValue());
+				}
+			}
+		}
+
+		long waterings = careCounts.getOrDefault(CareType.WATERING, 0L);
+		long fertilizings = careCounts.getOrDefault(CareType.FERTILIZING, 0L);
+		long prunings = careCounts.getOrDefault(CareType.PRUNING, 0L);
+
 		long totalPosts = postRepository.countByAuthorId(userId);
 		long totalComments = commentRepository.countByAuthorId(userId);
 
@@ -179,10 +193,42 @@ public class AchievementService {
 		return result;
 	}
 
+	/**
+	 * Calcula o progresso uma única vez, concede quaisquer conquistas recém-atingidas in-place
+	 * e retorna a lista completa atualizada (evitando dupla execução no controller).
+	 */
+	@Transactional
+	public List<AchievementProgressDTO> syncAndGetProgress(UUID userId) {
+		List<AchievementProgressDTO> progressList = obterConquistasProgressoDoUsuario(userId);
+		List<AchievementProgressDTO> updatedList = new ArrayList<>(progressList.size());
+
+		for (AchievementProgressDTO dto : progressList) {
+			if (!dto.isUnlocked() && dto.getProgress() >= dto.getMaxProgress()) {
+				UserAchievement newUa = concederConquista(userId, dto.getName(), dto.getDescription());
+				if (newUa != null) {
+					log.info("Conquista '{}' desbloqueada para o usuário ID {}", dto.getName(), userId);
+					updatedList.add(AchievementProgressDTO.builder()
+							.id(newUa.getAchievement().getId())
+							.name(dto.getName())
+							.description(dto.getDescription())
+							.icon(dto.getIcon())
+							.unlocked(true)
+							.unlockedAt(newUa.getUnlockedAt())
+							.progress(dto.getMaxProgress())
+							.maxProgress(dto.getMaxProgress())
+							.build());
+					continue;
+				}
+			}
+			updatedList.add(dto);
+		}
+
+		return updatedList;
+	}
+
 	@Transactional
 	public List<AchievementProgressDTO> obterConquistasDesbloqueadasDoUsuario(UUID userId) {
-		checkAndGrantAll(userId);
-		return obterConquistasProgressoDoUsuario(userId).stream()
+		return syncAndGetProgress(userId).stream()
 				.filter(AchievementProgressDTO::isUnlocked)
 				.toList();
 	}
@@ -293,10 +339,7 @@ public class AchievementService {
 				? Math.max(1, ChronoUnit.DAYS.between(user.getCreatedAt().toLocalDate(), LocalDate.now(StreakService.ZONE_BRASILIA)) + 1)
 				: 1;
 
-		long diasDistintosDeCuidado = plantCareLogRepository.findByUserId(userId).stream()
-				.map(log -> log.getPerformedAt().toLocalDate())
-				.distinct()
-				.count();
+		long diasDistintosDeCuidado = plantCareLogRepository.countDistinctCareDaysByUserId(userId);
 
 		long maxDiasPossiveis = Math.max(diasDesdeCriacao, diasDistintosDeCuidado);
 
@@ -332,6 +375,7 @@ public class AchievementService {
 	}
 
 	@Transactional(readOnly = true)
+	@Cacheable(value = CacheConfig.ACHIEVEMENTS_DEF_CACHE, key = "'all'", unless = "#result == null || #result.isEmpty()")
 	public List<Achievement> listarTodas() {
 		return achievementRepository.findAll();
 	}

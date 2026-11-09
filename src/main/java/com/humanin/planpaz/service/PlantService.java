@@ -5,9 +5,16 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.humanin.planpaz.config.CacheConfig;
 import com.humanin.planpaz.dto.PlantResponseDTO;
 import com.humanin.planpaz.infra.exception.BusinessException;
 import com.humanin.planpaz.infra.exception.ResourceNotFoundException;
@@ -29,7 +36,15 @@ public class PlantService {
 	public final PlantRepository plantRepository;
 	public final UserRepository userRepository;
 
+	@Autowired(required = false)
+	private CacheManager cacheManager;
+
 	@Transactional
+	@Caching(evict = {
+			@CacheEvict(value = CacheConfig.PLANT_CATALOG_CACHE, allEntries = true),
+			@CacheEvict(value = CacheConfig.PLANT_STAGES_CACHE, allEntries = true),
+			@CacheEvict(value = CacheConfig.PLANT_CARE_CACHE, allEntries = true)
+	})
 	public PlantResponseDTO adicionarPlanta(com.humanin.planpaz.dto.PlantCreateDTO dto) {
 		if (plantRepository.existsByNameIgnoreCase(dto.name())) {
 			throw new BusinessException("Já existe uma planta com esse nome.");
@@ -38,6 +53,11 @@ public class PlantService {
 		return PlantResponseDTO.fromEntity(saved);
 	}
 
+	@Caching(evict = {
+			@CacheEvict(value = CacheConfig.PLANT_CATALOG_CACHE, allEntries = true),
+			@CacheEvict(value = CacheConfig.PLANT_STAGES_CACHE, allEntries = true),
+			@CacheEvict(value = CacheConfig.PLANT_CARE_CACHE, allEntries = true)
+	})
 	public Plant adicionarPlanta(Plant planta) {
 		if (plantRepository.existsByNameIgnoreCase(planta.getName())) {
 			throw new BusinessException("Já existe uma planta com esse nome.");
@@ -46,8 +66,21 @@ public class PlantService {
 		return plantRepository.save(planta);
 	}
 
+	@Cacheable(value = CacheConfig.PLANT_CATALOG_CACHE, key = "'all'", unless = "#result == null || #result.isEmpty()")
+	@SuppressWarnings("unchecked")
 	public List<Plant> listarPlantas() {
-		return plantRepository.findAll();
+		Cache cache = cacheManager != null ? cacheManager.getCache(CacheConfig.PLANT_CATALOG_CACHE) : null;
+		if (cache != null) {
+			List<Plant> cached = cache.get("all", List.class);
+			if (cached != null && !cached.isEmpty()) {
+				return cached;
+			}
+		}
+		List<Plant> all = plantRepository.findAll();
+		if (cache != null && !all.isEmpty()) {
+			cache.put("all", all);
+		}
+		return all;
 	}
 
 	@Transactional(readOnly = true)
@@ -57,9 +90,9 @@ public class PlantService {
 		User user = null;
 		if (userParam != null) {
 			if (userParam.getId() != null) {
-				user = userRepository.findById(userParam.getId()).orElse(null);
+				user = userRepository.findWithPreferencesById(userParam.getId()).orElse(null);
 			} else if (userParam.getEmail() != null) {
-				user = userRepository.findByEmail(userParam.getEmail()).orElse(null);
+				user = userRepository.findWithPreferencesByEmail(userParam.getEmail()).orElse(null);
 			}
 		}
 
@@ -78,7 +111,7 @@ public class PlantService {
 		Size size = parseEnum(Size.class, sizeStr);
 		TemperatureLevel temperature = parseEnum(TemperatureLevel.class, temperatureStr);
 
-		List<Plant> plantas = plantRepository.findAll();
+		List<Plant> plantas = listarPlantas();
 		final User finalUser = user;
 
 		// Verifica se o usuário tem algum perfil configurado
@@ -192,6 +225,11 @@ public class PlantService {
 		return score;
 	}
 
+	@Caching(evict = {
+			@CacheEvict(value = CacheConfig.PLANT_CATALOG_CACHE, allEntries = true),
+			@CacheEvict(value = CacheConfig.PLANT_STAGES_CACHE, allEntries = true),
+			@CacheEvict(value = CacheConfig.PLANT_CARE_CACHE, allEntries = true)
+	})
 	public Plant editarPlanta(Plant planta) {
 		Plant novaPlanta = plantRepository.findById(planta.getId())
 				.orElseThrow(() -> new ResourceNotFoundException("Planta não encontrada com ID: " + planta.getId()));
@@ -215,6 +253,11 @@ public class PlantService {
 	}
 
 	@Transactional
+	@Caching(evict = {
+			@CacheEvict(value = CacheConfig.PLANT_CATALOG_CACHE, allEntries = true),
+			@CacheEvict(value = CacheConfig.PLANT_STAGES_CACHE, allEntries = true),
+			@CacheEvict(value = CacheConfig.PLANT_CARE_CACHE, allEntries = true)
+	})
 	public PlantResponseDTO editarPlanta(UUID id, com.humanin.planpaz.dto.PlantUpdateDTO dto) {
 		Plant novaPlanta = plantRepository.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException("Planta não encontrada com ID: " + id));
@@ -240,6 +283,11 @@ public class PlantService {
 		return PlantResponseDTO.fromEntity(saved);
 	}
 
+	@Caching(evict = {
+			@CacheEvict(value = CacheConfig.PLANT_CATALOG_CACHE, allEntries = true),
+			@CacheEvict(value = CacheConfig.PLANT_STAGES_CACHE, allEntries = true),
+			@CacheEvict(value = CacheConfig.PLANT_CARE_CACHE, allEntries = true)
+	})
 	public void excluirPlanta(UUID idPlanta) {
 		if (!plantRepository.existsById(idPlanta)) {
 			throw new ResourceNotFoundException("Planta não encontrada com ID: " + idPlanta);
@@ -248,11 +296,13 @@ public class PlantService {
 		plantRepository.deleteById(idPlanta);
 	}
 
+	@Cacheable(value = CacheConfig.PLANT_CATALOG_CACHE, key = "'entity:' + #id", unless = "#result == null")
 	public Plant buscarPorId(UUID id) {
 		return plantRepository.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException("Planta não encontrada com ID: " + id));
 	}
 
+	@Cacheable(value = CacheConfig.PLANT_CATALOG_CACHE, key = "'dto:' + #id", unless = "#result == null")
 	public PlantResponseDTO buscarDTOPorId(UUID id) {
 		return PlantResponseDTO.fromEntity(buscarPorId(id));
 	}

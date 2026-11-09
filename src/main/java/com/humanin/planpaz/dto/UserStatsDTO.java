@@ -9,5 +9,19 @@ public record UserStatsDTO(
 		long totalPlants,
 		long totalPosts,
 		long daysOnApp,
-		int streakCount
-) {}
+		int streakCount,
+		long followersCount,
+		long followingCount
+) {
+	public UserStatsDTO(
+			UUID userId,
+			double totalCo2Grams,
+			int totalEcoScore,
+			long totalPlants,
+			long totalPosts,
+			long daysOnApp,
+			int streakCount
+	) {
+		this(userId, totalCo2Grams, totalEcoScore, totalPlants, totalPosts, daysOnApp, streakCount, 0L, 0L);
+	}
+}

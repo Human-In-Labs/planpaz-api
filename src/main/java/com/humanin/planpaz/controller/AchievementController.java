@@ -37,15 +37,13 @@ public class AchievementController {
 	@GetMapping("/me")
 	public ResponseEntity<List<AchievementProgressDTO>> getMyAchievementsProgress(Authentication authentication) {
 		User user = getAuthenticatedUser(authentication);
-		achievementService.checkAndGrantAll(user.getId());
-		List<AchievementProgressDTO> conquistas = achievementService.obterConquistasProgressoDoUsuario(user.getId());
+		List<AchievementProgressDTO> conquistas = achievementService.syncAndGetProgress(user.getId());
 		return ResponseEntity.ok(conquistas);
 	}
 
 	@GetMapping("/user/{userId}")
 	public ResponseEntity<List<AchievementProgressDTO>> getUserAchievementsProgress(@PathVariable UUID userId) {
-		achievementService.checkAndGrantAll(userId);
-		List<AchievementProgressDTO> conquistas = achievementService.obterConquistasProgressoDoUsuario(userId);
+		List<AchievementProgressDTO> conquistas = achievementService.syncAndGetProgress(userId);
 		return ResponseEntity.ok(conquistas);
 	}
 

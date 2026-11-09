@@ -2,8 +2,14 @@ package com.humanin.planpaz.repositories;
 
 import com.humanin.planpaz.model.Like;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 public interface LikeRepository extends JpaRepository<Like, UUID> {
@@ -20,7 +26,13 @@ public interface LikeRepository extends JpaRepository<Like, UUID> {
 	// Conta o total de curtidas recebidas em todas as publicações de um autor
 	long countByPostAuthorId(UUID authorId);
 
-	@org.springframework.data.jpa.repository.Modifying
-	@org.springframework.data.jpa.repository.Query("DELETE FROM Like l WHERE l.post.id = :postId")
-	void deleteByPostId(@org.springframework.data.repository.query.Param("postId") UUID postId);
+	@Query("SELECT l.post.id, COUNT(l) FROM Like l WHERE l.post.id IN :postIds GROUP BY l.post.id")
+	List<Object[]> countByPostIds(@Param("postIds") Collection<UUID> postIds);
+
+	@Query("SELECT l.post.id FROM Like l WHERE l.author.id = :authorId AND l.post.id IN :postIds")
+	Set<UUID> findLikedPostIds(@Param("authorId") UUID authorId, @Param("postIds") Collection<UUID> postIds);
+
+	@Modifying
+	@Query("DELETE FROM Like l WHERE l.post.id = :postId")
+	void deleteByPostId(@Param("postId") UUID postId);
 }

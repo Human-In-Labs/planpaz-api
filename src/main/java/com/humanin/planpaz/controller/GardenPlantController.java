@@ -20,6 +20,7 @@ import com.humanin.planpaz.dto.ApiResponseDTO;
 import com.humanin.planpaz.dto.GardenPlantCreateDTO;
 import com.humanin.planpaz.dto.GardenPlantResponseDTO;
 import com.humanin.planpaz.dto.GardenPlantUpdateDTO;
+import com.humanin.planpaz.dto.GardenRemindersResponseDTO;
 import com.humanin.planpaz.dto.PlantStatsDTO;
 import com.humanin.planpaz.dto.StageSuggestionDTO;
 import com.humanin.planpaz.dto.WateringReminderDTO;
@@ -75,6 +76,18 @@ public class GardenPlantController {
 		User user = getAuthenticatedUser(authentication);
 		List<GardenPlantResponseDTO> plantas = gardenPlantService.listarPorUsuarioDTO(user.getId());
 		return ResponseEntity.ok(plantas);
+	}
+
+	// =========================
+	// RETORNAR TODOS OS LEMBRETES DO JARDIM EM LOTE (OPT-02)
+	// =========================
+
+	@GetMapping("/reminders")
+	public ResponseEntity<GardenRemindersResponseDTO> getGardenReminders(
+			@RequestParam(defaultValue = "1") int count,
+			Authentication authentication) {
+		User user = getAuthenticatedUser(authentication);
+		return ResponseEntity.ok(wateringService.getAllGardenReminders(user.getId(), count));
 	}
 
 	// =========================

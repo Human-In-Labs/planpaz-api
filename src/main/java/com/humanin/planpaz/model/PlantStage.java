@@ -10,6 +10,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -19,7 +20,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "plant_stage")
+@Table(name = "plant_stage", indexes = {
+		@Index(name = "idx_plant_stage_plant_order", columnList = "plant_id, \"order\"")
+})
 @Getter
 @Setter
 @AllArgsConstructor

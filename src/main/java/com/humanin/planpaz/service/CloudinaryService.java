@@ -4,10 +4,11 @@ import java.io.IOException;
 import java.util.Map;
 
 import org.springframework.stereotype.Service;
-import com.cloudinary.utils.ObjectUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.cloudinary.Cloudinary;
+import com.cloudinary.Transformation;
+import com.cloudinary.utils.ObjectUtils;
 import com.humanin.planpaz.infra.exception.BusinessException;
 
 import lombok.RequiredArgsConstructor;
@@ -24,7 +25,13 @@ public class CloudinaryService {
 		}
 		try {
 			Map<?, ?> uploadResult = cloudinary.uploader().upload(file.getBytes(),
-					ObjectUtils.asMap("resource_type", "auto"));
+					ObjectUtils.asMap(
+							"resource_type", "auto",
+							"transformation", new Transformation<>()
+									.width(1920)
+									.height(1920)
+									.crop("limit")
+									.quality("auto:good")));
 			String secureUrl = (String) uploadResult.get("secure_url");
 			if (secureUrl == null || secureUrl.isBlank()) {
 				secureUrl = (String) uploadResult.get("url");

@@ -10,6 +10,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -20,7 +21,8 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "follow", uniqueConstraints = {
-		@UniqueConstraint(name = "uk_follower_followed", columnNames = { "follower_id", "followed_id" }) })
+		@UniqueConstraint(name = "uk_follower_followed", columnNames = { "follower_id", "followed_id" }) }, indexes = {
+		@Index(name = "idx_follow_followed_id", columnList = "followed_id") })
 @Getter
 @Setter
 @NoArgsConstructor

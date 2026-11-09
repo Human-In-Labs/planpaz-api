@@ -1,6 +1,9 @@
 package com.humanin.planpaz.service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.data.domain.Page;
@@ -77,8 +80,29 @@ public class CommentService {
 	@Transactional(readOnly = true)
 	public Page<CommentResponseDTO> getPostComments(UUID postId, int page, int size) {
 		Pageable pageable = PageRequest.of(page, size);
-		return commentRepository.findByPostIdAndParentCommentIsNullOrderByCommentedAtDesc(postId, pageable)
-				.map(CommentResponseDTO::fromEntity);
+		Page<Comment> parentPage = commentRepository.findByPostIdAndParentCommentIsNullOrderByCommentedAtDesc(postId, pageable);
+
+		if (parentPage.isEmpty()) {
+			return parentPage.map(CommentResponseDTO::fromEntity);
+		}
+
+		List<UUID> parentIds = parentPage.getContent().stream().map(Comment::getId).toList();
+		List<Comment> allReplies = commentRepository.findByParentCommentIdInOrderByCommentedAtAsc(parentIds);
+
+		Map<UUID, List<CommentResponseDTO>> repliesByParentId = new HashMap<>();
+		for (Comment reply : allReplies) {
+			if (reply.getParentComment() != null && reply.getParentComment().getId() != null) {
+				UUID parentId = reply.getParentComment().getId();
+				repliesByParentId.computeIfAbsent(parentId, k -> new ArrayList<>())
+						.add(CommentResponseDTO.fromEntity(reply));
+			}
+		}
+
+		return parentPage.map(parent -> {
+			CommentResponseDTO dto = CommentResponseDTO.fromEntity(parent);
+			dto.setReplies(repliesByParentId.getOrDefault(parent.getId(), new ArrayList<>()));
+			return dto;
+		});
 	}
 
 	@Transactional(readOnly = true)

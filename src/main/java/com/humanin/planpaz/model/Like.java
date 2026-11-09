@@ -13,6 +13,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -24,7 +25,8 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "likes", uniqueConstraints = {
-		@UniqueConstraint(name = "uk_like_author_post", columnNames = { "author_id", "post_id" }) })
+		@UniqueConstraint(name = "uk_like_author_post", columnNames = { "author_id", "post_id" }) }, indexes = {
+		@Index(name = "idx_likes_post_id", columnList = "post_id") })
 @Getter
 @Setter
 @AllArgsConstructor

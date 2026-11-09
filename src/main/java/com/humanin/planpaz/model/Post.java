@@ -16,6 +16,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -25,7 +26,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "post")
+@Table(name = "post", indexes = {
+		@Index(name = "idx_post_posted_at", columnList = "posted_at"),
+		@Index(name = "idx_post_author_posted_at", columnList = "author_id, posted_at")
+})
 @Getter
 @Setter
 @AllArgsConstructor

@@ -1,6 +1,10 @@
 package com.humanin.planpaz.service;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.data.domain.Page;
@@ -66,7 +70,7 @@ public class PostService {
 			// ignore
 		}
 
-		PostResponseDTO response = mapToDTO(savedPost, dto.getAuthorId());
+		PostResponseDTO response = PostResponseDTO.fromEntity(savedPost, 0L, false, 0L);
 		if (unlockedList != null && !unlockedList.isEmpty()) {
 			response.setUnlockedAchievement(unlockedList.get(0));
 			response.setUnlockedAchievements(unlockedList);
@@ -86,7 +90,7 @@ public class PostService {
 		} else {
 			posts = postRepository.findAllByOrderByPostedAtDesc(pageable);
 		}
-		return posts.map(post -> mapToDTO(post, currentUserId));
+		return mapPageToDTOs(posts, currentUserId);
 	}
 
 	@Transactional(readOnly = true)
@@ -102,8 +106,8 @@ public class PostService {
 	@Transactional(readOnly = true)
 	public Page<PostResponseDTO> getPostsByAuthor(UUID authorId, int page, int size, UUID currentUserId) {
 		Pageable pageable = PageRequest.of(page, size);
-		return postRepository.findByAuthorIdOrderByPostedAtDesc(authorId, pageable)
-				.map(post -> mapToDTO(post, currentUserId));
+		Page<Post> posts = postRepository.findByAuthorIdOrderByPostedAtDesc(authorId, pageable);
+		return mapPageToDTOs(posts, currentUserId);
 	}
 
 	@Transactional(readOnly = true)
@@ -125,6 +129,39 @@ public class PostService {
 		likeRepository.deleteByPostId(postId);
 		commentRepository.deleteByPostId(postId);
 		postRepository.delete(post);
+	}
+
+	private Page<PostResponseDTO> mapPageToDTOs(Page<Post> postsPage, UUID currentUserId) {
+		if (postsPage.isEmpty()) {
+			return postsPage.map(post -> PostResponseDTO.fromEntity(post, 0L, false, 0L));
+		}
+
+		List<UUID> postIds = postsPage.getContent().stream().map(Post::getId).toList();
+
+		Map<UUID, Long> likesCountMap = new HashMap<>();
+		for (Object[] row : likeRepository.countByPostIds(postIds)) {
+			if (row != null && row.length >= 2 && row[0] instanceof UUID postId && row[1] instanceof Number count) {
+				likesCountMap.put(postId, count.longValue());
+			}
+		}
+
+		Set<UUID> likedPostIds = currentUserId != null
+				? likeRepository.findLikedPostIds(currentUserId, postIds)
+				: Collections.emptySet();
+
+		Map<UUID, Long> commentsCountMap = new HashMap<>();
+		for (Object[] row : commentRepository.countByPostIds(postIds)) {
+			if (row != null && row.length >= 2 && row[0] instanceof UUID postId && row[1] instanceof Number count) {
+				commentsCountMap.put(postId, count.longValue());
+			}
+		}
+
+		return postsPage.map(post -> {
+			long likesCount = likesCountMap.getOrDefault(post.getId(), 0L);
+			boolean likedByCurrentUser = likedPostIds != null && likedPostIds.contains(post.getId());
+			long commentsCount = commentsCountMap.getOrDefault(post.getId(), 0L);
+			return PostResponseDTO.fromEntity(post, likesCount, likedByCurrentUser, commentsCount);
+		});
 	}
 
 	private PostResponseDTO mapToDTO(Post post, UUID currentUserId) {
